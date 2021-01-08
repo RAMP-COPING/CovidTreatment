@@ -383,23 +383,59 @@ Check if anyone has not received help at all having sought it, check proportion 
 
 ```
 
-
 ##### Client level vs systemic barriers
 identify if treatment was received when sought according to category
 
-NEED TO GO BACK AND GET THESE VARIABLES. CHECK ALICIA AND LAURA SCRIPT FOR NAMING ETC
-```{r dummy type of barriers}
-# 
-# treat_dat <- treat_dat %>%
-#   mutate(TypeReceived  = case_when( == 1 ~ "Systemic",
-#                                 == 1 ~ "Systemic",
-#                                  == 1 ~ "Systemic",
-#                                  == 1 ~ "Systemic",
-#                                  == 1 ~ "Client-level",
-#                                  == 1 ~ "Client-level",
-#                                 == 1 ~ "Client-level",
-#                                  == 1 ~ "Client-level"))
+```{r run script to relabel and clean treatment hep and barrier factors}
+setwd(wd)
+## factorise and label barrier and helpfulness 
+source("./scripts/relabel_barriers_help_factors.R")
 
+```
+
+Identify whether barriers are systemic or client-level
+```{r dummy type of barriers}
+## systemic
+treat_dat[grep("prevent",names(treat_dat))] <- apply(treat_dat[grep("prevent",names(treat_dat))], 2, function(x) 
+  ifelse(x == "Could not get an appointment","Systemic",x))
+
+treat_dat[grep("prevent",names(treat_dat))] <- apply(treat_dat[grep("prevent",names(treat_dat))], 2, function(x) 
+  ifelse(x == "Waiting list was too long","Systemic",x))
+
+treat_dat[grep("prevent",names(treat_dat))] <- apply(treat_dat[grep("prevent",names(treat_dat))], 2, function(x) 
+  ifelse(x == "Was assessed and was unable to be offered support","Systemic",x))
+
+treat_dat[grep("prevent",names(treat_dat))] <- apply(treat_dat[grep("prevent",names(treat_dat))], 2, function(x) 
+  ifelse(x == "Support option was unavailable when tried to access it","Systemic",x))
+
+## client level
+treat_dat[grep("prevent",names(treat_dat))] <- apply(treat_dat[grep("prevent",names(treat_dat))], 2, function(x) 
+  ifelse(x == "None of the support options were relevant","Client-level",x))
+
+treat_dat[grep("prevent",names(treat_dat))] <- apply(treat_dat[grep("prevent",names(treat_dat))], 2, function(x) 
+  ifelse(x == "Didn't feel well enough to engage","Client-level",x))
+
+treat_dat[grep("prevent",names(treat_dat))] <- apply(treat_dat[grep("prevent",names(treat_dat))], 2, function(x) 
+  ifelse(x == "Was too busy to engage","Client-level",x))
+
+treat_dat[grep("prevent",names(treat_dat))] <- apply(treat_dat[grep("prevent",names(treat_dat))], 2, function(x) 
+  ifelse(x == "Felt better","Client-level",x))
+
+```
+
+##### total barriers that are client focused or systemic by wave
+
+Create dummy variables indicating systemic and client barriers in a column each
+```{r dummy variables for overall rates of  client or systemic barriers}
+
+systemic <- rowSums(sapply(treat_dat[grep("prevent",names(treat_dat))], function(v) v %in% c("Systemic")))
+treat_dat$BarrierToTreatment.Systemic <- ifelse(systemic>0,1,0)
+
+client <- rowSums(sapply(treat_dat[grep("prevent",names(treat_dat))], function(v) v %in% c("Client-level")))
+treat_dat$BarrierToTreatment.Client <- ifelse(client>0,1,0)
+
+other <- rowSums(sapply(treat_dat[grep("prevent",names(treat_dat))], function(v) v %in% c("Other")))
+treat_dat$BarrierToTreatment.Other <- ifelse(other>0,1,0)
 ```
 
 # Aim 1 analyses
@@ -432,7 +468,33 @@ Number of people who sought treatment at any point during the pandemic
 
 ```
 
-### Number of times sought treatment (relative to number of times I responded)
+### Frequency of systemic / client barriers by wave
+Barriers to receiving treatment by wave.
+
+Systemic
+```{r check barriers by wave systemic}
+treat_dat %>%
+  group_by(wave) %>%
+  freq(BarrierToTreatment.Systemic)
+```
+Client
+```{r check barriers by wave client}
+
+treat_dat %>%
+  group_by(wave) %>%
+  freq(BarrierToTreatment.Client)
+
+```
+
+Other
+```{r check barriers by wave other}
+treat_dat %>%
+  group_by(wave) %>%
+  freq(BarrierToTreatment.Other)
+```
+
+
+### Number of times sought treatment (relative to number of times responded)
 
 
 ### Frequency of reasons for seeking treatment (by wave)
@@ -445,6 +507,15 @@ treat_dat %>%
 
 ```
 
+### Frequency of type of treatment sought
+
+```{r freq treatment type}
+
+treat_dat %>%
+  group_by(wave) %>%
+  freq(TypeSought)
+
+```
 ### Frequency of reasons for seeking treatment (by wave, by treatment seeking numbers)
 Note: Some people may have sought help more than once for more than one reason
 

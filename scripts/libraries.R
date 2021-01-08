@@ -40,8 +40,17 @@ if(!require(summarytools)){
   library(summarytools)
 }
 
-
 if(!require(skimr)){
   install.packages("skimr")
   library(skimr)
+}
+
+if(!require(lfactors)){
+  install.packages("lfactors")
+  library(lfactors)
+}
+
+if(!require(Rfast)){
+  install.packages("Rfast")
+  library(Rfast)
 }
