@@ -52,9 +52,19 @@ Will submit to Psychological Medicine in first instance
 
 # set up 
 
-```{r source file path}
+Clear global environment
+```{r Clear global environment}
+remove(list = ls())
+```
+
+## Call in set up scripts
+
+```{r source files}
 #source data directory: data_path
 source("/Users/kirstin/Dropbox/SGDP/RAMP/Projects/Treatment/file_paths.R")
+setwd(wd)
+source("./scripts/palettes.R")
+source("./scripts/libraries.R")
 
 ```
 
@@ -63,52 +73,19 @@ source("/Users/kirstin/Dropbox/SGDP/RAMP/Projects/Treatment/file_paths.R")
 knitr::opts_chunk$set(echo = FALSE,
                       comment=NA,
                       prompt=FALSE,
-                      cache=FALSE)
+                      cache=FALSE,
+                      root.dir=wd)
 
 knitr::opts_chunk$set(fig.path="figures/")
-setwd(wd)
+
 
 
 options(bitmapType = 'quartz') # to render fonts better
 ```
 
-Clear global environment
-```{r Clear global environment}
-remove(list = ls())
-```
-
 Retrieve the current date to use it for file endings to not overwrite files when one exports files
 ```{r Recent date}
 date = Sys.Date()
-```
-
-#Packages
-Install packages (if they are not available in your version of R)
-```{r Installing packages}
-#install.packages("summarytools")
-#install.packages("tidyverse")
-#install.packages("psych")
-#install.packages("broom")
-#install.packages("skimr")
-#install.packages("polycor")
-#install.packages("corrplot")
-#install.packages("patchwork")
-#install.packages("ggpubr")
-```
-
-Load packages
-```{r Load packages}
-library(knitr)
-library(summarytools)
-library(psych)
-library(polycor)
-library(corrplot)
-library(patchwork)
-library(broom)
-library(tidyverse)
-library(ggpubr)
-
-
 ```
 
 # R functions
@@ -123,80 +100,20 @@ sapply(files.sources, source)
 
 ```
 
-# Colour palettes
-Define colours for plotting this are the standard coping colours
-```{r Colour palettes: COPING}
-palette2 <- c("#78D9C5",
-                    "#F5BE5E")
-
-palette3 <- c("#78D9C5",
-                    "#F5BE5E",
-                    "#EEB6E9")
-
-palette4 <- c("#78D9C5",
-                    "#F5BE5E",
-                    "#EEB6E9",
-                    "#DBDB73")
-
-palette5 <- c("#78D9C5",
-                    "#F5BE5E",
-                    "#EEB6E9",
-                    "#DBDB73",
-                    "#FFED98")
-
-palette6 <- c("#78D9C5",
-                    "#F5BE5E",
-                    "#EEB6E9",
-                    "#DBDB73",
-                    "#FFED98",
-                    "#BFD2EB")
-
-palette7 <- c("#78D9C5",
-                    "#F5BE5E",
-                    "#EEB6E9",
-                    "#DBDB73",
-                    "#FFED98",
-                    "#BFD2EB",
-                    "#808080")
-
-paletteGRAD <- c("#F5BE5E",
-                       "#FFD284",
-                       "#FFEED1",
-                       "#B5B5B5",
-                       "#DEFFF8",
-                       "#94F6E1",
-                       "#78D9C5")
-
-NeuCenterpalette <- c("#78D9C5",
-                            "#808080",
-                            "#F5BE5E")
-
-worseGRADpalette <- c("#78D9C5",
-                          "#FFEED1",
-                          "#F5BE5E",
-                          "#FFB1B5")
-GLADpalette = c("#efc00b",
-                "#b7dee8")
-```
-
 # Data import
-
-## Source data file paths
-
-
 ## Read in data for RAMP
 ```{r read in data}
 treatRAMP <- readRDS(file = paste0(data_path, "/ramp_followupb/treatment_ramp_followupb.rds"))
 demRAMP <- readRDS(file = paste0(data_path, "/ramp/dem_ramp.RDS"))
 
-
 ```
 
 ## Create a wave column for RAMP 
 
+Base this on dates of the follow ups
+
 ```{r add wave column ramp}
 
-treatRAMP$wave<-as.integer(str_match( treatRAMP$distributionChannel, "(?i)[/wave=?\\s*(\\d+)%22)%5b,2]\\wave=?\\s*(\\d+)")[,2])
 
 ```
 
