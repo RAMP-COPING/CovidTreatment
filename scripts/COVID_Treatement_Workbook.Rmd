@@ -38,7 +38,7 @@ How do we show change over time in treatment seeking and receipt over time?
 
 ## Predictors
 
-We select predictors that predict worse outcomes for common mental health problems in this sample (see [https://github.com/klpurves/PANCHANGE_analysis/tree/forest_plots]())
+We select predictors that predict worse outcomes for common mental health problems in this sample [see GitHub for relevant paper here](https://github.com/klpurves/PANCHANGE_analysis/tree/forest_plots)
 
 
 ## submission
@@ -48,6 +48,20 @@ Will submit to Psychological Medicine in first instance
 ## variables that need creating
 
 - did you seek treatment at any time
+
+### Variable categorisation
+
+**treatment type:**
+supported (requires contact) or self guided ()
+
+Categorisation makes sense for resource allocation etc.
+
+**reasons for seeking**
+new or existing
+crisis as a third (number dependent)
+
+**barriers**
+Systemic and client level
 
 
 # set up 
@@ -109,8 +123,12 @@ demRAMP <- readRDS(file = paste0(data_path, "/ramp/dem_ramp.RDS"))
 ```
 
 ## Create a wave column for RAMP 
-
 Base this on dates of the follow ups
+
+```{r identify wave dates ramp}
+setwd(wd)
+source("./scripts/RAMPwaves.R")
+```
 
 ```{r add wave column ramp}
 
@@ -127,13 +145,15 @@ Base this on dates of the follow ups
 
 ## Exclusions
 
-- Only inxluding those who sought (or di not seek) help for themselves
+- Only including those who sought (or di not seek) help for themselves
 
 ## Figures
 
-1. Covid figures, lockdown dates, histogram/density 
-2. Horizontal stacked bars showing proportion of people seeking treatment
-3. Bar plot showing the proportion of respondents that sought treatment by wave, and stacked by proportion of those who received it. 
+1. COVID figures, lockdown dates, histogram/density 
+2. Bar plot showing the proportion of respondents that sought treatment by wave, and stacked by proportion of those who received it, andother panel fro treatment type, and barriers 
+3. Map of the UK showing rates of treatment seeking and receipt per area
+4. Forest plots
+
 
 
 
