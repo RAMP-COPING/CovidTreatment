@@ -145,7 +145,7 @@ source("./scripts/RAMPwaves.R")
 
 ## Exclusions
 
-- Only including those who sought (or di not seek) help for themselves
+- Only including those who sought (or did not seek) help for themselves
 
 ## Figures
 
