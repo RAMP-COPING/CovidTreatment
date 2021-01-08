@@ -1,0 +1,222 @@
+---
+title: "RAMP/COPING treatment paper core notebook"
+
+author: "K L Purves"
+date: '`r format(Sys.time(), "%d %B, %Y")`'
+output:
+  html_document:
+    df_print: paged
+    toc: yes
+    toc_depth: 2
+    toc_float:
+      collapsed: false
+    number_sections: false
+    highlight: monochrome
+    theme: cerulean
+code_folding: show
+
+html_notebook:
+  theme: cerulean
+toc: yes
+---
+
+This workbook runs code and shows results for the manuscript ***Access and uptake of mental health services during the COVID-19 pandemic: rates, barriers and usefulness***. 
+
+# Project description
+
+## Research questions
+
+1. What are the rates for treatment seeking for MH concerns at each time point (wave)
+- rates over time
+
+2. 
+
+## Details, discussion and questions
+
+How do we show change over time in treatment seeking and receipt over time?
+- are services overwhelmed?
+
+## Predictors
+
+We select predictors that predict worse outcomes for common mental health problems in this sample (see [https://github.com/klpurves/PANCHANGE_analysis/tree/forest_plots]())
+
+
+## submission
+
+Will submit to Psychological Medicine in first instance
+
+## variables that need creating
+
+- did you seek treatment at any time
+
+
+# set up 
+
+```{r source file path}
+#source data directory: data_path
+source("/Users/kirstin/Dropbox/SGDP/RAMP/Projects/Treatment/file_paths.R")
+
+```
+
+
+```{r Setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE,
+                      comment=NA,
+                      prompt=FALSE,
+                      cache=FALSE)
+
+knitr::opts_chunk$set(fig.path="figures/")
+setwd(wd)
+
+
+options(bitmapType = 'quartz') # to render fonts better
+```
+
+Clear global environment
+```{r Clear global environment}
+remove(list = ls())
+```
+
+Retrieve the current date to use it for file endings to not overwrite files when one exports files
+```{r Recent date}
+date = Sys.Date()
+```
+
+#Packages
+Install packages (if they are not available in your version of R)
+```{r Installing packages}
+#install.packages("summarytools")
+#install.packages("tidyverse")
+#install.packages("psych")
+#install.packages("broom")
+#install.packages("skimr")
+#install.packages("polycor")
+#install.packages("corrplot")
+#install.packages("patchwork")
+#install.packages("ggpubr")
+```
+
+Load packages
+```{r Load packages}
+library(knitr)
+library(summarytools)
+library(psych)
+library(polycor)
+library(corrplot)
+library(patchwork)
+library(broom)
+library(tidyverse)
+library(ggpubr)
+
+
+```
+
+# R functions
+
+```{r call in function library functions}
+
+# source all functions in the function library folder
+
+files.sources = paste0("/FunctionLib",list.files("/FunctionLib"))
+
+sapply(files.sources, source)
+
+```
+
+# Colour palettes
+Define colours for plotting this are the standard coping colours
+```{r Colour palettes: COPING}
+palette2 <- c("#78D9C5",
+                    "#F5BE5E")
+
+palette3 <- c("#78D9C5",
+                    "#F5BE5E",
+                    "#EEB6E9")
+
+palette4 <- c("#78D9C5",
+                    "#F5BE5E",
+                    "#EEB6E9",
+                    "#DBDB73")
+
+palette5 <- c("#78D9C5",
+                    "#F5BE5E",
+                    "#EEB6E9",
+                    "#DBDB73",
+                    "#FFED98")
+
+palette6 <- c("#78D9C5",
+                    "#F5BE5E",
+                    "#EEB6E9",
+                    "#DBDB73",
+                    "#FFED98",
+                    "#BFD2EB")
+
+palette7 <- c("#78D9C5",
+                    "#F5BE5E",
+                    "#EEB6E9",
+                    "#DBDB73",
+                    "#FFED98",
+                    "#BFD2EB",
+                    "#808080")
+
+paletteGRAD <- c("#F5BE5E",
+                       "#FFD284",
+                       "#FFEED1",
+                       "#B5B5B5",
+                       "#DEFFF8",
+                       "#94F6E1",
+                       "#78D9C5")
+
+NeuCenterpalette <- c("#78D9C5",
+                            "#808080",
+                            "#F5BE5E")
+
+worseGRADpalette <- c("#78D9C5",
+                          "#FFEED1",
+                          "#F5BE5E",
+                          "#FFB1B5")
+GLADpalette = c("#efc00b",
+                "#b7dee8")
+```
+
+# Data import
+
+## Source data file paths
+
+
+## Read in data for RAMP
+```{r read in data}
+treatRAMP <- readRDS(file = paste0(data_path, "/ramp_followupb/treatment_ramp_followupb.rds"))
+demRAMP <- readRDS(file = paste0(data_path, "/ramp/dem_ramp.RDS"))
+
+
+```
+
+## Create a wave column for RAMP 
+
+```{r add wave column ramp}
+
+treatRAMP$wave<-as.integer(str_match( treatRAMP$distributionChannel, "(?i)[/wave=?\\s*(\\d+)%22)%5b,2]\\wave=?\\s*(\\d+)")[,2])
+
+```
+
+## Create data set per wave for RAMP treatment
+
+
+
+## Merge Waves as columns, add demographics
+
+
+
+## Exclusions
+
+- Only inxluding those who sought (or di not seek) help for themselves
+
+## Figures
+
+1. Covid figures, lockdown dates, histogram/density 
+2. Horizontal stacked bars showing proportion of people seeking treatment
+3. Bar plot showing the proportion of respondents that sought treatment by wave, and stacked by proportion of those who received it. 
+
+
+
