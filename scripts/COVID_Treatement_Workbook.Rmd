@@ -145,7 +145,7 @@ demCOPE.nbr <- readRDS(file = paste0(data_path, "/coping_nbr/dem_coping_nbr.RDS"
 
 ```
 
-# Create a wave columns in treatment data
+## Create a wave columns in treatment data
 Base this on dates of the follow ups drawn from qualtrics.
 
 RAMP
@@ -166,6 +166,16 @@ COPING
 ```{r identify wave dates coping}
 setwd(wd)
 source("./scripts/COPINGwaves.R")
+```
+## drop data before data collection started
+
+Drop Any data collected earleir than June (our first instance of the questionnaire)
+
+```{r drop May dat}
+
+treatRAMP <- treatRAMP %>%
+  filter(startDate > as.POSIXct("2020-06-01"))
+
 ```
 
 ## select only relevant demographics
@@ -252,9 +262,22 @@ treat_dat$wave <- factor(treat_dat$wave,
 
 ```
 
+
+## make prefer not say NA for purposes of this analyses
+
+```{r make -77 in treatment seeking NA}
+
+treat_dat$soughthelp_for_self <- ifelse(treat_dat$soughthelp_for_self == -77,NA,treat_dat$soughthelp_for_self)
+
+```
+
 ## Create summary variables for treatment
+Grouping variables to make sensible categoires for comparing different aspects of treatment seeking
+
 
 ### Sought help for new or pre-existing MH disorder 
+
+
 
 ### Type of treatment (supported / self guided)
 
@@ -262,7 +285,20 @@ treat_dat$wave <- factor(treat_dat$wave,
 
 ### Sought treatment at any time
 
+```{r treatment seek in any wave}
+
+seeksum <- treat_dat %>%
+  pivot_wider(id_cols = ID,
+              names_from = wave,
+              values_from = soughthelp_for_self)
+
+seeksum$AnyHelpSeek <- apply(seeksum[2:10],1,function(x) ifelse(1 %in% x,1,0))
+  
+```
+
+
 ### received treatment at any time
+
 
 ### Client level vs systemic barriers
 
@@ -280,8 +316,8 @@ treat_dat %>%
   group_by(wave) %>%
   count()
 
-
 ```
+
 ### Frequency of treatment seeking per wave
 
 ```{r treatment seeking freq by wave}
@@ -292,8 +328,17 @@ treat_dat %>%
 
 ```
 
-### Frequency of treatment seeking
+### Frequency of treatment seeking overall
+Number of people who sought treatment at any point during the pandemic
 
+Note, because some people will have responded twice in a month when we were collecting twice weekly, will code this as: if they reported seeking treatment during that month at all.
+```{r check number of overall treatment seeking}
+
+
+
+table(seeksum$AnyHelpSeek)
+
+```
 
 ## Analytic decision notes
 

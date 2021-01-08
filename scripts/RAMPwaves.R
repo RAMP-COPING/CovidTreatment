@@ -1,22 +1,19 @@
 ## Create wave column in RAMP
-## Rather than using wave email outs, we will look at respondents by month
-## Will be easier to comapre to covid across the year and to compare across samples
 
 
-# May
-start1 <- as.POSIXct("2020-05-01")
-end1 <-  as.POSIXct("2020-06-01")
+## Roughly by month.Some day discerpancies from pure calendar month to make sure there is no confusion with 
+### survey send out dates
 
 # June
 start2 <- as.POSIXct("2020-06-01")
-end2 <-  as.POSIXct("2020-07-01")
+end2 <-  as.POSIXct("2020-06-29")  ## both RAMP and COPING ended by now, new RAMP started at 30 June
 
 #July
-start3 <- as.POSIXct("2020-07-01")
-end3 <-  as.POSIXct("2020-08-01")
+start3 <- as.POSIXct("2020-06-30")
+end3 <-  as.POSIXct("2020-07-27")
 
 #August
-start4 <- as.POSIXct("2020-08-01")
+start4 <- as.POSIXct("2020-07-28")
 end4 <-  as.POSIXct("2020-09-01")
 
 #September
@@ -42,8 +39,7 @@ end9 <-   as.POSIXct("2021-02-01")
 
 treatRAMP <- 
   treatRAMP %>%
-  mutate(wave =  case_when(startDate >= start1 & startDate <= end1 ~ "May 2020",
-                           startDate >= start2 & startDate < end2 ~ "June 2020",
+  mutate(wave =  case_when(startDate >= start2 & startDate < end2 ~ "June 2020",
                            startDate >= start3 & startDate < end3 ~ "July 2020",
                            startDate >= start4 & startDate < end4 ~ "August 2020",
                            startDate >= start5 & startDate < end5 ~ "September 2020",
