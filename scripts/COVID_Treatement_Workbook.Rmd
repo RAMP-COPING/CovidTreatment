@@ -102,32 +102,56 @@ Retrieve the current date to use it for file endings to not overwrite files when
 date = Sys.Date()
 ```
 
-# R functions
+## R functions
 
 ```{r call in function library functions}
 
 # source all functions in the function library folder
-
 files.sources = paste0("/FunctionLib",list.files("/FunctionLib"))
-
 sapply(files.sources, source)
 
 ```
 
-# Data import
-## Read in data for RAMP
+# Data wrangling
+
+## Data import
+RAMP
 ```{r read in data}
 treatRAMP <- readRDS(file = paste0(data_path, "/ramp_followupb/treatment_ramp_followupb.rds"))
 demRAMP <- readRDS(file = paste0(data_path, "/ramp/dem_ramp.RDS"))
 
 ```
 
-## Create a wave column for RAMP 
-Base this on dates of the follow ups
+RAMP
+```{r read in data}
+treatCOPE <- readRDS(file = paste0(cope_path, "/coping_followupa_ongoing/treatment_coping_followupa_ongoing.rds"))
+demCOPE.glad <- readRDS(file = paste0(data_path, "/coping_glad/dem_coping_glad.RDS"))
+demCOPE.edgi <- readRDS(file = paste0(data_path, "/coping_edgi/dem_coping_edgi.RDS"))
+demCOPE.nbr <- readRDS(file = paste0(data_path, "/coping_nbr/dem_coping_nbr.RDS"))
+
+```
+
+# Create a wave columns in treatment data
+Base this on dates of the follow ups drawn from qualtrics.
+
+RAMP
+5 waves
+
+1 - May 2020
+2 - June 2020
+3 - July 2020 (start date actually the last day of June)
+4 - September 2020
+5 - November 2020
 
 ```{r identify wave dates ramp}
 setwd(wd)
 source("./scripts/RAMPwaves.R")
+```
+
+COPING
+```{r identify wave dates coping}
+setwd(wd)
+source("./scripts/COPINGwaves.R")
 ```
 
 ```{r add wave column ramp}
