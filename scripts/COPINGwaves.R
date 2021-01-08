@@ -44,7 +44,7 @@ end9 <-   as.POSIXct("2021-01-31")
 
 treatCOPE <- 
   treatCOPE %>%
-  mutate(wave =  case_when(startDate >= start1 & startDate <= end1 ~ "May 2020",
+  mutate(wave =  case_when(startDate >= start1 & startDate < end1 ~ "May 2020",
                            startDate >= start2 & startDate < end2 ~ "June 2020",
                            startDate >= start3 & startDate < end3 ~ "July 2020",
                            startDate >= start4 & startDate < end4 ~ "August 2020",
@@ -52,5 +52,4 @@ treatCOPE <-
                            startDate >= start6 & startDate < end6 ~ "October 2020",
                            startDate >= start7 & startDate < end7 ~ "November 2020",
                            startDate >= start8 & startDate < end8 ~ "December 2020",
-                           startDate >= start9 & startDate < end9 ~ "January 2021",
-                           TRUE ~ NA_real_))
+                           startDate >= start9 & startDate < end9 ~ "January 2021"))

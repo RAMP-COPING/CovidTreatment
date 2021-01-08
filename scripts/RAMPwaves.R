@@ -50,5 +50,4 @@ treatRAMP <-
                            startDate >= start6 & startDate < end6 ~ "October 2020",
                            startDate >= start7 & startDate < end7 ~ "November 2020",
                            startDate >= start8 & startDate < end8 ~ "December 2020",
-                           startDate >= start9 & startDate < end9 ~ "January 2021",
-                           TRUE ~ NA_real_))
+                           startDate >= start9 & startDate < end9 ~ "January 2021"))

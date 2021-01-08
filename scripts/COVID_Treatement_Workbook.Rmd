@@ -126,7 +126,8 @@ demRAMP <- readRDS(file = paste0(data_path, "/ramp/dem_ramp.RDS"))
 
 ```
 
-RAMP
+COPING
+Note, external data refrence is a hash-id for coping. So it is consistent across aprticipants and matches, but is not linkable to GLAD ID
 ```{r read in data}
 treatCOPE <- readRDS(file = paste0(cope_path, "/coping_followupa_ongoing/treatment_coping_followupa_ongoing.rds"))
 demCOPE.glad <- readRDS(file = paste0(data_path, "/coping_glad/dem_coping_glad.RDS"))
@@ -158,11 +159,65 @@ setwd(wd)
 source("./scripts/COPINGwaves.R")
 ```
 
-## Create data set per wave for RAMP treatment
+## select only relevant demographics
+
+```{r demographic select list}
+keepcols.cope <- c("externalDataReference","dem.which_gender_do_you_identify_with")
+cols.cope <- c("LoginID","Gender")
+keepcols.nbr <- c("subjectid")
+cols.nbr <- c("LoginID")
+keepcols.ramp <- c("externalDataReference","dem2.how_old_are_you","dem2.which_gender_do_you_identify_with")
+cols.ramp <- c("LoginID","Age","Gender")
+```
 
 
+```{r demographic select}
+dem.cope.glad <- demCOPE.glad[names(demCOPE.glad) %in% keepcols.cope]
+dem.cope.edgi <- demCOPE.edgi[names(demCOPE.edgi) %in% keepcols.cope]
+dem.cope.nbr <- demCOPE.nbr[names(demCOPE.nbr) %in% keepcols.nbr]
+dem.ramp <- demRAMP[names(demRAMP) %in% keepcols.ramp]
 
-## Merge Waves as columns, add demographics
+names(dem.cope.glad) <- cols.cope
+names(dem.cope.edgi) <- cols.cope
+names(dem.cope.nbr) <- cols.nbr
+names(dem.ramp) <- cols.ramp
+```
+## add sample columns 
+
+```{r add sample col}
+
+dem.cope.glad$Sample <-  "COPING"
+dem.cope.edgi$Sample <- "COPING"
+dem.cope.nbr$Sample <- "COPING"
+dem.ramp$Sample <- "RAMP"
+
+treatRAMP$Sample <- "RAMP"
+treatCOPE$Sample <- "COPING"
+
+```
+
+## merge demographcis
+
+```{r demographics merge}
+
+dem <- merge(dem.cope.glad,dem.cope.edgi)
+dem <- merge(dem,dem.cope.nbr)
+dem <- merge(dem,dem.ramp)
+
+```
+
+## Rename the treatment variables and drop irrelevant ones
+
+used the [data dictionary](https://docs.google.com/spreadsheets/d/1Vp028XLxbcXeOdjeuI-3y-kVenKWDR4hW9iJ1tHpttI/edit#gid=1527211037) to identify the relevant items and rename them
+
+```{r rename COPE & RAMP datasets and select variables}
+setwd(wd)
+source("./scripts/renameRAMPtreatment.R")
+
+treatRAMP.fin <- treatRAMP.renamed[names(treatRAMP.renamed) %in% treatnames]
+treatCOPE.fin <- treatCOPE.renamed[names(treatCOPE.renamed) %in% treatnames]
+
+```
 
 
 
@@ -173,8 +228,8 @@ source("./scripts/COPINGwaves.R")
 ## Figures
 
 1. COVID figures, lockdown dates, histogram/density 
-2. Bar plot showing the proportion of respondents that sought treatment by wave, and stacked by proportion of those who received it, andother panel fro treatment type, and barriers 
-3. Map of the UK showing rates of treatment seeking and receipt per area
+2. Bar plot 
+3. Map of the UK showing rates of treatment seeking and receipt per area (prop sought treatment == size, proportion received == colour) probably district or rgion level?
 4. Forest plots
 
 
