@@ -3026,6 +3026,22 @@ div.tocify {
 ## 
 ##     view</code></pre>
 <pre><code>## Loading required package: skimr</code></pre>
+<pre><code>## Loading required package: lfactors</code></pre>
+<pre><code>## lfactors v1.0.4</code></pre>
+<pre><code>## Loading required package: Rfast</code></pre>
+<pre><code>## Loading required package: Rcpp</code></pre>
+<pre><code>## Loading required package: RcppZiggurat</code></pre>
+<pre><code>## 
+## Attaching package: &#39;Rfast&#39;</code></pre>
+<pre><code>## The following object is masked from &#39;package:psych&#39;:
+## 
+##     skew</code></pre>
+<pre><code>## The following object is masked from &#39;package:dplyr&#39;:
+## 
+##     nth</code></pre>
+<pre><code>## The following objects are masked from &#39;package:purrr&#39;:
+## 
+##     is_integer, transpose</code></pre>
 <p>Retrieve the current date to use it for file endings to not overwrite files when one exports files</p>
 </div>
 <div id="r-functions" class="section level4">
@@ -3114,7 +3130,11 @@ visible FALSE                  </code></pre>
 <div id="client-level-vs-systemic-barriers" class="section level5">
 <h5>Client level vs systemic barriers</h5>
 <p>identify if treatment was received when sought according to category</p>
-<p>NEED TO GO BACK AND GET THESE VARIABLES. CHECK ALICIA AND LAURA SCRIPT FOR NAMING ETC</p>
+<p>Identify whether barriers are systemic or client-level</p>
+</div>
+<div id="total-barriers-that-are-client-focused-or-systemic-by-wave" class="section level5">
+<h5>total barriers that are client focused or systemic by wave</h5>
+<p>Create dummy variables indicating systemic and client barriers in a column each</p>
 </div>
 </div>
 </div>
@@ -3218,8 +3238,258 @@ Group: wave = NA
 <h3>Frequency of treatment seeking overall</h3>
 <p>Number of people who sought treatment at any point during the pandemic</p>
 </div>
-<div id="number-of-times-sought-treatment-relative-to-number-of-times-i-responded" class="section level3">
-<h3>Number of times sought treatment (relative to number of times I responded)</h3>
+<div id="frequency-of-systemic-client-barriers-by-wave" class="section level3">
+<h3>Frequency of systemic / client barriers by wave</h3>
+<p>Barriers to receiving treatment by wave.</p>
+<p>Systemic</p>
+<pre><code>Frequencies  
+treat_dat$BarrierToTreatment.Systemic  
+Type: Numeric  
+Group: wave = June 2020  
+
+               Freq   % Valid   % Valid Cum.   % Total   % Total Cum.
+----------- ------- --------- -------------- --------- --------------
+          0   19068    100.00         100.00    100.00         100.00
+       &lt;NA&gt;       0                               0.00         100.00
+      Total   19068    100.00         100.00    100.00         100.00
+
+Group: wave = July 2020  
+
+               Freq   % Valid   % Valid Cum.   % Total   % Total Cum.
+----------- ------- --------- -------------- --------- --------------
+          0   20705     99.11          99.11     99.11          99.11
+          1     186      0.89         100.00      0.89         100.00
+       &lt;NA&gt;       0                               0.00         100.00
+      Total   20891    100.00         100.00    100.00         100.00
+
+Group: wave = August 2020  
+
+               Freq   % Valid   % Valid Cum.   % Total   % Total Cum.
+----------- ------- --------- -------------- --------- --------------
+          0   18268     96.98          96.98     96.98          96.98
+          1     569      3.02         100.00      3.02         100.00
+       &lt;NA&gt;       0                               0.00         100.00
+      Total   18837    100.00         100.00    100.00         100.00
+
+Group: wave = September 2020  
+
+              Freq   % Valid   % Valid Cum.   % Total   % Total Cum.
+----------- ------ --------- -------------- --------- --------------
+          0   4725     96.65          96.65     96.65          96.65
+          1    164      3.35         100.00      3.35         100.00
+       &lt;NA&gt;      0                               0.00         100.00
+      Total   4889    100.00         100.00    100.00         100.00
+
+Group: wave = October 2020  
+
+               Freq   % Valid   % Valid Cum.   % Total   % Total Cum.
+----------- ------- --------- -------------- --------- --------------
+          0   14748     96.96          96.96     96.96          96.96
+          1     463      3.04         100.00      3.04         100.00
+       &lt;NA&gt;       0                               0.00         100.00
+      Total   15211    100.00         100.00    100.00         100.00
+
+Group: wave = November 2020  
+
+              Freq   % Valid   % Valid Cum.   % Total   % Total Cum.
+----------- ------ --------- -------------- --------- --------------
+          0   4633     96.60          96.60     96.60          96.60
+          1    163      3.40         100.00      3.40         100.00
+       &lt;NA&gt;      0                               0.00         100.00
+      Total   4796    100.00         100.00    100.00         100.00
+
+Group: wave = December 2020  
+
+               Freq   % Valid   % Valid Cum.   % Total   % Total Cum.
+----------- ------- --------- -------------- --------- --------------
+          0   14025     97.35          97.35     97.35          97.35
+          1     382      2.65         100.00      2.65         100.00
+       &lt;NA&gt;       0                               0.00         100.00
+      Total   14407    100.00         100.00    100.00         100.00
+
+Group: wave = January 2021  
+
+              Freq   % Valid   % Valid Cum.   % Total   % Total Cum.
+----------- ------ --------- -------------- --------- --------------
+          0   1607     95.03          95.03     95.03          95.03
+          1     84      4.97         100.00      4.97         100.00
+       &lt;NA&gt;      0                               0.00         100.00
+      Total   1691    100.00         100.00    100.00         100.00
+
+Group: wave = NA  
+
+              Freq   % Valid   % Valid Cum.   % Total   % Total Cum.
+----------- ------ --------- -------------- --------- --------------
+          0      1    100.00         100.00    100.00         100.00
+       &lt;NA&gt;      0                               0.00         100.00
+      Total      1    100.00         100.00    100.00         100.00</code></pre>
+<p>Client</p>
+<pre><code>Frequencies  
+treat_dat$BarrierToTreatment.Client  
+Type: Numeric  
+Group: wave = June 2020  
+
+               Freq   % Valid   % Valid Cum.   % Total   % Total Cum.
+----------- ------- --------- -------------- --------- --------------
+          0   19068    100.00         100.00    100.00         100.00
+       &lt;NA&gt;       0                               0.00         100.00
+      Total   19068    100.00         100.00    100.00         100.00
+
+Group: wave = July 2020  
+
+               Freq   % Valid   % Valid Cum.   % Total   % Total Cum.
+----------- ------- --------- -------------- --------- --------------
+          0   20715     99.16          99.16     99.16          99.16
+          1     176      0.84         100.00      0.84         100.00
+       &lt;NA&gt;       0                               0.00         100.00
+      Total   20891    100.00         100.00    100.00         100.00
+
+Group: wave = August 2020  
+
+               Freq   % Valid   % Valid Cum.   % Total   % Total Cum.
+----------- ------- --------- -------------- --------- --------------
+          0   18359     97.46          97.46     97.46          97.46
+          1     478      2.54         100.00      2.54         100.00
+       &lt;NA&gt;       0                               0.00         100.00
+      Total   18837    100.00         100.00    100.00         100.00
+
+Group: wave = September 2020  
+
+              Freq   % Valid   % Valid Cum.   % Total   % Total Cum.
+----------- ------ --------- -------------- --------- --------------
+          0   4760     97.36          97.36     97.36          97.36
+          1    129      2.64         100.00      2.64         100.00
+       &lt;NA&gt;      0                               0.00         100.00
+      Total   4889    100.00         100.00    100.00         100.00
+
+Group: wave = October 2020  
+
+               Freq   % Valid   % Valid Cum.   % Total   % Total Cum.
+----------- ------- --------- -------------- --------- --------------
+          0   14825     97.46          97.46     97.46          97.46
+          1     386      2.54         100.00      2.54         100.00
+       &lt;NA&gt;       0                               0.00         100.00
+      Total   15211    100.00         100.00    100.00         100.00
+
+Group: wave = November 2020  
+
+              Freq   % Valid   % Valid Cum.   % Total   % Total Cum.
+----------- ------ --------- -------------- --------- --------------
+          0   4658     97.12          97.12     97.12          97.12
+          1    138      2.88         100.00      2.88         100.00
+       &lt;NA&gt;      0                               0.00         100.00
+      Total   4796    100.00         100.00    100.00         100.00
+
+Group: wave = December 2020  
+
+               Freq   % Valid   % Valid Cum.   % Total   % Total Cum.
+----------- ------- --------- -------------- --------- --------------
+          0   14086     97.77          97.77     97.77          97.77
+          1     321      2.23         100.00      2.23         100.00
+       &lt;NA&gt;       0                               0.00         100.00
+      Total   14407    100.00         100.00    100.00         100.00
+
+Group: wave = January 2021  
+
+              Freq   % Valid   % Valid Cum.   % Total   % Total Cum.
+----------- ------ --------- -------------- --------- --------------
+          0   1628     96.27          96.27     96.27          96.27
+          1     63      3.73         100.00      3.73         100.00
+       &lt;NA&gt;      0                               0.00         100.00
+      Total   1691    100.00         100.00    100.00         100.00
+
+Group: wave = NA  
+
+              Freq   % Valid   % Valid Cum.   % Total   % Total Cum.
+----------- ------ --------- -------------- --------- --------------
+          0      1    100.00         100.00    100.00         100.00
+       &lt;NA&gt;      0                               0.00         100.00
+      Total      1    100.00         100.00    100.00         100.00</code></pre>
+<p>Other</p>
+<pre><code>Frequencies  
+treat_dat$BarrierToTreatment.Other  
+Type: Numeric  
+Group: wave = June 2020  
+
+               Freq   % Valid   % Valid Cum.   % Total   % Total Cum.
+----------- ------- --------- -------------- --------- --------------
+          0   19068    100.00         100.00    100.00         100.00
+       &lt;NA&gt;       0                               0.00         100.00
+      Total   19068    100.00         100.00    100.00         100.00
+
+Group: wave = July 2020  
+
+               Freq   % Valid   % Valid Cum.   % Total   % Total Cum.
+----------- ------- --------- -------------- --------- --------------
+          0   20779     99.46          99.46     99.46          99.46
+          1     112      0.54         100.00      0.54         100.00
+       &lt;NA&gt;       0                               0.00         100.00
+      Total   20891    100.00         100.00    100.00         100.00
+
+Group: wave = August 2020  
+
+               Freq   % Valid   % Valid Cum.   % Total   % Total Cum.
+----------- ------- --------- -------------- --------- --------------
+          0   18398     97.67          97.67     97.67          97.67
+          1     439      2.33         100.00      2.33         100.00
+       &lt;NA&gt;       0                               0.00         100.00
+      Total   18837    100.00         100.00    100.00         100.00
+
+Group: wave = September 2020  
+
+              Freq   % Valid   % Valid Cum.   % Total   % Total Cum.
+----------- ------ --------- -------------- --------- --------------
+          0   4760     97.36          97.36     97.36          97.36
+          1    129      2.64         100.00      2.64         100.00
+       &lt;NA&gt;      0                               0.00         100.00
+      Total   4889    100.00         100.00    100.00         100.00
+
+Group: wave = October 2020  
+
+               Freq   % Valid   % Valid Cum.   % Total   % Total Cum.
+----------- ------- --------- -------------- --------- --------------
+          0   14889     97.88          97.88     97.88          97.88
+          1     322      2.12         100.00      2.12         100.00
+       &lt;NA&gt;       0                               0.00         100.00
+      Total   15211    100.00         100.00    100.00         100.00
+
+Group: wave = November 2020  
+
+              Freq   % Valid   % Valid Cum.   % Total   % Total Cum.
+----------- ------ --------- -------------- --------- --------------
+          0   4664     97.25          97.25     97.25          97.25
+          1    132      2.75         100.00      2.75         100.00
+       &lt;NA&gt;      0                               0.00         100.00
+      Total   4796    100.00         100.00    100.00         100.00
+
+Group: wave = December 2020  
+
+               Freq   % Valid   % Valid Cum.   % Total   % Total Cum.
+----------- ------- --------- -------------- --------- --------------
+          0   14147     98.20          98.20     98.20          98.20
+          1     260      1.80         100.00      1.80         100.00
+       &lt;NA&gt;       0                               0.00         100.00
+      Total   14407    100.00         100.00    100.00         100.00
+
+Group: wave = January 2021  
+
+              Freq   % Valid   % Valid Cum.   % Total   % Total Cum.
+----------- ------ --------- -------------- --------- --------------
+          0   1643     97.16          97.16     97.16          97.16
+          1     48      2.84         100.00      2.84         100.00
+       &lt;NA&gt;      0                               0.00         100.00
+      Total   1691    100.00         100.00    100.00         100.00
+
+Group: wave = NA  
+
+              Freq   % Valid   % Valid Cum.   % Total   % Total Cum.
+----------- ------ --------- -------------- --------- --------------
+          0      1    100.00         100.00    100.00         100.00
+       &lt;NA&gt;      0                               0.00         100.00
+      Total      1    100.00         100.00    100.00         100.00</code></pre>
+</div>
+<div id="number-of-times-sought-treatment-relative-to-number-of-times-responded" class="section level3">
+<h3>Number of times sought treatment (relative to number of times responded)</h3>
 </div>
 <div id="frequency-of-reasons-for-seeking-treatment-by-wave" class="section level3">
 <h3>Frequency of reasons for seeking treatment (by wave)</h3>
@@ -3310,6 +3580,89 @@ Group: wave = NA
       Existing mental health disorder      1    100.00         100.00    100.00         100.00
                                  &lt;NA&gt;      0                               0.00         100.00
                                 Total      1    100.00         100.00    100.00         100.00</code></pre>
+</div>
+<div id="frequency-of-type-of-treatment-sought" class="section level3">
+<h3>Frequency of type of treatment sought</h3>
+<pre><code>Frequencies  
+treat_dat$TypeSought  
+Type: Character  
+Group: wave = June 2020  
+
+               Freq   % Valid   % Valid Cum.   % Total   % Total Cum.
+----------- ------- --------- -------------- --------- --------------
+       &lt;NA&gt;   19068                             100.00         100.00
+      Total   19068      0.00         100.00    100.00         100.00
+
+Group: wave = July 2020  
+
+                     Freq   % Valid   % Valid Cum.   % Total   % Total Cum.
+----------------- ------- --------- -------------- --------- --------------
+      Self-guided      92     13.49          13.49      0.44           0.44
+        Supported     590     86.51         100.00      2.82           3.26
+             &lt;NA&gt;   20209                              96.74         100.00
+            Total   20891    100.00         100.00    100.00         100.00
+
+Group: wave = August 2020  
+
+                     Freq   % Valid   % Valid Cum.   % Total   % Total Cum.
+----------------- ------- --------- -------------- --------- --------------
+      Self-guided     281     12.66          12.66      1.49           1.49
+        Supported    1938     87.34         100.00     10.29          11.78
+             &lt;NA&gt;   16618                              88.22         100.00
+            Total   18837    100.00         100.00    100.00         100.00
+
+Group: wave = September 2020  
+
+                    Freq   % Valid   % Valid Cum.   % Total   % Total Cum.
+----------------- ------ --------- -------------- --------- --------------
+      Self-guided     96     13.87          13.87      1.96           1.96
+        Supported    596     86.13         100.00     12.19          14.15
+             &lt;NA&gt;   4197                              85.85         100.00
+            Total   4889    100.00         100.00    100.00         100.00
+
+Group: wave = October 2020  
+
+                     Freq   % Valid   % Valid Cum.   % Total   % Total Cum.
+----------------- ------- --------- -------------- --------- --------------
+      Self-guided     204     11.42          11.42      1.34           1.34
+        Supported    1583     88.58         100.00     10.41          11.75
+             &lt;NA&gt;   13424                              88.25         100.00
+            Total   15211    100.00         100.00    100.00         100.00
+
+Group: wave = November 2020  
+
+                    Freq   % Valid   % Valid Cum.   % Total   % Total Cum.
+----------------- ------ --------- -------------- --------- --------------
+      Self-guided    101     14.33          14.33      2.11           2.11
+        Supported    604     85.67         100.00     12.59          14.70
+             &lt;NA&gt;   4091                              85.30         100.00
+            Total   4796    100.00         100.00    100.00         100.00
+
+Group: wave = December 2020  
+
+                     Freq   % Valid   % Valid Cum.   % Total   % Total Cum.
+----------------- ------- --------- -------------- --------- --------------
+      Self-guided     174     11.04          11.04      1.21           1.21
+        Supported    1402     88.96         100.00      9.73          10.94
+             &lt;NA&gt;   12831                              89.06         100.00
+            Total   14407    100.00         100.00    100.00         100.00
+
+Group: wave = January 2021  
+
+                    Freq   % Valid   % Valid Cum.   % Total   % Total Cum.
+----------------- ------ --------- -------------- --------- --------------
+      Self-guided     36     14.40          14.40      2.13           2.13
+        Supported    214     85.60         100.00     12.66          14.78
+             &lt;NA&gt;   1441                              85.22         100.00
+            Total   1691    100.00         100.00    100.00         100.00
+
+Group: wave = NA  
+
+                  Freq   % Valid   % Valid Cum.   % Total   % Total Cum.
+--------------- ------ --------- -------------- --------- --------------
+      Supported      1    100.00         100.00    100.00         100.00
+           &lt;NA&gt;      0                               0.00         100.00
+          Total      1    100.00         100.00    100.00         100.00</code></pre>
 </div>
 <div id="frequency-of-reasons-for-seeking-treatment-by-wave-by-treatment-seeking-numbers" class="section level3">
 <h3>Frequency of reasons for seeking treatment (by wave, by treatment seeking numbers)</h3>
