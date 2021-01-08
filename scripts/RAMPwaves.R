@@ -5,15 +5,15 @@
 
 # May
 start1 <- as.POSIXct("2020-05-01")
-end1 <-  as.POSIXct("2020-05-31")
+end1 <-  as.POSIXct("2020-06-01")
 
 # June
 start2 <- as.POSIXct("2020-06-01")
-end2 <-  as.POSIXct("2020-06-30")
+end2 <-  as.POSIXct("2020-07-01")
 
 #July
-start3 <- as.POSIXct("2020-06-30")
-end3 <-  as.POSIXct("2020-07-31")
+start3 <- as.POSIXct("2020-07-01")
+end3 <-  as.POSIXct("2020-08-01")
 
 #August
 start4 <- as.POSIXct("2020-08-01")
@@ -21,23 +21,23 @@ end4 <-  as.POSIXct("2020-09-01")
 
 #September
 start5 <- as.POSIXct("2020-09-01")
-end5 <-  as.POSIXct("2020-09-30")
+end5 <-  as.POSIXct("2020-10-01")
 
 #October
 start6 <- as.POSIXct("2020-10-01")
-end6 <-   as.POSIXct("2020-10-31") 
+end6 <-   as.POSIXct("2020-11-01") 
 
 #November
 start7 <- as.POSIXct("2020-11-01")
-end7 <-   as.POSIXct("2020-11-30") 
+end7 <-   as.POSIXct("2020-12-01") 
 
 #December
 start8 <- as.POSIXct("2020-12-01")
-end8 <-   as.POSIXct("2020-12-31") 
+end8 <-   as.POSIXct("2021-01-01") 
 
 #January
 start9 <- as.POSIXct("2021-01-01")
-end9 <-   as.POSIXct("2021-01-31") 
+end9 <-   as.POSIXct("2021-02-01") 
 
 
 treatRAMP <- 
