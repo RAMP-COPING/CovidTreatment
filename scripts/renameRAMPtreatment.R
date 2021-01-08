@@ -1,6 +1,6 @@
 ## list of names for variables we need to work with
 
-treatnames <- c("ID"
+treatnames <- c("ID","wave","Sample"
   ,"soughthelp_for_self"
   ,"soughthelp_didnot_seek"	
   ,"soughthelp_prefer_not_say"

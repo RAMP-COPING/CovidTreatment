@@ -35,3 +35,7 @@ if(!require(ggpubr)){
   library(ggpubr)
 }
 
+if(!require(summarytools)){
+  install.packages("summarytools")
+  library(summarytools)
+}

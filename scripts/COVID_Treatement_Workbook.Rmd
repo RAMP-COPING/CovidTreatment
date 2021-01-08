@@ -68,6 +68,15 @@ Henry
 Laura
 Molly
 
+## Figures
+
+1. COVID figures, lockdown dates, histogram/density 
+2. Bar plot 
+3. Map of the UK showing rates of treatment seeking and receipt per area (prop sought treatment == size, proportion received == colour) probably district or rgion level?
+4. Forest plots
+
+
+
 # set up 
 
 Clear global environment
@@ -111,8 +120,8 @@ date = Sys.Date()
 ```{r call in function library functions}
 
 # source all functions in the function library folder
-files.sources = paste0("/FunctionLib",list.files("/FunctionLib"))
-sapply(files.sources, source)
+#files.sources = paste0("/FunctionLib",list.files("/FunctionLib"))
+#sapply(files.sources, source)
 
 ```
 
@@ -196,7 +205,13 @@ treatCOPE$Sample <- "COPING"
 
 ```
 
+## SPACE FOR PREDICTOR CLEANING
+
+Will need to find and add predictor variables. Will add this here.
+
 ## merge demographcis
+
+Waiting till I can get age into GLAD & EDGI
 
 ```{r demographics merge}
 
@@ -218,20 +233,71 @@ treatRAMP.fin <- treatRAMP.renamed[names(treatRAMP.renamed) %in% treatnames]
 treatCOPE.fin <- treatCOPE.renamed[names(treatCOPE.renamed) %in% treatnames]
 
 ```
+## merge RAMP and COPING treatment data
+
+Use rbind to add COPING to RAMP
+
+```{r merge coping and ramp treatment data}
+
+treat_dat <- rbind(treatRAMP.fin,treatCOPE.fin)
+  
+```
+
+## order wave variable
+
+```{r reorder wave factor}
+
+treat_dat$wave <- factor(treat_dat$wave,
+                         levels = c("May 2020","June 2020", "July 2020","August 2020","September 2020","October 2020","November 2020","Deember 2020","January 2021"))
+
+```
+
+## Create summary variables for treatment
+
+### Sought help for new or pre-existing MH disorder 
+
+### Type of treatment (supported / self guided)
+
+### received treatment if sought (per wave)
+
+### Sought treatment at any time
+
+### received treatment at any time
+
+### Client level vs systemic barriers
 
 
 
-## Exclusions
+# Aim 1 analyses
 
-- Only including those who sought (or did not seek) help for themselves
+## Descriptives
 
-## Figures
+### Response rates per wave
 
-1. COVID figures, lockdown dates, histogram/density 
-2. Bar plot 
-3. Map of the UK showing rates of treatment seeking and receipt per area (prop sought treatment == size, proportion received == colour) probably district or rgion level?
-4. Forest plots
+```{r response rates per wave}
+
+treat_dat %>%
+  group_by(wave) %>%
+  count()
 
 
+```
+### Frequency of treatment seeking per wave
 
+```{r treatment seeking freq by wave}
+
+treat_dat %>%
+  group_by(wave) %>%
+  freq(soughthelp_for_self)
+
+```
+
+### Frequency of treatment seeking
+
+
+## Analytic decision notes
+
+### Including cohort as a covariate
+
+This would likely be a collider (sx severity is going to be associated with both cohort and treatment seeking)
 

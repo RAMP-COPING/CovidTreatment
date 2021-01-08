@@ -25,11 +25,11 @@ end5 <-  as.POSIXct("2020-09-30")
 
 #October
 start6 <- as.POSIXct("2020-10-01")
-end6 <-   as.POSIXct("2021-10-31") 
+end6 <-   as.POSIXct("2020-10-31") 
 
 #November
 start7 <- as.POSIXct("2020-11-01")
-end7 <-   as.POSIXct("2021-11-30") 
+end7 <-   as.POSIXct("2020-11-30") 
 
 #December
 start8 <- as.POSIXct("2020-12-01")
