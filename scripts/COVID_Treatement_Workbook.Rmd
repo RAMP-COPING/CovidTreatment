@@ -7,7 +7,7 @@ output:
   html_document:
     df_print: paged
     toc: yes
-    toc_depth: 2
+    toc_depth: 3
     toc_float:
       collapsed: false
     number_sections: false
@@ -24,32 +24,32 @@ This workbook runs code and shows results for the manuscript ***Access and uptak
 
 # Project description
 
-## Research questions
+#### Research questions
 
 1. What are the rates for treatment seeking for MH concerns at each time point (wave)
 - rates over time
 
 2. 
 
-## Details, discussion and questions
+#### Details, discussion and questions
 
 How do we show change over time in treatment seeking and receipt over time?
 - are services overwhelmed?
 
-## Predictors
+#### Predictors
 
 We select predictors that predict worse outcomes for common mental health problems in this sample [see GitHub for relevant paper here](https://github.com/klpurves/PANCHANGE_analysis/tree/forest_plots)
 
 
-## submission
+#### submission
 
 Will submit to Psychological Medicine in first instance
 
-## variables that need creating
+#### variables that need creating
 
 - did you seek treatment at any time
 
-### Variable categorisation
+#### Variable categorisation
 
 **treatment type:**
 supported (requires contact) or self guided ()
@@ -63,12 +63,12 @@ crisis as a third (number dependent)
 **barriers**
 Systemic and client level
 
-### People who have helped along the way
+#### People who have helped along the way
 Henry 
 Laura
 Molly
 
-## Figures
+#### Figures
 
 1. COVID figures, lockdown dates, histogram/density 
 2. Bar plot 
@@ -84,7 +84,7 @@ Clear global environment
 remove(list = ls())
 ```
 
-## Call in set up scripts
+#### Call in set up scripts
 
 ```{r source files}
 #source data directory: data_path
@@ -115,7 +115,7 @@ Retrieve the current date to use it for file endings to not overwrite files when
 date = Sys.Date()
 ```
 
-## R functions
+#### R functions
 
 ```{r call in function library functions}
 
@@ -127,7 +127,7 @@ sapply(files.sources, source)
 
 # Data wrangling
 
-## Data import
+#### Data import
 RAMP
 ```{r read in data ramp}
 treatRAMP <- readRDS(file = paste0(data_path, "/ramp_followupb/treatment_ramp_followupb.rds"))
@@ -145,7 +145,7 @@ demCOPE.nbr <- readRDS(file = paste0(data_path, "/coping_nbr/dem_coping_nbr.RDS"
 
 ```
 
-## Create a wave columns in treatment data
+#### Create a wave columns in treatment data
 Base this on dates of the follow ups drawn from qualtrics.
 
 RAMP
@@ -167,7 +167,7 @@ COPING
 setwd(wd)
 source("./scripts/COPINGwaves.R")
 ```
-## drop data before data collection started
+#### drop data before data collection started
 
 Drop Any data collected earleir than June (our first instance of the questionnaire)
 
@@ -178,7 +178,7 @@ treatRAMP <- treatRAMP %>%
 
 ```
 
-## select only relevant demographics
+#### select only relevant demographics
 
 ```{r demographic select list}
 keepcols.cope <- c("externalDataReference","dem.which_gender_do_you_identify_with")
@@ -201,7 +201,7 @@ names(dem.cope.edgi) <- cols.cope
 names(dem.cope.nbr) <- cols.nbr
 names(dem.ramp) <- cols.ramp
 ```
-## add sample columns 
+#### add sample columns 
 
 ```{r add sample col}
 
@@ -219,7 +219,7 @@ treatCOPE$Sample <- "COPING"
 
 Will need to find and add predictor variables. Will add this here.
 
-## merge demographcis
+#### merge demographcis
 
 Waiting till I can get age into GLAD & EDGI
 
@@ -231,7 +231,7 @@ dem <- merge(dem,dem.ramp)
 
 ```
 
-## Rename the treatment variables and drop irrelevant ones
+#### Rename the treatment variables and drop irrelevant ones
 
 used the [data dictionary](https://docs.google.com/spreadsheets/d/1Vp028XLxbcXeOdjeuI-3y-kVenKWDR4hW9iJ1tHpttI/edit#gid=1527211037) to identify the relevant items and rename them
 
@@ -243,7 +243,7 @@ treatRAMP.fin <- treatRAMP.renamed[names(treatRAMP.renamed) %in% treatnames]
 treatCOPE.fin <- treatCOPE.renamed[names(treatCOPE.renamed) %in% treatnames]
 
 ```
-## merge RAMP and COPING treatment data
+#### merge RAMP and COPING treatment data
 
 Use rbind to add COPING to RAMP
 
@@ -253,7 +253,7 @@ treat_dat <- rbind(treatRAMP.fin,treatCOPE.fin)
   
 ```
 
-## order wave variable
+#### order wave variable
 
 ```{r reorder wave factor}
 
@@ -262,7 +262,7 @@ treat_dat$wave <- factor(treat_dat$wave,
 
 ```
 
-## Drop accidental duplicate IDs
+#### Drop accidental duplicate IDs
 
 these are IDS that were allocated twice by qualtrics. Technical errors. Will drop all instances
 ```{r id  duplicates}
@@ -273,12 +273,13 @@ DupIDdat <- treat_dat %>%
               values_from = soughthelp_for_self,
               values_fn = length)
 
-dupids <- DupIDdat$ID[(DupIDdat$`June 2020` > 1 | AnySeekSums$`July 2020` > 1 |
-                         DupIDdat$`August 2020` > 1 | AnySeekSums$`September 2020` > 1 |
-                         DupIDdat$`October 2020` > 1 | AnySeekSums$`November 2020` > 1 |
-                         DupIDdat$`December 2020` > 1 | AnySeekSums$`January 2021` > 1)]
+dupids <- DupIDdat$ID[(DupIDdat$`June 2020` > 1 | DupIDdat$`July 2020` > 1 |
+                         DupIDdat$`August 2020` > 1 | DupIDdat$`September 2020` > 1 |
+                         DupIDdat$`October 2020` > 1 | DupIDdat$`November 2020` > 1 |
+                         DupIDdat$`December 2020` > 1 | DupIDdat$`January 2021` > 1)]
 
 dupids <- unique(dupids)
+
 ```
 
 Now drop from our treatment data
@@ -287,7 +288,7 @@ Now drop from our treatment data
 treat_dat <- treat_dat[(treat_dat$ID %!in% dupids),]
 ```
 
-## make prefer not say NA for purposes of this analyses
+#### make prefer not say NA for purposes of this analyses
 
 ```{r make -77 in treatment seeking NA}
 
@@ -295,11 +296,11 @@ treat_dat$soughthelp_for_self <- ifelse(treat_dat$soughthelp_for_self == -77,NA,
 
 ```
 
-## Create summary variables for treatment
+#### Create summary variables for treatment
 Grouping variables to make sensible categoires for comparing different aspects of treatment seeking
 
 
-### Sought help for new or pre-existing MH disorder 
+##### Sought help for new or pre-existing MH disorder 
 
 Categorise reasons for help seeking into whether it was for a pre-existing, newly emerging MH disorder or a crisis
 
@@ -318,7 +319,7 @@ treat_dat <- treat_dat %>%
 ```
 
 
-### Type of treatment (supported / self guided)
+##### Type of treatment (supported / self guided)
 
 Categorise places where treatment was sought into supported or self-guided
 
@@ -338,7 +339,7 @@ treat_dat <- treat_dat %>%
 
 ```
 
-### received treatment if sought 
+##### received treatment if sought 
 
 identify if treatment was received when sought according to category
 ```{r dummy type of treatment received}
@@ -360,21 +361,21 @@ treat_dat <- treat_dat %>%
 
 ```
 
-### Sought treatment at any time (How many times, how many total responses)
+##### Sought treatment at any time (How many times, how many total responses)
 
 Create a dataset and column that identifies how many times someone sought help, how many times they responded, and if they ever sought help
 ```{r treatment seek in any wave}
 
 ```
 
-### received treatment at any time (How many times, how many total response)
+##### received treatment at any time (How many times, how many total response)
 
-```{r treatment seek in any wave}
+```{r treatment receipt in any wave}
 
 
 ```
 
-### Received help having sought it (include proprtion of times help is received having sought it)
+##### Received help having sought it (include proprtion of times help is received having sought it)
 
 Check if anyone has not received help at all having sought it, check proportion of times help received having sought it
 ```{r received help having sought it}
@@ -383,21 +384,21 @@ Check if anyone has not received help at all having sought it, check proportion 
 ```
 
 
-### Client level vs systemic barriers
+##### Client level vs systemic barriers
 identify if treatment was received when sought according to category
 
 NEED TO GO BACK AND GET THESE VARIABLES. CHECK ALICIA AND LAURA SCRIPT FOR NAMING ETC
 ```{r dummy type of barriers}
-
-treat_dat <- treat_dat %>%
-  mutate(TypeReceived  = case_when( == 1 ~ "Systemic",
-                                == 1 ~ "Systemic",
-                                 == 1 ~ "Systemic",
-                                 == 1 ~ "Systemic",
-                                 == 1 ~ "Client-level",
-                                 == 1 ~ "Client-level",
-                                == 1 ~ "Client-level",
-                                 == 1 ~ "Client-level"))
+# 
+# treat_dat <- treat_dat %>%
+#   mutate(TypeReceived  = case_when( == 1 ~ "Systemic",
+#                                 == 1 ~ "Systemic",
+#                                  == 1 ~ "Systemic",
+#                                  == 1 ~ "Systemic",
+#                                  == 1 ~ "Client-level",
+#                                  == 1 ~ "Client-level",
+#                                 == 1 ~ "Client-level",
+#                                  == 1 ~ "Client-level"))
 
 ```
 
@@ -428,8 +429,7 @@ treat_dat %>%
 ### Frequency of treatment seeking overall
 Number of people who sought treatment at any point during the pandemic
 ```{r check number of overall treatment seeking}
-AnySeekSums %>%
-  freq(AnyHelpSeek)
+
 ```
 
 ### Number of times sought treatment (relative to number of times I responded)
