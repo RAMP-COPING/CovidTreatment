@@ -129,7 +129,7 @@ date = Sys.Date()
 
 ## Data import
 RAMP
-```{r read in data}
+```{r read in data ramp}
 treatRAMP <- readRDS(file = paste0(data_path, "/ramp_followupb/treatment_ramp_followupb.rds"))
 demRAMP <- readRDS(file = paste0(data_path, "/ramp/dem_ramp.RDS"))
 
@@ -137,7 +137,7 @@ demRAMP <- readRDS(file = paste0(data_path, "/ramp/dem_ramp.RDS"))
 
 COPING
 Note, external data refrence is a hash-id for coping. So it is consistent across aprticipants and matches, but is not linkable to GLAD ID
-```{r read in data}
+```{r read in data coping}
 treatCOPE <- readRDS(file = paste0(cope_path, "/coping_followupa_ongoing/treatment_coping_followupa_ongoing.rds"))
 demCOPE.glad <- readRDS(file = paste0(data_path, "/coping_glad/dem_coping_glad.RDS"))
 demCOPE.edgi <- readRDS(file = paste0(data_path, "/coping_edgi/dem_coping_edgi.RDS"))
