@@ -3038,13 +3038,17 @@ div.tocify {
 <p>RAMP</p>
 <p>COPING Note, external data refrence is a hash-id for coping. So it is consistent across aprticipants and matches, but is not linkable to GLAD ID</p>
 </div>
-</div>
-<div id="create-a-wave-columns-in-treatment-data" class="section level1">
-<h1>Create a wave columns in treatment data</h1>
+<div id="create-a-wave-columns-in-treatment-data" class="section level2">
+<h2>Create a wave columns in treatment data</h2>
 <p>Base this on dates of the follow ups drawn from qualtrics.</p>
 <p>RAMP 5 waves</p>
 <p>1 - May 2020 2 - June 2020 3 - July 2020 (start date actually the last day of June) 4 - September 2020 5 - November 2020</p>
 <p>COPING</p>
+</div>
+<div id="drop-data-before-data-collection-started" class="section level2">
+<h2>drop data before data collection started</h2>
+<p>Drop Any data collected earleir than June (our first instance of the questionnaire)</p>
+</div>
 <div id="select-only-relevant-demographics" class="section level2">
 <h2>select only relevant demographics</h2>
 </div>
@@ -3070,10 +3074,15 @@ div.tocify {
 <div id="order-wave-variable" class="section level2">
 <h2>order wave variable</h2>
 </div>
+<div id="make-prefer-not-say-na-for-purposes-of-this-analyses" class="section level2">
+<h2>make prefer not say NA for purposes of this analyses</h2>
+</div>
 <div id="create-summary-variables-for-treatment" class="section level2">
 <h2>Create summary variables for treatment</h2>
+<p>Grouping variables to make sensible categoires for comparing different aspects of treatment seeking</p>
 <div id="sought-help-for-new-or-pre-existing-mh-disorder" class="section level3">
 <h3>Sought help for new or pre-existing MH disorder</h3>
+<p>Categorise reasons for help seeking into whether it was for a pre-existing, newly emerging MH disorder or a crisis</p>
 </div>
 <div id="type-of-treatment-supported-self-guided" class="section level3">
 <h3>Type of treatment (supported / self guided)</h3>
@@ -3100,7 +3109,7 @@ div.tocify {
 <h3>Response rates per wave</h3>
 <div data-pagedtable="false">
 <script data-pagedtable-source type="application/json">
-{"columns":[{"label":["wave"],"name":[1],"type":["fctr"],"align":["left"]},{"label":["n"],"name":[2],"type":["int"],"align":["right"]}],"data":[{"1":"May 2020","2":"4474"},{"1":"June 2020","2":"22286"},{"1":"July 2020","2":"21245"},{"1":"August 2020","2":"15581"},{"1":"September 2020","2":"4910"},{"1":"October 2020","2":"15289"},{"1":"November 2020","2":"4822"},{"1":"December 2020","2":"14484"},{"1":"January 2021","2":"1696"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
+{"columns":[{"label":["wave"],"name":[1],"type":["fctr"],"align":["left"]},{"label":["n"],"name":[2],"type":["int"],"align":["right"]}],"data":[{"1":"June 2020","2":"19140"},{"1":"July 2020","2":"21036"},{"1":"August 2020","2":"18935"},{"1":"September 2020","2":"4910"},{"1":"October 2020","2":"15289"},{"1":"November 2020","2":"4822"},{"1":"December 2020","2":"14484"},{"1":"January 2021","2":"1696"},{"1":"NA","2":"1"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
   </script>
 </div>
 </div>
@@ -3108,97 +3117,206 @@ div.tocify {
 <h3>Frequency of treatment seeking per wave</h3>
 <pre><code>Frequencies  
 treat_dat$soughthelp_for_self  
-Label: In the past month, have you sought or tried to get help for yourself or someone you know because of any feelings or thoughts you were having related to your mental health or wellbeing? By help, we mean a professional or external service , rather than talking to friends or family or performing activities such as exercise or hobbies.Please tick all that apply, whether or not you received help.  
 Type: Numeric  
-Group: wave = May 2020  
-
-              Freq   % Valid   % Valid Cum.   % Total   % Total Cum.
------------ ------ --------- -------------- --------- --------------
-       &lt;NA&gt;   4474                             100.00         100.00
-      Total   4474      0.00         100.00    100.00         100.00
-
 Group: wave = June 2020  
 
                Freq   % Valid   % Valid Cum.   % Total   % Total Cum.
 ----------- ------- --------- -------------- --------- --------------
-        -77      53      1.74           1.74      0.24           0.24
-          0    2550     83.94          85.68     11.44          11.68
-          1     435     14.32         100.00      1.95          13.63
-       &lt;NA&gt;   19248                              86.37         100.00
-      Total   22286    100.00         100.00    100.00         100.00
+       &lt;NA&gt;   19140                             100.00         100.00
+      Total   19140      0.00         100.00    100.00         100.00
 
 Group: wave = July 2020  
 
                Freq   % Valid   % Valid Cum.   % Total   % Total Cum.
 ----------- ------- --------- -------------- --------- --------------
-        -77     139      2.82           2.82      0.65           0.65
-          0    4060     82.30          85.12     19.11          19.76
-          1     734     14.88         100.00      3.45          23.22
-       &lt;NA&gt;   16312                              76.78         100.00
-      Total   21245    100.00         100.00    100.00         100.00
+          0    3923     84.91          84.91     18.65          18.65
+          1     697     15.09         100.00      3.31          21.96
+       &lt;NA&gt;   16416                              78.04         100.00
+      Total   21036    100.00         100.00    100.00         100.00
 
 Group: wave = August 2020  
 
                Freq   % Valid   % Valid Cum.   % Total   % Total Cum.
 ----------- ------- --------- -------------- --------- --------------
-        -77     573      3.69           3.69      3.68           3.68
-          0   12983     83.63          87.32     83.33          87.00
-          1    1969     12.68         100.00     12.64          99.64
-       &lt;NA&gt;      56                               0.36         100.00
-      Total   15581    100.00         100.00    100.00         100.00
+          0   15670     86.53          86.53     82.76          82.76
+          1    2440     13.47         100.00     12.89          95.64
+       &lt;NA&gt;     825                               4.36         100.00
+      Total   18935    100.00         100.00    100.00         100.00
 
 Group: wave = September 2020  
 
               Freq   % Valid   % Valid Cum.   % Total   % Total Cum.
 ----------- ------ --------- -------------- --------- --------------
-        -77    127      2.59           2.59      2.59           2.59
-          0   4005     81.57          84.15     81.57          84.15
-          1    778     15.85         100.00     15.85         100.00
-       &lt;NA&gt;      0                               0.00         100.00
+          0   4005     83.73          83.73     81.57          81.57
+          1    778     16.27         100.00     15.85          97.41
+       &lt;NA&gt;    127                               2.59         100.00
       Total   4910    100.00         100.00    100.00         100.00
 
 Group: wave = October 2020  
 
                Freq   % Valid   % Valid Cum.   % Total   % Total Cum.
 ----------- ------- --------- -------------- --------- --------------
-        -77     502      3.28           3.28      3.28           3.28
-          0   12760     83.46          86.75     83.46          86.74
-          1    2026     13.25         100.00     13.25          99.99
-       &lt;NA&gt;       1                               0.01         100.00
+          0   12760     86.30          86.30     83.46          83.46
+          1    2026     13.70         100.00     13.25          96.71
+       &lt;NA&gt;     503                               3.29         100.00
       Total   15289    100.00         100.00    100.00         100.00
 
 Group: wave = November 2020  
 
               Freq   % Valid   % Valid Cum.   % Total   % Total Cum.
 ----------- ------ --------- -------------- --------- --------------
-        -77    128      2.65           2.65      2.65           2.65
-          0   3897     80.82          83.47     80.82          83.47
-          1    797     16.53         100.00     16.53         100.00
-       &lt;NA&gt;      0                               0.00         100.00
+          0   3897     83.02          83.02     80.82          80.82
+          1    797     16.98         100.00     16.53          97.35
+       &lt;NA&gt;    128                               2.65         100.00
       Total   4822    100.00         100.00    100.00         100.00
 
 Group: wave = December 2020  
 
                Freq   % Valid   % Valid Cum.   % Total   % Total Cum.
 ----------- ------- --------- -------------- --------- --------------
-        -77     531      3.67           3.67      3.67           3.67
-          0   12184     84.12          87.79     84.12          87.79
-          1    1769     12.21         100.00     12.21         100.00
-       &lt;NA&gt;       0                               0.00         100.00
+          0   12184     87.32          87.32     84.12          84.12
+          1    1769     12.68         100.00     12.21          96.33
+       &lt;NA&gt;     531                               3.67         100.00
       Total   14484    100.00         100.00    100.00         100.00
 
 Group: wave = January 2021  
 
               Freq   % Valid   % Valid Cum.   % Total   % Total Cum.
 ----------- ------ --------- -------------- --------- --------------
-        -77     38      2.24           2.24      2.24           2.24
-          0   1369     80.72          82.96     80.72          82.96
-          1    289     17.04         100.00     17.04         100.00
+          0   1369     82.57          82.57     80.72          80.72
+          1    289     17.43         100.00     17.04          97.76
+       &lt;NA&gt;     38                               2.24         100.00
+      Total   1696    100.00         100.00    100.00         100.00
+
+Group: wave = NA  
+
+              Freq   % Valid   % Valid Cum.   % Total   % Total Cum.
+----------- ------ --------- -------------- --------- --------------
+          1      1    100.00         100.00    100.00         100.00
        &lt;NA&gt;      0                               0.00         100.00
-      Total   1696    100.00         100.00    100.00         100.00</code></pre>
+      Total      1    100.00         100.00    100.00         100.00</code></pre>
 </div>
-<div id="frequency-of-treatment-seeking" class="section level3">
-<h3>Frequency of treatment seeking</h3>
+<div id="frequency-of-treatment-seeking-overall" class="section level3">
+<h3>Frequency of treatment seeking overall</h3>
+<p>Number of people who sought treatment at any point during the pandemic</p>
+<pre><code>Frequencies  
+AnySeekSums$AnyHelpSeek  
+Type: Character  
+
+                           Freq   % Valid   % Valid Cum.   % Total   % Total Cum.
+----------------------- ------- --------- -------------- --------- --------------
+      Never sought help   22588     80.65          80.65     80.65          80.65
+            Sought help    5420     19.35         100.00     19.35         100.00
+                   &lt;NA&gt;       0                               0.00         100.00
+                  Total   28008    100.00         100.00    100.00         100.00</code></pre>
+</div>
+<div id="frequency-of-reasons-for-seeking-treatment-by-wave" class="section level3">
+<h3>Frequency of reasons for seeking treatment (by wave)</h3>
+<pre><code>Frequencies  
+treat_dat$ReasonSeek  
+Type: Character  
+Group: wave = June 2020  
+
+               Freq   % Valid   % Valid Cum.   % Total   % Total Cum.
+----------- ------- --------- -------------- --------- --------------
+       &lt;NA&gt;   19140                             100.00         100.00
+      Total   19140      0.00         100.00    100.00         100.00
+
+Group: wave = July 2020  
+
+                                         Freq   % Valid   % Valid Cum.   % Total   % Total Cum.
+------------------------------------- ------- --------- -------------- --------- --------------
+      Existing mental health disorder     529     66.12          66.12      2.51           2.51
+                 Mental health crisis      14      1.75          67.88      0.07           2.58
+              Newly emerging symptoms     257     32.12         100.00      1.22           3.80
+                                 &lt;NA&gt;   20236                              96.20         100.00
+                                Total   21036    100.00         100.00    100.00         100.00
+
+Group: wave = August 2020  
+
+                                         Freq   % Valid   % Valid Cum.   % Total   % Total Cum.
+------------------------------------- ------- --------- -------------- --------- --------------
+      Existing mental health disorder    1956     72.28          72.28     10.33          10.33
+                 Mental health crisis      30      1.11          73.39      0.16          10.49
+              Newly emerging symptoms     720     26.61         100.00      3.80          14.29
+                                 &lt;NA&gt;   16229                              85.71         100.00
+                                Total   18935    100.00         100.00    100.00         100.00
+
+Group: wave = September 2020  
+
+                                        Freq   % Valid   % Valid Cum.   % Total   % Total Cum.
+------------------------------------- ------ --------- -------------- --------- --------------
+      Existing mental health disorder    598     70.94          70.94     12.18          12.18
+                 Mental health crisis     19      2.25          73.19      0.39          12.57
+              Newly emerging symptoms    226     26.81         100.00      4.60          17.17
+                                 &lt;NA&gt;   4067                              82.83         100.00
+                                Total   4910    100.00         100.00    100.00         100.00
+
+Group: wave = October 2020  
+
+                                         Freq   % Valid   % Valid Cum.   % Total   % Total Cum.
+------------------------------------- ------- --------- -------------- --------- --------------
+      Existing mental health disorder    1620     72.55          72.55     10.60          10.60
+                 Mental health crisis      39      1.75          74.29      0.26          10.85
+              Newly emerging symptoms     574     25.71         100.00      3.75          14.61
+                                 &lt;NA&gt;   13056                              85.39         100.00
+                                Total   15289    100.00         100.00    100.00         100.00
+
+Group: wave = November 2020  
+
+                                        Freq   % Valid   % Valid Cum.   % Total   % Total Cum.
+------------------------------------- ------ --------- -------------- --------- --------------
+      Existing mental health disorder    605     70.76          70.76     12.55          12.55
+                 Mental health crisis     12      1.40          72.16      0.25          12.80
+              Newly emerging symptoms    238     27.84         100.00      4.94          17.73
+                                 &lt;NA&gt;   3967                              82.27         100.00
+                                Total   4822    100.00         100.00    100.00         100.00
+
+Group: wave = December 2020  
+
+                                         Freq   % Valid   % Valid Cum.   % Total   % Total Cum.
+------------------------------------- ------- --------- -------------- --------- --------------
+      Existing mental health disorder    1389     71.78          71.78      9.59           9.59
+                 Mental health crisis      30      1.55          73.33      0.21           9.80
+              Newly emerging symptoms     516     26.67         100.00      3.56          13.36
+                                 &lt;NA&gt;   12549                              86.64         100.00
+                                Total   14484    100.00         100.00    100.00         100.00
+
+Group: wave = January 2021  
+
+                                        Freq   % Valid   % Valid Cum.   % Total   % Total Cum.
+------------------------------------- ------ --------- -------------- --------- --------------
+      Existing mental health disorder    232     73.89          73.89     13.68          13.68
+                 Mental health crisis      4      1.27          75.16      0.24          13.92
+              Newly emerging symptoms     78     24.84         100.00      4.60          18.51
+                                 &lt;NA&gt;   1382                              81.49         100.00
+                                Total   1696    100.00         100.00    100.00         100.00
+
+Group: wave = NA  
+
+                                        Freq   % Valid   % Valid Cum.   % Total   % Total Cum.
+------------------------------------- ------ --------- -------------- --------- --------------
+      Existing mental health disorder      1    100.00         100.00    100.00         100.00
+                                 &lt;NA&gt;      0                               0.00         100.00
+                                Total      1    100.00         100.00    100.00         100.00</code></pre>
+</div>
+<div id="frequency-of-reasons-for-seeking-treatment-by-wave-by-treatment-seeking-numbers" class="section level3">
+<h3>Frequency of reasons for seeking treatment (by wave, by treatment seeking numbers)</h3>
+<p>Note: Some people may have sought help more than once for more than one reason</p>
+<p>The people who have a reason, but also fall in the did not seek treatment for self column (0) will be people who sought help at at least one point and gave a reason for that, but obviously might not have done so at every point.</p>
+<pre><code>Cross-Tabulation, Row Proportions  
+ReasonSeek * soughthelp_for_self  
+Data Frame: treat_dat  
+
+--------------------------------- --------------------- --------------- -------------- --------------- -----------------
+                                    soughthelp_for_self               0              1            &lt;NA&gt;             Total
+                       ReasonSeek                                                                                       
+  Existing mental health disorder                          1044 (15.1%)   5886 (84.9%)       0 ( 0.0%)     6930 (100.0%)
+             Mental health crisis                            71 (48.0%)     77 (52.0%)       0 ( 0.0%)      148 (100.0%)
+          Newly emerging symptoms                           460 (17.6%)   2149 (82.4%)       0 ( 0.0%)     2609 (100.0%)
+                             &lt;NA&gt;                         52233 (57.6%)    685 ( 0.8%)   37708 (41.6%)    90626 (100.0%)
+                            Total                         53808 (53.6%)   8797 ( 8.8%)   37708 (37.6%)   100313 (100.0%)
+--------------------------------- --------------------- --------------- -------------- --------------- -----------------</code></pre>
 </div>
 </div>
 <div id="analytic-decision-notes" class="section level2">

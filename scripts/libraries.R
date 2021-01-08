@@ -39,3 +39,9 @@ if(!require(summarytools)){
   install.packages("summarytools")
   library(summarytools)
 }
+
+
+if(!require(skimr)){
+  install.packages("skimr")
+  library(skimr)
+}
