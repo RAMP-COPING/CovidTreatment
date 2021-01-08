@@ -63,6 +63,10 @@ crisis as a third (number dependent)
 **barriers**
 Systemic and client level
 
+### People who have helped along the way
+Henry 
+Laura
+Molly
 
 # set up 
 
@@ -152,11 +156,6 @@ COPING
 ```{r identify wave dates coping}
 setwd(wd)
 source("./scripts/COPINGwaves.R")
-```
-
-```{r add wave column ramp}
-
-
 ```
 
 ## Create data set per wave for RAMP treatment

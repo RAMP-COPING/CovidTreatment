@@ -1,27 +1,56 @@
 ## Create wave column in COPING
-## use start dates for data distribution emails to identify waves
+## use start dates for data distribution emails to identify waves from the RAMP study to ensure that the waves are comparable time periods 
+## across the two studies
+
+## that means COPING will have no data for wave 1 (RAMP sent out a wave before COPING in set B)
+## but will have a 6th wave as the set a questionnaire has already gone out for this sample, but RAMPS equivalent only goes out at the end of this month
 
 
-start1 <- as.POSIXct("2020-05-05")
-end1 <-  as.POSIXct("2020-06-01")
+# May
+start1 <- as.POSIXct("2020-05-01")
+end1 <-  as.POSIXct("2020-05-31")
 
-start2 <- as.POSIXct("2020-06-02")
-end2 <-  as.POSIXct("2020-06-29")
+# June
+start2 <- as.POSIXct("2020-06-01")
+end2 <-  as.POSIXct("2020-06-30")
 
+#July
 start3 <- as.POSIXct("2020-06-30")
-end3 <-  as.POSIXct("2020-09-21")
+end3 <-  as.POSIXct("2020-07-31")
 
-start4 <- as.POSIXct("2020-09-22")
-end4 <-  as.POSIXct("2020-11-016")
+#August
+start4 <- as.POSIXct("2020-08-01")
+end4 <-  as.POSIXct("2020-09-01")
 
-start5 <- as.POSIXct("2020-11-17")
-end5 <-  as.POSIXct("2020-12-17")
+#September
+start5 <- as.POSIXct("2020-09-01")
+end5 <-  as.POSIXct("2020-09-30")
 
-treatCOPING <- 
-  treatCOPING %>%
-  mutate(wave =  case_when(startDate >= start1 & startDate <= end1 ~ 1,
-                           startDate >= start2 & startDate <= end2 ~ 2,
-                           startDate >= start3 & startDate <= end3 ~ 3,
-                           startDate >= start4 & startDate <= end4 ~ 4,
-                           startDate >= start5 & startDate <= end5 ~ 5,
+#October
+start6 <- as.POSIXct("2020-10-01")
+end6 <-   as.POSIXct("2021-10-31") 
+
+#November
+start7 <- as.POSIXct("2020-11-01")
+end7 <-   as.POSIXct("2021-11-30") 
+
+#December
+start8 <- as.POSIXct("2020-12-01")
+end8 <-   as.POSIXct("2020-12-31") 
+
+#January
+start9 <- as.POSIXct("2021-01-01")
+end9 <-   as.POSIXct("2021-01-31") 
+
+treatCOPE <- 
+  treatCOPE %>%
+  mutate(wave =  case_when(startDate >= start1 & startDate <= end1 ~ "May 2020",
+                           startDate >= start2 & startDate < end2 ~ "June 2020",
+                           startDate >= start3 & startDate < end3 ~ "July 2020",
+                           startDate >= start4 & startDate < end4 ~ "August 2020",
+                           startDate >= start5 & startDate < end5 ~ "September 2020",
+                           startDate >= start6 & startDate < end6 ~ "October 2020",
+                           startDate >= start7 & startDate < end7 ~ "November 2020",
+                           startDate >= start8 & startDate < end8 ~ "December 2020",
+                           startDate >= start9 & startDate < end9 ~ "January 2021",
                            TRUE ~ NA_real_))
