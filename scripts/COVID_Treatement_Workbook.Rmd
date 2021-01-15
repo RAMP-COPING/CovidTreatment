@@ -297,7 +297,7 @@ treat_dat$soughthelp_for_self <- ifelse(treat_dat$soughthelp_for_self == -77,NA,
 ```
 
 #### Create summary variables for treatment
-Grouping variables to make sensible categoires for comparing different aspects of treatment seeking
+Grouping variables to make sensible categories for comparing different aspects of treatment seeking
 
 
 ##### Sought help for new or pre-existing MH disorder 
@@ -361,10 +361,13 @@ treat_dat <- treat_dat %>%
 
 ```
 
+
 ##### Sought treatment at any time (How many times, how many total responses)
 
 Create a dataset and column that identifies how many times someone sought help, how many times they responded, and if they ever sought help
 ```{r treatment seek in any wave}
+
+
 
 ```
 
@@ -376,8 +379,7 @@ Create a dataset and column that identifies how many times someone sought help, 
 ```
 
 ##### Received help having sought it (include proprtion of times help is received having sought it)
-
-Check if anyone has not received help at all having sought it, check proportion of times help received having sought it
+Check if anyone has not received help at all having sought it, check proportion of times help received having sought it, separated into supported vs self-guided treatments
 ```{r received help having sought it}
 
 
@@ -468,6 +470,15 @@ treat_dat %>%
 ### Frequency of treatment seeking overall
 Number of people who sought treatment at any point during the pandemic
 ```{r check number of overall treatment seeking}
+
+```
+
+### Frequency of treatment receipt by wave
+
+```{r treatment receipt by wave}
+treat_dat %>%
+  group_by(wave) %>%
+  freq(TypeReceived)
 
 ```
 
