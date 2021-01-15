@@ -75,7 +75,7 @@ Molly
 3. Map of the UK showing rates of treatment seeking and receipt per area (prop sought treatment == size, proportion received == colour) probably district or rgion level?
 4. Forest plots
 
-
+** prevention figure: bars for each barrier type, coloured by whether systemic or client led
 
 # set up 
 
@@ -437,6 +437,9 @@ treat_dat$BarrierToTreatment.Client <- ifelse(client>0,1,0)
 other <- rowSums(sapply(treat_dat[grep("prevent",names(treat_dat))], function(v) v %in% c("Other")))
 treat_dat$BarrierToTreatment.Other <- ifelse(other>0,1,0)
 ```
+
+##### Count number of systemic vs client led barriers over whole sample for service type
+
 
 # Aim 1 analyses
 

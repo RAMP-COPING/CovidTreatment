@@ -2919,7 +2919,7 @@ div.tocify {
 
 <h1 class="title toc-ignore">RAMP/COPING treatment paper core notebook</h1>
 <h4 class="author">K L Purves</h4>
-<h4 class="date">08 January, 2021</h4>
+<h4 class="date">15 January, 2021</h4>
 
 </div>
 
@@ -2976,6 +2976,7 @@ div.tocify {
 <li>Map of the UK showing rates of treatment seeking and receipt per area (prop sought treatment == size, proportion received == colour) probably district or rgion level?</li>
 <li>Forest plots</li>
 </ol>
+<p>** prevention figure: bars for each barrier type, coloured by whether systemic or client led</p>
 </div>
 </div>
 <div id="set-up" class="section level1">
@@ -3136,6 +3137,9 @@ visible FALSE                  </code></pre>
 <h5>total barriers that are client focused or systemic by wave</h5>
 <p>Create dummy variables indicating systemic and client barriers in a column each</p>
 </div>
+<div id="count-number-of-systemic-vs-client-led-barriers-over-whole-sample-for-service-type" class="section level5">
+<h5>Count number of systemic vs client led barriers over whole sample for service type</h5>
+</div>
 </div>
 </div>
 </div>
@@ -3147,7 +3151,7 @@ visible FALSE                  </code></pre>
 <h3>Response rates per wave</h3>
 <div data-pagedtable="false">
 <script data-pagedtable-source type="application/json">
-{"columns":[{"label":["wave"],"name":[1],"type":["fctr"],"align":["left"]},{"label":["n"],"name":[2],"type":["int"],"align":["right"]}],"data":[{"1":"June 2020","2":"19068"},{"1":"July 2020","2":"20891"},{"1":"August 2020","2":"18837"},{"1":"September 2020","2":"4889"},{"1":"October 2020","2":"15211"},{"1":"November 2020","2":"4796"},{"1":"December 2020","2":"14407"},{"1":"January 2021","2":"1691"},{"1":"NA","2":"1"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
+{"columns":[{"label":["wave"],"name":[1],"type":["fctr"],"align":["left"]},{"label":["n"],"name":[2],"type":["int"],"align":["right"]}],"data":[{"1":"June 2020","2":"19068"},{"1":"July 2020","2":"20891"},{"1":"August 2020","2":"18837"},{"1":"September 2020","2":"4889"},{"1":"October 2020","2":"15211"},{"1":"November 2020","2":"4796"},{"1":"December 2020","2":"14410"},{"1":"January 2021","2":"1691"},{"1":"NA","2":"1"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
   </script>
 </div>
 </div>
@@ -3212,10 +3216,10 @@ Group: wave = December 2020
 
                Freq   % Valid   % Valid Cum.   % Total   % Total Cum.
 ----------- ------- --------- -------------- --------- --------------
-          0   12133     87.43          87.43     84.22          84.22
-          1    1745     12.57         100.00     12.11          96.33
+          0   12135     87.42          87.42     84.21          84.21
+          1    1746     12.58         100.00     12.12          96.33
        &lt;NA&gt;     529                               3.67         100.00
-      Total   14407    100.00         100.00    100.00         100.00
+      Total   14410    100.00         100.00    100.00         100.00
 
 Group: wave = January 2021  
 
@@ -3302,10 +3306,10 @@ Group: wave = December 2020
 
                Freq   % Valid   % Valid Cum.   % Total   % Total Cum.
 ----------- ------- --------- -------------- --------- --------------
-          0   14025     97.35          97.35     97.35          97.35
-          1     382      2.65         100.00      2.65         100.00
+          0   14027     97.34          97.34     97.34          97.34
+          1     383      2.66         100.00      2.66         100.00
        &lt;NA&gt;       0                               0.00         100.00
-      Total   14407    100.00         100.00    100.00         100.00
+      Total   14410    100.00         100.00    100.00         100.00
 
 Group: wave = January 2021  
 
@@ -3384,10 +3388,10 @@ Group: wave = December 2020
 
                Freq   % Valid   % Valid Cum.   % Total   % Total Cum.
 ----------- ------- --------- -------------- --------- --------------
-          0   14086     97.77          97.77     97.77          97.77
+          0   14089     97.77          97.77     97.77          97.77
           1     321      2.23         100.00      2.23         100.00
        &lt;NA&gt;       0                               0.00         100.00
-      Total   14407    100.00         100.00    100.00         100.00
+      Total   14410    100.00         100.00    100.00         100.00
 
 Group: wave = January 2021  
 
@@ -3466,10 +3470,10 @@ Group: wave = December 2020
 
                Freq   % Valid   % Valid Cum.   % Total   % Total Cum.
 ----------- ------- --------- -------------- --------- --------------
-          0   14147     98.20          98.20     98.20          98.20
+          0   14150     98.20          98.20     98.20          98.20
           1     260      1.80         100.00      1.80         100.00
        &lt;NA&gt;       0                               0.00         100.00
-      Total   14407    100.00         100.00    100.00         100.00
+      Total   14410    100.00         100.00    100.00         100.00
 
 Group: wave = January 2021  
 
@@ -3557,11 +3561,11 @@ Group: wave = December 2020
 
                                          Freq   % Valid   % Valid Cum.   % Total   % Total Cum.
 ------------------------------------- ------- --------- -------------- --------- --------------
-      Existing mental health disorder    1365     71.54          71.54      9.47           9.47
-                 Mental health crisis      29      1.52          73.06      0.20           9.68
-              Newly emerging symptoms     514     26.94         100.00      3.57          13.24
-                                 &lt;NA&gt;   12499                              86.76         100.00
-                                Total   14407    100.00         100.00    100.00         100.00
+      Existing mental health disorder    1365     71.50          71.50      9.47           9.47
+                 Mental health crisis      29      1.52          73.02      0.20           9.67
+              Newly emerging symptoms     515     26.98         100.00      3.57          13.25
+                                 &lt;NA&gt;   12501                              86.75         100.00
+                                Total   14410    100.00         100.00    100.00         100.00
 
 Group: wave = January 2021  
 
@@ -3642,10 +3646,10 @@ Group: wave = December 2020
 
                      Freq   % Valid   % Valid Cum.   % Total   % Total Cum.
 ----------------- ------- --------- -------------- --------- --------------
-      Self-guided     174     11.04          11.04      1.21           1.21
-        Supported    1402     88.96         100.00      9.73          10.94
-             &lt;NA&gt;   12831                              89.06         100.00
-            Total   14407    100.00         100.00    100.00         100.00
+      Self-guided     174     11.03          11.03      1.21           1.21
+        Supported    1403     88.97         100.00      9.74          10.94
+             &lt;NA&gt;   12833                              89.06         100.00
+            Total   14410    100.00         100.00    100.00         100.00
 
 Group: wave = January 2021  
 
@@ -3677,9 +3681,9 @@ Data Frame: treat_dat
                        ReasonSeek                                                                                      
   Existing mental health disorder                          1037 (15.1%)   5818 (84.9%)       0 ( 0.0%)    6855 (100.0%)
              Mental health crisis                            71 (48.3%)     76 (51.7%)       0 ( 0.0%)     147 (100.0%)
-          Newly emerging symptoms                           458 (17.7%)   2134 (82.3%)       0 ( 0.0%)    2592 (100.0%)
-                             &lt;NA&gt;                         52008 (57.7%)    681 ( 0.8%)   37508 (41.6%)   90197 (100.0%)
-                            Total                         53574 (53.7%)   8709 ( 8.7%)   37508 (37.6%)   99791 (100.0%)
+          Newly emerging symptoms                           458 (17.7%)   2135 (82.3%)       0 ( 0.0%)    2593 (100.0%)
+                             &lt;NA&gt;                         52010 (57.7%)    681 ( 0.8%)   37508 (41.6%)   90199 (100.0%)
+                            Total                         53576 (53.7%)   8710 ( 8.7%)   37508 (37.6%)   99794 (100.0%)
 --------------------------------- --------------------- --------------- -------------- --------------- ----------------</code></pre>
 </div>
 </div>
