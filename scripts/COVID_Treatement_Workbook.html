@@ -3120,6 +3120,7 @@ visible FALSE                  </code></pre>
 <div id="sought-treatment-at-any-time-how-many-times-how-many-total-responses" class="section level5">
 <h5>Sought treatment at any time (How many times, how many total responses)</h5>
 <p>Create a dataset and column that identifies how many times someone sought help, how many times they responded, and if they ever sought help</p>
+<p>Making a new dataset where the count by ID is tracked</p>
 </div>
 <div id="received-treatment-at-any-time-how-many-times-how-many-total-response" class="section level5">
 <h5>received treatment at any time (How many times, how many total response)</h5>
@@ -3241,6 +3242,23 @@ Group: wave = NA
 <div id="frequency-of-treatment-seeking-overall" class="section level3">
 <h3>Frequency of treatment seeking overall</h3>
 <p>Number of people who sought treatment at any point during the pandemic</p>
+<pre><code>Frequencies  
+treat_dat_byID$AnySeek  
+Type: Character  
+
+                                   Freq   % Valid   % Valid Cum.   % Total   % Total Cum.
+------------------------------- ------- --------- -------------- --------- --------------
+              Never sought help   22530     80.68          80.68     80.68          80.68
+      Sought help at least once    5396     19.32         100.00     19.32         100.00
+                           &lt;NA&gt;       0                               0.00         100.00
+                          Total   27926    100.00         100.00    100.00         100.00</code></pre>
+</div>
+<div id="count-table-of-treatment-seeking-across-all-waves" class="section level3">
+<h3>Count table of treatment seeking across all waves</h3>
+<p>Number of times people sought treatment at any point during the pandemic</p>
+<pre><code>
+    0     1     2     3     4 
+22530  3094  1428   736   138 </code></pre>
 </div>
 <div id="frequency-of-treatment-receipt-by-wave" class="section level3">
 <h3>Frequency of treatment receipt by wave</h3>

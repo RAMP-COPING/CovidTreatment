@@ -365,9 +365,19 @@ treat_dat <- treat_dat %>%
 ##### Sought treatment at any time (How many times, how many total responses)
 
 Create a dataset and column that identifies how many times someone sought help, how many times they responded, and if they ever sought help
+
+Making a new dataset where the count by ID is tracked
+```{r treatment seek in any wave count}
+
+treat_dat_byID <- treat_dat %>%
+  group_by(ID) %>%
+  tally(soughthelp_for_self)
+
+```
+
 ```{r treatment seek in any wave}
 
-
+treat_dat_byID$AnySeek <- ifelse(treat_dat_byID$n > 0,"Sought help at least once", "Never sought help")
 
 ```
 
@@ -442,7 +452,6 @@ treat_dat$BarrierToTreatment.Other <- ifelse(other>0,1,0)
 
 ##### Count number of systemic vs client led barriers over whole sample for service type
 
-
 # Aim 1 analyses
 
 ## Descriptives
@@ -469,7 +478,18 @@ treat_dat %>%
 
 ### Frequency of treatment seeking overall
 Number of people who sought treatment at any point during the pandemic
+```{r check  overall treatment seeking}
+
+treat_dat_byID %>%
+  freq(AnySeek)
+
+```
+
+### Count table of treatment seeking across all waves
+Number of times people sought treatment at any point during the pandemic
 ```{r check number of overall treatment seeking}
+
+table(treat_dat_byID$n)
 
 ```
 
