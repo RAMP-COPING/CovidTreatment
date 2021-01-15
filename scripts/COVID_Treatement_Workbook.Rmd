@@ -307,13 +307,9 @@ Categorise reasons for help seeking into whether it was for a pre-existing, newl
 ```{r dummy reason for help seek variable}
 
 treat_dat <- treat_dat %>%
-  mutate(ReasonSeek = case_when(reasonhelp_new_mh == 1 ~ "Newly emerging symptoms",
-                                reasonhelp_new_med == 1 ~ "Newly emerging symptoms",
-                                reasonhelp_cont_mh == 1 ~ "Existing mental health disorder",
-                                reasonhelp_worsen_mh == 1 ~ "Existing mental health disorder",
-                                reasonhelp_repeat_prescription == 1 ~ "Existing mental health disorder",
-                                reasonhelp_change_med == 1 ~ "Existing mental health disorder",
-                                reasonhelp_alt_support == 1 ~ "Existing mental health disorder",
+  mutate(ReasonSeek = case_when(reasonhelp_new_mh == 1 | reasonhelp_new_med == 1 ~ "Newly emerging symptoms",
+                                reasonhelp_cont_mh == 1 | reasonhelp_worsen_mh == 1 | reasonhelp_repeat_prescription == 1 |
+                                 reasonhelp_change_med == 1 | reasonhelp_alt_support == 1 ~ "Existing mental health",
                                 reasonhelp_mh_crisis == 1 ~ "Mental health crisis" ))
 
 ```
@@ -519,6 +515,15 @@ treat_dat %>%
 treat_dat %>%
   group_by(wave) %>%
   freq(soughthelp_for_self)
+
+```
+### Reason for seeking treatment by wave
+
+```{r reason seek by wave}
+
+treat_dat %>%
+  group_by(wave) %>%
+  freq(ReasonSeek)
 
 ```
 ### Frequency of treatment receipt by type and wave (any instances of treatment, not total instances)
