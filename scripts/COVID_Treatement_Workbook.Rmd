@@ -557,7 +557,6 @@ treat_dat %>%
   freq(TypeSought.SelfGuided.total)
 
 ```
-
 ### Frequency of treatment receipt by wave (any instances of treatment, not total instances)
 Seeking ANY instances of this type of treatment (i.e., if they sought supported help from 3 sources ina  wave, it will just register once)
 
@@ -575,7 +574,6 @@ Supported
 treat_dat %>%
   group_by(wave) %>%
   freq(TypeReceived.SelfGuide.Any)
-
 ```
 
 ### Frequency of treatment receipt by wave (total)
@@ -586,7 +584,6 @@ Supported
 treat_dat %>%
   group_by(wave) %>%
   freq(TypeReceived.Supported.total)
-
 ```
 
 Self guided
@@ -594,7 +591,6 @@ Self guided
 treat_dat %>%
   group_by(wave) %>%
   freq(TypeReceived.SelfGuided.total)
-
 ```
 
 
