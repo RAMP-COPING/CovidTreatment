@@ -80,4 +80,15 @@ treat_dat <- treat_dat %>%
                                              treatmenthelpful_nongov_website == "Somewhat helpful" ~ "Somewhat helpful",
                                              treatmenthelpful_nongov_website == "Very helpful" ~ "Very helpful",
                                              treatmenthelpful_nongov_website == "Extremely helpful" ~ "Extremely helpful"))
+
+## reodrder factors
+
+treat_dat$Helpfulness_Supported <- factor(treat_dat$Helpfulness_Supported, levels=c("Extremely unhelpful","Very unhelpful","Somewhat unhelpful",
+                                                                                    "Neither helpful nor unhelpful",
+                                                                                    "Somewhat helpful","Very helpful","Extremely helpful"))
+
+treat_dat$Helpfulness_SelfGuided <- factor(treat_dat$Helpfulness_SelfGuided, levels=c("Extremely unhelpful","Very unhelpful","Somewhat unhelpful",
+                                                                                    "Neither helpful nor unhelpful",
+                                                                                    "Somewhat helpful","Very helpful","Extremely helpful"))
+
          

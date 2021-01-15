@@ -666,7 +666,6 @@ treat_dat %>%
   freq(Helpfulness_SelfGuided)
 ```
 
-
 ## Analytic decision notes
 
 ### Including cohort as a covariate
