@@ -3104,7 +3104,7 @@ visible FALSE                  </code></pre>
 </div>
 <div id="create-summary-variables-for-treatment" class="section level4">
 <h4>Create summary variables for treatment</h4>
-<p>Grouping variables to make sensible categoires for comparing different aspects of treatment seeking</p>
+<p>Grouping variables to make sensible categories for comparing different aspects of treatment seeking</p>
 <div id="sought-help-for-new-or-pre-existing-mh-disorder" class="section level5">
 <h5>Sought help for new or pre-existing MH disorder</h5>
 <p>Categorise reasons for help seeking into whether it was for a pre-existing, newly emerging MH disorder or a crisis</p>
@@ -3126,7 +3126,7 @@ visible FALSE                  </code></pre>
 </div>
 <div id="received-help-having-sought-it-include-proprtion-of-times-help-is-received-having-sought-it" class="section level5">
 <h5>Received help having sought it (include proprtion of times help is received having sought it)</h5>
-<p>Check if anyone has not received help at all having sought it, check proportion of times help received having sought it</p>
+<p>Check if anyone has not received help at all having sought it, check proportion of times help received having sought it, separated into supported vs self-guided treatments</p>
 </div>
 <div id="client-level-vs-systemic-barriers" class="section level5">
 <h5>Client level vs systemic barriers</h5>
@@ -3241,6 +3241,89 @@ Group: wave = NA
 <div id="frequency-of-treatment-seeking-overall" class="section level3">
 <h3>Frequency of treatment seeking overall</h3>
 <p>Number of people who sought treatment at any point during the pandemic</p>
+</div>
+<div id="frequency-of-treatment-receipt-by-wave" class="section level3">
+<h3>Frequency of treatment receipt by wave</h3>
+<pre><code>Frequencies  
+treat_dat$TypeReceived  
+Type: Character  
+Group: wave = June 2020  
+
+               Freq   % Valid   % Valid Cum.   % Total   % Total Cum.
+----------- ------- --------- -------------- --------- --------------
+       &lt;NA&gt;   19068                             100.00         100.00
+      Total   19068      0.00         100.00    100.00         100.00
+
+Group: wave = July 2020  
+
+                     Freq   % Valid   % Valid Cum.   % Total   % Total Cum.
+----------------- ------- --------- -------------- --------- --------------
+      Self-guided      52      8.52           8.52      0.25           0.25
+        Supported     558     91.48         100.00      2.67           2.92
+             &lt;NA&gt;   20281                              97.08         100.00
+            Total   20891    100.00         100.00    100.00         100.00
+
+Group: wave = August 2020  
+
+                     Freq   % Valid   % Valid Cum.   % Total   % Total Cum.
+----------------- ------- --------- -------------- --------- --------------
+      Self-guided     199      9.84           9.84      1.06           1.06
+        Supported    1824     90.16         100.00      9.68          10.74
+             &lt;NA&gt;   16814                              89.26         100.00
+            Total   18837    100.00         100.00    100.00         100.00
+
+Group: wave = September 2020  
+
+                    Freq   % Valid   % Valid Cum.   % Total   % Total Cum.
+----------------- ------ --------- -------------- --------- --------------
+      Self-guided     66     10.39          10.39      1.35           1.35
+        Supported    569     89.61         100.00     11.64          12.99
+             &lt;NA&gt;   4254                              87.01         100.00
+            Total   4889    100.00         100.00    100.00         100.00
+
+Group: wave = October 2020  
+
+                     Freq   % Valid   % Valid Cum.   % Total   % Total Cum.
+----------------- ------- --------- -------------- --------- --------------
+      Self-guided     170     10.35          10.35      1.12           1.12
+        Supported    1473     89.65         100.00      9.68          10.80
+             &lt;NA&gt;   13568                              89.20         100.00
+            Total   15211    100.00         100.00    100.00         100.00
+
+Group: wave = November 2020  
+
+                    Freq   % Valid   % Valid Cum.   % Total   % Total Cum.
+----------------- ------ --------- -------------- --------- --------------
+      Self-guided     57      8.85           8.85      1.19           1.19
+        Supported    587     91.15         100.00     12.24          13.43
+             &lt;NA&gt;   4152                              86.57         100.00
+            Total   4796    100.00         100.00    100.00         100.00
+
+Group: wave = December 2020  
+
+                     Freq   % Valid   % Valid Cum.   % Total   % Total Cum.
+----------------- ------- --------- -------------- --------- --------------
+      Self-guided     140      9.49           9.49      0.97           0.97
+        Supported    1336     90.51         100.00      9.27          10.24
+             &lt;NA&gt;   12934                              89.76         100.00
+            Total   14410    100.00         100.00    100.00         100.00
+
+Group: wave = January 2021  
+
+                    Freq   % Valid   % Valid Cum.   % Total   % Total Cum.
+----------------- ------ --------- -------------- --------- --------------
+      Self-guided     19      8.15           8.15      1.12           1.12
+        Supported    214     91.85         100.00     12.66          13.78
+             &lt;NA&gt;   1458                              86.22         100.00
+            Total   1691    100.00         100.00    100.00         100.00
+
+Group: wave = NA  
+
+                  Freq   % Valid   % Valid Cum.   % Total   % Total Cum.
+--------------- ------ --------- -------------- --------- --------------
+      Supported      1    100.00         100.00    100.00         100.00
+           &lt;NA&gt;      0                               0.00         100.00
+          Total      1    100.00         100.00    100.00         100.00</code></pre>
 </div>
 <div id="frequency-of-systemic-client-barriers-by-wave" class="section level3">
 <h3>Frequency of systemic / client barriers by wave</h3>
