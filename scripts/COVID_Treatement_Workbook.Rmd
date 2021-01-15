@@ -334,16 +334,23 @@ create a variable that will say if they sought supported or self guided for each
 ```{r dummy type of treatment sought}
 
 treat_dat <- treat_dat %>%
-  mutate(TypeSought = case_when(wherehelp_sought_emergency_mh == 1 ~ "Supported",
-                               wherehelp_sought_existing_mh_team == 1 ~ "Supported",
-                                wherehelp_sought_online_talk_therapy == 1 ~ "Supported",
-                                wherehelp_sought_gp == 1 ~ "Supported",
-                                wherehelp_received_nonnhs_phone == 1 ~ "Supported",
-                                wherehelp_sought_nhs_111 == 1 ~ "Supported",
-                                wherehelp_sought_gov_website == 1 ~ "Self-guided",
-                                wherehelp_received_selfguide_online == 1 ~ "Self-guided",
-                                wherehelp_sought_nongov_website == 1 ~ "Self-guided",
-                                wherehelp_sought_struc_therapy == 1 ~ "Self-guided"))
+  mutate(TypeSought.Supported.Any  = case_when(wherehelp_sought_emergency_mh == 1 ~ "Sought Supported",
+                               wherehelp_sought_existing_mh_team == 1 ~ "Sought Supported",
+                                wherehelp_sought_online_talk_therapy == 1 ~ "Sought Supported",
+                                wherehelp_sought_gp == 1 ~ "Sought Supported",
+                                wherehelp_sought_nonnhs_phone == 1 ~ "Sought Supported",
+                                wherehelp_sought_nhs_111 == 1 ~ "Sought Supported", 
+                               TRUE ~ "Did not seek supported treatment"),
+         TypeSought.SelfGuide.Any = case_when(
+                                wherehelp_sought_gov_website == 1 ~ "Sought Self-guided",
+                                wherehelp_sought_selfguide_online == 1 ~ "Sought Self-guided",
+                                wherehelp_sought_nongov_website == 1 ~ "Sought Self-guided",
+                                wherehelp_sought_struc_therapy == 1 ~ "Sought Self-guided",
+                                TRUE ~ "Did not seek self-guided treatment")) %>%
+  
+  mutate(AnySought = case_when(TypeSought.Supported.Any  == "Sought Supported" ~ 1,
+                                  TypeSought.SelfGuide.Any  == "Sought Self-guided" ~ 1,
+                                 TRUE ~ 0))
 ```
 
 creat variable counting number of self guided or supported treatment types sought per wave per person
@@ -390,7 +397,6 @@ treat_dat <- treat_dat %>%
 
 ##### number of agencies from which treatment was received, if sought
 
-
 ```{r type received counts}
 
 supportcols <- c("wherehelp_received_emergency_mh","wherehelp_received_online_talk_therapy",
@@ -404,15 +410,6 @@ selfcols <- c("wherehelp_received_gov_website","wherehelp_received_selfguide_onl
 treat_dat$TypeReceived.Supported.total <- rowSums(treat_dat[names(treat_dat) %in% supportcols],na.rm = T)
 treat_dat$TypeReceived.SelfGuided.total <- rowSums(treat_dat[names(treat_dat) %in% selfcols],na.rm = T)
 
-```
-
-```{r treatment type counts sought}
-
-treat_dat_typesought <- treat_dat %>%
-  select(ID,TypeSought,wave) %>%
-  group_by(ID) %>%
-  mutate(check = str_count(TypeSought,"Supported"))
-  
 ```
 
 ##### Sought treatment at any time (How many times, how many total responses)
@@ -434,12 +431,6 @@ treat_dat_byID$AnySeek <- ifelse(treat_dat_byID$n > 0,"Sought help at least once
 
 ```
 
-##### Received help having sought it (include proportion of times help is received having sought it)
-Check if anyone has not received help at all having sought it, check proportion of times help received having sought it, seperated into supported vs self-guided treatments
-```{r received help having sought it}
-
-
-```
 
 ##### Client level vs systemic barriers
 identify if treatment was received when sought according to category
@@ -499,6 +490,13 @@ setwd(wd)
 source("./scripts/Relabel_helpful_factors.R")
 
 ```
+#### group agencies for helpfulness into client led or supported.
+Assess helpfulness for both type seperately depending on helpfulness by agency sought
+
+```{r group helpfullness agencies into client led or supported}
+setwd(wd)
+source("./scripts/Helpfulness_column_creation.R")
+```
 
 # Aim 1 analyses
 
@@ -523,6 +521,27 @@ treat_dat %>%
   freq(soughthelp_for_self)
 
 ```
+### Frequency of treatment receipt by type and wave (any instances of treatment, not total instances)
+
+Seeking ANY instances of this type of treatment (i.e., if they sought supported help from 3 sources in a  wave, it will just register once)
+BUT they might ALSO have sought help from both routes (i.e., if they sought help from a supported and self guided source, they will register in each of these categories. So we might expect to have more people in the supported + self guided categories per wave than we do who sought help for themselves above)
+
+
+**Supported**
+```{r treatment sought by wave supported any}
+treat_dat %>%
+  group_by(wave) %>%
+  freq(TypeSought.Supported.Any)
+
+```
+
+Supported
+```{r treatment sought by wave self guided any}
+treat_dat %>%
+  group_by(wave) %>%
+  freq(TypeSought.SelfGuide.Any)
+
+```
 
 ### Frequency of treatment seeking overall
 Number of people who sought treatment at any point during the pandemic
@@ -534,7 +553,7 @@ treat_dat_byID %>%
 ```
 
 ### Count table of treatment seeking across all waves
-Number of times people sought treatment at any point during the pandemic
+Number of times people sought treatment at any point during the pandemic (so, 138 people sought help 4 times)
 ```{r check number of overall treatment seeking}
 table(treat_dat_byID$n)
 ```
@@ -558,7 +577,7 @@ treat_dat %>%
 
 ```
 ### Frequency of treatment receipt by wave (any instances of treatment, not total instances)
-Seeking ANY instances of this type of treatment (i.e., if they sought supported help from 3 sources ina  wave, it will just register once)
+Receiving ANY instances of this type of treatment (i.e., if they sought and received supported help from 3 sources ina  wave, it will just register once)
 
 Supported
 ```{r treatment receipt by wave any}
@@ -631,27 +650,20 @@ treat_dat %>%
   freq(PreventHelp_SelfGuided)
 ```
 
-### Number of times sought treatment (relative to number of times responded)
 
+### Frequency of different levels of helpfullness by treatment type (cupported/client led) by wave
 
-### Frequency of reasons for seeking treatment (by wave)
-
-```{r freq treatment seek reasons}
-
+For supported options
+```{r check helpfulness by wave supported}
 treat_dat %>%
   group_by(wave) %>%
-  freq(ReasonSeek)
-
+  freq(Helpfulness_Supported)
 ```
-
-
-### Frequency of reasons for seeking treatment (by wave, by treatment seeking numbers)
-Note: Some people may have sought help more than once for more than one reason
-
-The people who have a reason, but also fall in the did not seek treatment for self column (0) will be people who sought help at at least one point and gave a reason for that, but obviously might not have done so at every point.
-
-```{r freq treatment seek reasons crosstab sought help}
-with(treat_dat, ctable(ReasonSeek,soughthelp_for_self))
+For  client led options
+```{r check helpfulness by wave client led}
+treat_dat %>%
+  group_by(wave) %>%
+  freq(Helpfulness_SelfGuided)
 ```
 
 
