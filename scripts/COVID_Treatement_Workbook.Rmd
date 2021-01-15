@@ -435,22 +435,15 @@ treat_dat[grep("prevent",names(treat_dat))] <- apply(treat_dat[grep("prevent",na
 
 ```
 
-##### total barriers that are client focused or systemic by wave
+#### group agencies for help prevention into client-led or supported
 
-Create dummy variables indicating systemic and client barriers in a column each
-```{r dummy variables for overall rates of  client or systemic barriers}
 
-systemic <- rowSums(sapply(treat_dat[grep("prevent",names(treat_dat))], function(v) v %in% c("Systemic")))
-treat_dat$BarrierToTreatment.Systemic <- ifelse(systemic>0,1,0)
+creates PreventHelp_Supported and PreventHelp_SelfGuided columns
 
-client <- rowSums(sapply(treat_dat[grep("prevent",names(treat_dat))], function(v) v %in% c("Client-level")))
-treat_dat$BarrierToTreatment.Client <- ifelse(client>0,1,0)
-
-other <- rowSums(sapply(treat_dat[grep("prevent",names(treat_dat))], function(v) v %in% c("Other")))
-treat_dat$BarrierToTreatment.Other <- ifelse(other>0,1,0)
+```{r group barrier agencies into client led or supported}
+setwd(wd)
+source("./scripts/Barriers_column_creation.R")
 ```
-
-##### Count number of systemic vs client led barriers over whole sample for service type
 
 # Aim 1 analyses
 
@@ -488,9 +481,7 @@ treat_dat_byID %>%
 ### Count table of treatment seeking across all waves
 Number of times people sought treatment at any point during the pandemic
 ```{r check number of overall treatment seeking}
-
 table(treat_dat_byID$n)
-
 ```
 
 ### Frequency of treatment receipt by wave
@@ -503,30 +494,22 @@ treat_dat %>%
 ```
 
 ### Frequency of systemic / client barriers by wave
+
 Barriers to receiving treatment by wave.
 
-Systemic
-```{r check barriers by wave systemic}
+For supported options
+```{r check barriers by wave supported}
 treat_dat %>%
   group_by(wave) %>%
-  freq(BarrierToTreatment.Systemic)
+  freq(PreventHelp_Supported)
 ```
-Client
-```{r check barriers by wave client}
 
+For client led options
+```{r check barriers by wave client led}
 treat_dat %>%
   group_by(wave) %>%
-  freq(BarrierToTreatment.Client)
-
+  freq(PreventHelp_Supported)
 ```
-
-Other
-```{r check barriers by wave other}
-treat_dat %>%
-  group_by(wave) %>%
-  freq(BarrierToTreatment.Other)
-```
-
 
 ### Number of times sought treatment (relative to number of times responded)
 
