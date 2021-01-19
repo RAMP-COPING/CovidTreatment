@@ -419,11 +419,16 @@ treat_dat_byID <- treat_dat %>%
   group_by(ID) %>%
   tally(soughthelp_for_self)
 
+treat_dat_byIDSamp <- treat_dat %>%
+  group_by(ID,Sample) %>%
+  tally(soughthelp_for_self)
+
 ```
 
 ```{r treatment seek in any wave}
 
 treat_dat_byID$AnySeek <- ifelse(treat_dat_byID$n > 0,"Sought help at least once", "Never sought help")
+treat_dat_byIDSamp$AnySeek <- ifelse(treat_dat_byIDSamp$n > 0,"Sought help at least once", "Never sought help")
 
 ```
 
@@ -505,7 +510,14 @@ source("./scripts/Helpfulness_column_creation.R")
 treat_dat %>%
   group_by(wave) %>%
   count()
+```
 
+By sample
+```{r response rates per wave by sample}
+
+treat_dat %>%
+  group_by(wave,Sample) %>%
+  count()
 ```
 
 ### Frequency of treatment seeking per wave
@@ -517,12 +529,29 @@ treat_dat %>%
   freq(soughthelp_for_self)
 
 ```
+By sample
+
+```{r treatment seeking freq by wave by sample}
+
+treat_dat %>%
+  group_by(wave,Sample) %>%
+  freq(soughthelp_for_self)
+
+```
 ### Reason for seeking treatment by wave
 
 ```{r reason seek by wave}
 
 treat_dat %>%
   group_by(wave) %>%
+  freq(ReasonSeek)
+
+```
+By sample
+```{r reason seek by wave by sample}
+
+treat_dat %>%
+  group_by(wave,Sample) %>%
   freq(ReasonSeek)
 
 ```
@@ -539,11 +568,26 @@ treat_dat %>%
   freq(TypeSought.Supported.Any)
 
 ```
+By sample
+```{r treatment sought by wave supported any by sample}
+treat_dat %>%
+  group_by(wave,Sample) %>%
+  freq(TypeSought.Supported.Any)
 
-Supported
+```
+
+**Self guided**
 ```{r treatment sought by wave self guided any}
 treat_dat %>%
   group_by(wave) %>%
+  freq(TypeSought.SelfGuide.Any)
+
+```
+
+By sample
+```{r treatment sought by wave self guided any by sample}
+treat_dat %>%
+  group_by(wave,Sample) %>%
   freq(TypeSought.SelfGuide.Any)
 
 ```
@@ -557,10 +601,29 @@ treat_dat_byID %>%
 
 ```
 
+
+By sample
+```{r check  overall treatment seeking by sample}
+
+treat_dat_byIDSamp %>%
+  group_by(Sample) %>%
+  freq(AnySeek)
+
+```
+
 ### Count table of treatment seeking across all waves
 Number of times people sought treatment at any point during the pandemic (so, 138 people sought help 4 times)
 ```{r check number of overall treatment seeking}
-table(treat_dat_byID$n)
+treat_dat_byID %>%
+  freq(n)
+
+```
+
+By sample
+```{r check number of overall treatment seeking by sample}
+treat_dat_byIDSamp %>%
+  group_by(Sample) %>%
+  freq(n)
 ```
 
 ### Count of the number of different sources from which treatment was sought, by treatment type, wave
@@ -569,6 +632,13 @@ Supported
 ```{r num sources from which treatment sought supported}
 treat_dat %>%
   group_by(wave) %>%
+  freq(TypeSought.Supported.total)
+
+```
+By sample
+```{r num sources from which treatment sought supported by sample}
+treat_dat %>%
+  group_by(wave,Sample) %>%
   freq(TypeSought.Supported.total)
 
 ```
@@ -581,6 +651,14 @@ treat_dat %>%
   freq(TypeSought.SelfGuided.total)
 
 ```
+By sample
+```{r num sources from which treatment sought self guided by sample}
+treat_dat %>%
+  group_by(wave,Sample) %>%
+  freq(TypeSought.SelfGuided.total)
+
+```
+
 ### Frequency of treatment receipt by wave (any instances of treatment, not total instances)
 Receiving ANY instances of this type of treatment (i.e., if they sought and received supported help from 3 sources ina  wave, it will just register once)
 
@@ -591,12 +669,25 @@ treat_dat %>%
   freq(TypeReceived.Supported.Any)
 
 ```
+By sample
+```{r treatment receipt by wave any by sample}
+treat_dat %>%
+  group_by(wave,Sample) %>%
+  freq(TypeReceived.Supported.Any)
+
+```
 
 
 Supported
 ```{r treatment receipt by wave self guided any}
 treat_dat %>%
   group_by(wave) %>%
+  freq(TypeReceived.SelfGuide.Any)
+```
+By sample
+```{r treatment receipt by wave self guided any by sample}
+treat_dat %>%
+  group_by(wave,Sample) %>%
   freq(TypeReceived.SelfGuide.Any)
 ```
 
@@ -609,9 +700,22 @@ treat_dat %>%
   group_by(wave) %>%
   freq(TypeReceived.Supported.total)
 ```
+By sample
+```{r treatment receipt by wave supported all by sample}
+treat_dat %>%
+  group_by(wave,Sample) %>%
+  freq(TypeReceived.Supported.total)
+```
 
-Self guided
+**Self guided**
 ```{r treatment receipt by wave self guided all}
+treat_dat %>%
+  group_by(wave) %>%
+  freq(TypeReceived.SelfGuided.total)
+```
+
+By sample
+```{r treatment receipt by wave self guided all by sample}
 treat_dat %>%
   group_by(wave) %>%
   freq(TypeReceived.SelfGuided.total)
@@ -620,19 +724,34 @@ treat_dat %>%
 
 ### Count of the number of different sources from which treatment was RECEIVED, by treatment type, wave
 
-Supported
+**Supported**
 ```{r num sources from which treatment received supported}
 treat_dat %>%
   group_by(wave) %>%
   freq(TypeReceived.Supported.total)
 
 ```
+By sample
+```{r num sources from which treatment received supported by sample}
+treat_dat %>%
+  group_by(wave,Sample) %>%
+  freq(TypeReceived.Supported.total)
+
+```
 
 
-Self guided
+**Self guided**
 ```{r num sources from which treatment received self guided}
 treat_dat %>%
   group_by(wave) %>%
+  freq(TypeReceived.SelfGuided.total)
+
+```
+
+By sample
+```{r num sources from which treatment received self guided by sample}
+treat_dat %>%
+  group_by(wave,Sample) %>%
   freq(TypeReceived.SelfGuided.total)
 
 ```
@@ -641,33 +760,60 @@ treat_dat %>%
 
 Barriers to receiving treatment by wave.
 
-For supported options
+**For supported options**
 ```{r check barriers by wave supported}
 treat_dat %>%
   group_by(wave) %>%
   freq(PreventHelp_Supported)
 ```
 
-For client led options
+By sample
+```{r check barriers by wave supported by sample}
+treat_dat %>%
+  group_by(wave,Sample) %>%
+  freq(PreventHelp_Supported)
+```
+
+**For client led options**
 ```{r check barriers by wave client led}
 treat_dat %>%
   group_by(wave) %>%
   freq(PreventHelp_SelfGuided)
 ```
 
+By sample
+```{r check barriers by wave client led by sample}
+treat_dat %>%
+  group_by(wave,Sample) %>%
+  freq(PreventHelp_SelfGuided)
+```
 
-### Frequency of different levels of helpfullness by treatment type (cupported/client led) by wave
 
-For supported options
+### Frequency of different levels of helpfulness by treatment type (cupported/client led) by wave
+
+**For supported options**
 ```{r check helpfulness by wave supported}
 treat_dat %>%
   group_by(wave) %>%
   freq(Helpfulness_Supported)
 ```
-For  client led options
+By sample
+```{r check helpfulness by wave supported by sample}
+treat_dat %>%
+  group_by(wave,Sample) %>%
+  freq(Helpfulness_Supported)
+```
+
+**For  client led options**
 ```{r check helpfulness by wave client led}
 treat_dat %>%
   group_by(wave) %>%
+  freq(Helpfulness_SelfGuided)
+```
+By sample
+```{r check helpfulness by wave client led by sample}
+treat_dat %>%
+  group_by(wave,Sample) %>%
   freq(Helpfulness_SelfGuided)
 ```
 
