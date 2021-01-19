@@ -844,8 +844,178 @@ treat_dat %>%
   freq(PreventHelp_SelfGuided.Other)
 ```
 
-```{r test}
+### Barriers by agency by wave
+#### Supported
 
+***Emergency mental health team***
+```{r barriers by agency em mh}
+
+treat_dat %>%
+  group_by(wave) %>%
+  freq(preventhelp_emergency_mh)
+
+```
+By sample
+```{r barriers by agency em mh by sample}
+
+treat_dat %>%
+  group_by(wave,Sample) %>%
+  freq(preventhelp_emergency_mh)
+
+```
+
+***Existing mental health team***
+```{r barriers by agency existing mh}
+
+treat_dat %>%
+  group_by(wave) %>%
+  freq(preventhelp_existing_mh_team)
+
+```
+By sample
+```{r barriers by agency existing mh by sample}
+
+treat_dat %>%
+  group_by(wave,Sample) %>%
+  freq(preventhelp_existing_mh_team)
+
+```
+
+***Online talk therapy***
+```{r barriers by agency online talk}
+
+treat_dat %>%
+  group_by(wave) %>%
+  freq(preventhelp_online_talk_therapy)
+
+```
+By sample
+```{r barriers by agency online talk by sample }
+
+treat_dat %>%
+  group_by(wave,Sample) %>%
+  freq(preventhelp_online_talk_therapy)
+
+```
+
+***GP***
+```{r barriers by agency GP}
+
+treat_dat %>%
+  group_by(wave) %>%
+  freq(preventhelp_gp)
+
+```
+By sample
+```{r barriers by agency gp by sample}
+
+treat_dat %>%
+  group_by(wave,Sample) %>%
+  freq(preventhelp_gp)
+
+```
+
+***NHS 111***
+```{r barriers by agency nhs 111}
+
+treat_dat %>%
+  group_by(wave) %>%
+  freq(preventhelp_nhs_111)
+
+```
+By sample
+```{r barriers by agency nhs 111 by sample}
+
+treat_dat %>%
+  group_by(wave,Sample) %>%
+  freq(preventhelp_nhs_111)
+
+```
+
+***Non NHS phone***
+```{r barriers by agency phone}
+
+treat_dat %>%
+  group_by(wave) %>%
+  freq(preventhelp_nonnhs_phone)
+
+```
+By sample
+```{r barriers by agencyphone by sample}
+
+treat_dat %>%
+  group_by(wave,Sample) %>%
+  freq(preventhelp_nonnhs_phone)
+
+```
+
+#### Self guided
+
+***Government website***
+```{r barriers by agency gov site}
+
+treat_dat %>%
+  group_by(wave) %>%
+  freq(preventhelp_gov_website)
+
+```
+By sample
+```{r barriers by agency gove site by sample}
+
+treat_dat %>%
+  group_by(wave,Sample) %>%
+  freq(preventhelp_gov_website)
+
+```
+
+***Non-government website***
+```{r barriers by agency non gov site}
+
+treat_dat %>%
+  group_by(wave) %>%
+  freq(preventhelp_nongov_website)
+
+```
+By sample
+```{r barriers by agency non gov site by sample}
+
+treat_dat %>%
+  group_by(wave,Sample) %>%
+  freq(preventhelp_nongov_website)
+
+```
+
+***Online self-therapy***
+```{r barriers by agency online self therapy}
+
+treat_dat %>%
+  group_by(wave) %>%
+  freq(preventhelp_online_self_therapy)
+
+```
+By sample
+```{r barriers by agency online self therapy by sample}
+
+treat_dat %>%
+  group_by(wave,Sample) %>%
+  freq(preventhelp_online_self_therapy)
+
+```
+
+***Structured therapeutic activity***
+```{r barriers by agency structured therapeutic activity}
+
+treat_dat %>%
+  group_by(wave) %>%
+  freq(preventhelp_struc_therapy)
+
+```
+By sample
+```{r barriers by agency structured therapeutic activity by sample}
+
+treat_dat %>%
+  group_by(wave,Sample) %>%
+  freq(preventhelp_struc_therapy)
 
 ```
 ### Frequency of different levels of helpfulness by treatment type (cupported/client led) by wave
