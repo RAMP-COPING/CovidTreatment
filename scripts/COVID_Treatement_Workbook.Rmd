@@ -756,39 +756,98 @@ treat_dat %>%
 
 ```
 
-### Frequency of systemic / client barriers by wave
+### Frequency of systemic / client barriers by wave and treatment type
 
 Barriers to receiving treatment by wave.
 
-**For supported options**
-```{r check barriers by wave supported}
+This section highlights the frequency of encountering AT LEAST ONE type of each barrier per person per barrier type per wave.
+
+Does not capture anyone more than once per category. i.e. someone who encountered 3 barriers, 1 of which was sytemic, one was client level and one was other wit appear once for each category. A person who experienced 3 systemic barriers will only be counted once (under systemic) 
+
+#### For supported options**
+**Systemic**
+```{r check barriers by wave supported systemic}
 treat_dat %>%
   group_by(wave) %>%
-  freq(PreventHelp_Supported)
+  freq(PreventHelp_Supported.Systemic)
 ```
-
 By sample
-```{r check barriers by wave supported by sample}
+```{r check barriers by wave supported systemic by sample}
 treat_dat %>%
   group_by(wave,Sample) %>%
-  freq(PreventHelp_Supported)
+  freq(PreventHelp_Supported.Systemic)
 ```
 
-**For client led options**
-```{r check barriers by wave client led}
+**Client-level**
+```{r check barriers by wave supported client level}
 treat_dat %>%
   group_by(wave) %>%
-  freq(PreventHelp_SelfGuided)
+  freq(PreventHelp_Supported.Client)
 ```
-
 By sample
-```{r check barriers by wave client led by sample}
+```{r check barriers by wave supported client by sample}
 treat_dat %>%
   group_by(wave,Sample) %>%
-  freq(PreventHelp_SelfGuided)
+  freq(PreventHelp_Supported.Client)
 ```
 
+**Other**
+```{r check barriers by wave supported otherl}
+treat_dat %>%
+  group_by(wave) %>%
+  freq(PreventHelp_Supported.Other)
+```
+By sample
+```{r check barriers by wave supported other by sample}
+treat_dat %>%
+  group_by(wave,Sample) %>%
+  freq(PreventHelp_Supported.Other)
+```
 
+#### For self guided options**
+**Systemic**
+```{r check barriers by wave SelfGuided systemic}
+treat_dat %>%
+  group_by(wave) %>%
+  freq(PreventHelp_SelfGuided.Systemic)
+```
+By sample
+```{r check barriers by wave SelfGuided systemic by sample}
+treat_dat %>%
+  group_by(wave,Sample) %>%
+  freq(PreventHelp_SelfGuided.Systemic)
+```
+
+**Client-level**
+```{r check barriers by wave SelfGuided client level}
+treat_dat %>%
+  group_by(wave) %>%
+  freq(PreventHelp_SelfGuided.Client)
+```
+By sample
+```{r check barriers by wave SelfGuided client by sample}
+treat_dat %>%
+  group_by(wave,Sample) %>%
+  freq(PreventHelp_SelfGuided.Client)
+```
+
+**Other**
+```{r check barriers by wave SelfGuided otherl}
+treat_dat %>%
+  group_by(wave) %>%
+  freq(PreventHelp_SelfGuided.Other)
+```
+By sample
+```{r check barriers by wave SelfGuided other by sample}
+treat_dat %>%
+  group_by(wave,Sample) %>%
+  freq(PreventHelp_SelfGuided.Other)
+```
+
+```{r test}
+
+
+```
 ### Frequency of different levels of helpfulness by treatment type (cupported/client led) by wave
 
 **For supported options**
