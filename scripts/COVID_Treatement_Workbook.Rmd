@@ -307,10 +307,11 @@ Categorise reasons for help seeking into whether it was for a pre-existing, newl
 ```{r dummy reason for help seek variable}
 
 treat_dat <- treat_dat %>%
-  mutate(ReasonSeek = case_when(reasonhelp_new_mh == 1 | reasonhelp_new_med == 1 ~ "Newly emerging symptoms",
+  mutate(ReasonSeek = case_when(reasonhelp_new_mh == 1 ~ "Newly emerging symptoms",
                                 reasonhelp_cont_mh == 1 | reasonhelp_worsen_mh == 1 | reasonhelp_repeat_prescription == 1 |
                                  reasonhelp_change_med == 1 | reasonhelp_alt_support == 1 ~ "Existing mental health",
-                                reasonhelp_mh_crisis == 1 ~ "Mental health crisis" ))
+                                reasonhelp_mh_crisis == 1 ~ "Mental health crisis",
+                               reasonhelp_new_med == 1 ~ "Seeking new treatment"))
 
 ```
 

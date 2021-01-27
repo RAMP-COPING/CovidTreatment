@@ -81,7 +81,7 @@ treat_dat <- treat_dat %>%
                                              treatmenthelpful_nongov_website == "Very helpful" ~ "Very helpful",
                                              treatmenthelpful_nongov_website == "Extremely helpful" ~ "Extremely helpful"))
 
-## reodrder factors
+## reorder factors
 
 treat_dat$Helpfulness_Supported <- factor(treat_dat$Helpfulness_Supported, levels=c("Extremely unhelpful","Very unhelpful","Somewhat unhelpful",
                                                                                     "Neither helpful nor unhelpful",

@@ -56,7 +56,16 @@ treatnames <- c("ID","wave","Sample","startDate"
   ,"reasonhelp_change_med"
   ,"reasonhelp_new_med"
   ,"reasonhelp_alt_support"
-  ,"reasonhelp_other")
+  ,"reasonhelp_other",
+  "reasonNohelp_feel_fine",
+  "reasonNohelp_I_feel_better",
+  "reasonNohelp_I_want_to_but_havent",
+  "reasonNohelp_Too_busy",
+  "reasonNohelp_I_dont_think_I_feel_bad_enough",
+  "reasonNohelp_I_didnt_know_where_to_find",
+  "reasonNohelp_I_want_help_dont_think_its_available",
+  "reasonNohelp_Bad_experiences_in_past",
+  "reasonNohelp_other"
 
 ## rename the relevant items for RAMP and COPING treatment seeking
 
@@ -117,7 +126,17 @@ treatRAMP.renamed <- treatRAMP %>%
   rename(reasonhelp_change_med	 =	treatment.seeking_changes_in_medication) %>%
   rename(reasonhelp_new_med	 =	treatment.seeking_new_medication) %>%
   rename(reasonhelp_alt_support	 =	treatment.availability_lack_normal_support) %>%
-  rename(reasonhelp_other	 = treatment.other_please_specify)
+  rename(reasonhelp_other	 = treatment.other_please_specify)   %>%
+  
+  rename(reasonNohelp_feel_fine	 = treatment.reason_seek_feel_fine) %>%
+  rename(reasonNohelp_I_feel_better	 = treatment.i_feel_better_than_i_normally_do) %>%
+  rename(reasonNohelp_I_want_to_but_havent	 = i_want_to_get_help_but_i_havent_done_it_yet) %>%
+  rename(reasonNohelp_Too_busy	 = treatment.busy_find) %>%
+  rename(reasonNohelp_I_dont_think_I_feel_bad_enough	 = treatment.feel_great_feelings_bad) %>%
+  rename(reasonNohelp_I_didnt_know_where_to_find	 = i_wasnt_sure_where_to_find_help) %>%
+  rename(reasonNohelp_I_want_help_dont_think_its_available	 = treatment.i_think_i_could_do_with_help_but_i_dont_think_there_is_help_available_for_me) %>%
+  rename(reasonNohelp_Bad_experiences_in_past	 = treatment.mental_health_services_provisions) %>%
+  rename(reasonNohelp_other	 = treatment.other_please_specify.1)
 
 ## COPING
 treatCOPE.renamed <- treatCOPE %>%
@@ -177,7 +196,18 @@ treatCOPE.renamed <- treatCOPE %>%
   rename(reasonhelp_change_med	 =	treatment.seeking_changes_in_medication) %>%
   rename(reasonhelp_new_med	 =	treatment.seeking_new_medication) %>%
   rename(reasonhelp_alt_support	 =	treatment.availability_lack_normal_support) %>%
-  rename(reasonhelp_other	 = treatment.other_please_specify)
+  rename(reasonhelp_other	 = treatment.other_please_specify) %>%
+  
+  rename(reasonNohelp_feel_fine	 = treatment.reason_seek_feel_fine) %>%
+  rename(reasonNohelp_I_feel_better	 = treatment.i_feel_better_than_i_normally_do) %>%
+  rename(reasonNohelp_I_want_to_but_havent	 = i_want_to_get_help_but_i_havent_done_it_yet) %>%
+  rename(reasonNohelp_Too_busy	 = treatment.busy_find) %>%
+  rename(reasonNohelp_I_dont_think_I_feel_bad_enough	 = treatment.feel_great_feelings_bad) %>%
+  rename(reasonNohelp_I_didnt_know_where_to_find	 = i_wasnt_sure_where_to_find_help) %>%
+  rename(reasonNohelp_I_want_help_dont_think_its_available	 = treatment.i_think_i_could_do_with_help_but_i_dont_think_there_is_help_available_for_me) %>%
+  rename(reasonNohelp_Bad_experiences_in_past	 = treatment.mental_health_services_provisions) %>%
+  rename(reasonNohelp_other	 = treatment.other_please_specify.1 )
+  
 
 
 
