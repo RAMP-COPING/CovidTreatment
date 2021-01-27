@@ -1047,6 +1047,19 @@ treat_dat %>%
   freq(Helpfulness_SelfGuided)
 ```
 
+### Frequency of reasons for NOT seeking help
+
+overall
+```{r check }
+
+for (i in grep("reasonNo", names(treat_dat)))
+  print(freq(treat_dat[i]))
+
+
+```
+
+
+
 ## Analytic decision notes
 
 ### Including cohort as a covariate
