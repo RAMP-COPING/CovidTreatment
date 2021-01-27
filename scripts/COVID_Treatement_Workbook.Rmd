@@ -182,11 +182,11 @@ treatRAMP <- treatRAMP %>%
 
 ```{r demographic select list}
 keepcols.cope <- c("externalDataReference","dem.which_gender_do_you_identify_with")
-cols.cope <- c("LoginID","Gender")
+cols.cope <- c("ID","Gender")
 keepcols.nbr <- c("subjectid")
-cols.nbr <- c("LoginID")
-keepcols.ramp <- c("externalDataReference","dem2.how_old_are_you","dem2.which_gender_do_you_identify_with")
-cols.ramp <- c("LoginID","Age","Gender")
+cols.nbr <- c("ID")
+keepcols.ramp <- c("externalDataReference","dem2.how_old_are_you","dem2.which_gender_do_you_identify_with","dem2.where_in_the_uk_do_you_live.txt")
+cols.ramp <- c("ID","Age","Gender","Postcode")
 ```
 
 
@@ -227,7 +227,7 @@ Waiting till I can get age into GLAD & EDGI
 
 dem <- merge(dem.cope.glad,dem.cope.edgi)
 dem <- merge(dem,dem.cope.nbr)
-dem <- merge(dem,dem.ramp)
+dem <- merge(dem,dem.ramp,all=TRUE)
 
 ```
 
@@ -390,6 +390,14 @@ treat_dat <- treat_dat %>%
   mutate(AnyReceived = case_when(TypeReceived.Supported.Any  == "Received Supported" ~ 1,
                                   TypeReceived.SelfGuide.Any  == "Received Self-guided" ~ 1,
                                  TRUE ~ 0))
+```
+
+```{r dummy treatment not received if sought}
+
+treat_dat  <- treat_dat %>%
+  mutate(AnyNoReceipt = case_when(AnyReceived == 0 ~1,
+                                  TRUE ~ 0))
+
 ```
 
 ##### number of agencies from which treatment was received, if sought
@@ -1058,7 +1066,60 @@ for (i in grep("reasonNo", names(treat_dat)))
 
 ```
 
+## Geographic
 
+Project postcode data onto map of the UK. Use downloaded long/lat data mapped to postcodes from ![this site](https://www.freemaptools.com/download-uk-postcode-lat-lng.htm) and city names from ![here](https://www.doogal.co.uk/UKPostcodes.php).
+
+### Create clean, labelled and flat outcode dataset
+
+```{r process downloaded geographic data}
+setwd(wd)
+source("./scripts/Create_labelled_outcode_dataset.R")
+head(postcode_df_area)
+```
+
+### Create counts of treatment seeking and barriers by region
+
+```{r process and count treatment by area}
+setwd(wd)
+source("./scripts/RAMP_postcode_cleaning.R")
+```
+
+
+### Merge sample data to downloaded UK data
+
+```{r merge national and RAMP data}
+
+postcode_full_seek <- left_join(postcode_seek,postcode_df_area,by="Outcode")
+postcode_full_barrier <- left_join(postcode_barrier,postcode_df_area,by="Outcode")
+
+# drop rows with no ID data as this indicates they did not exist in the downloaded Uk reference data
+postcode_full_seek <- postcode_full_seek[(!is.na(postcode_full_seek$id) == T),]
+postcode_full_barrier <- postcode_full_barrier[(!is.na(postcode_full_barrier$id) == T),]
+
+```
+
+### create counts by county
+
+```{r county count dataset}
+
+setwd(wd)
+source("./scripts/Count_treatment_by_County.R")
+
+```
+
+check treatment seeking
+```{r check head and count looks fine seek}
+head(area_count_seek)
+sum(area_count_seek$nCounty)
+```
+
+check treatment barriers
+```{r check head and count looks fine barrier}
+head(area_count_barrier)
+sum(area_count_barrier$nCounty)
+```
+## start making the map
 
 ## Analytic decision notes
 
@@ -1066,3 +1127,4 @@ for (i in grep("reasonNo", names(treat_dat)))
 
 This would likely be a collider (sx severity is going to be associated with both cohort and treatment seeking)
 
+#### NOTE TO SELF:: fix any treatment barrier stuff

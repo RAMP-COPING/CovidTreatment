@@ -54,3 +54,51 @@ if(!require(Rfast)){
   install.packages("Rfast")
   library(Rfast)
 }
+
+if(!require(maps)){
+  install.packages("maps")
+  library(maps)
+}
+# get Uk from maps
+
+UK <- map_data("world") %>% filter(region=="UK")
+
+
+if(!require(mapproj)){
+  install.packages("mapproj")
+  library(mapproj)
+}
+
+if(!require(viridis)){
+  install.packages("viridis")
+  library(viridis)
+}
+
+if(!require(ggformula)){
+  install.packages("ggformula")
+  library(ggformula)
+}
+
+
+if(!require(ggpubr)){
+  install.packages("ggpubr")
+  library(ggpubr)
+}
+
+if(!require(ggrepel)){
+  install.packages("ggrepel")
+  library(ggrepel)
+}
+
+
+
+if(!require(stringi)){
+  install.packages("stringi")
+  library(stringi)
+}
+
+if(!require(Cairo)){
+  install.packages("Cairo")
+  library(Cairo)
+}
+
