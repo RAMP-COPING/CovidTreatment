@@ -65,7 +65,7 @@ treatnames <- c("ID","wave","Sample","startDate"
   "reasonNohelp_I_didnt_know_where_to_find",
   "reasonNohelp_I_want_help_dont_think_its_available",
   "reasonNohelp_Bad_experiences_in_past",
-  "reasonNohelp_other"
+  "reasonNohelp_other")
 
 ## rename the relevant items for RAMP and COPING treatment seeking
 
@@ -130,10 +130,10 @@ treatRAMP.renamed <- treatRAMP %>%
   
   rename(reasonNohelp_feel_fine	 = treatment.reason_seek_feel_fine) %>%
   rename(reasonNohelp_I_feel_better	 = treatment.i_feel_better_than_i_normally_do) %>%
-  rename(reasonNohelp_I_want_to_but_havent	 = i_want_to_get_help_but_i_havent_done_it_yet) %>%
+  rename(reasonNohelp_I_want_to_but_havent	 = treatment.i_want_to_get_help_but_i_havent_done_it_yet) %>%
   rename(reasonNohelp_Too_busy	 = treatment.busy_find) %>%
   rename(reasonNohelp_I_dont_think_I_feel_bad_enough	 = treatment.feel_great_feelings_bad) %>%
-  rename(reasonNohelp_I_didnt_know_where_to_find	 = i_wasnt_sure_where_to_find_help) %>%
+  rename(reasonNohelp_I_didnt_know_where_to_find	 = treatment.i_wasnt_sure_where_to_find_help) %>%
   rename(reasonNohelp_I_want_help_dont_think_its_available	 = treatment.i_think_i_could_do_with_help_but_i_dont_think_there_is_help_available_for_me) %>%
   rename(reasonNohelp_Bad_experiences_in_past	 = treatment.mental_health_services_provisions) %>%
   rename(reasonNohelp_other	 = treatment.other_please_specify.1)
@@ -200,10 +200,10 @@ treatCOPE.renamed <- treatCOPE %>%
   
   rename(reasonNohelp_feel_fine	 = treatment.reason_seek_feel_fine) %>%
   rename(reasonNohelp_I_feel_better	 = treatment.i_feel_better_than_i_normally_do) %>%
-  rename(reasonNohelp_I_want_to_but_havent	 = i_want_to_get_help_but_i_havent_done_it_yet) %>%
+  rename(reasonNohelp_I_want_to_but_havent	 = treatment.i_want_to_get_help_but_i_havent_done_it_yet) %>%
   rename(reasonNohelp_Too_busy	 = treatment.busy_find) %>%
   rename(reasonNohelp_I_dont_think_I_feel_bad_enough	 = treatment.feel_great_feelings_bad) %>%
-  rename(reasonNohelp_I_didnt_know_where_to_find	 = i_wasnt_sure_where_to_find_help) %>%
+  rename(reasonNohelp_I_didnt_know_where_to_find	 = treatment.i_wasnt_sure_where_to_find_help) %>%
   rename(reasonNohelp_I_want_help_dont_think_its_available	 = treatment.i_think_i_could_do_with_help_but_i_dont_think_there_is_help_available_for_me) %>%
   rename(reasonNohelp_Bad_experiences_in_past	 = treatment.mental_health_services_provisions) %>%
   rename(reasonNohelp_other	 = treatment.other_please_specify.1 )
