@@ -5,6 +5,11 @@ if(!require(tidyverse)){
   library(tidyverse)
 }
 
+if(!require(data.table)){
+  install.packages("data.table")
+  library(data.table)
+}
+
 if(!require(knitr)){
   install.packages("knitr")
   library(knitr)
@@ -54,6 +59,8 @@ if(!require(Rfast)){
   install.packages("Rfast")
   library(Rfast)
 }
+
+## these overwrite map in dplyr, so only load when needed
 # 
 # if(!require(maps)){
 #   install.packages("maps")
