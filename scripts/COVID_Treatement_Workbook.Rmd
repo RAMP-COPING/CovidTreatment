@@ -225,10 +225,17 @@ Waiting till I can get age into GLAD & EDGI
 
 ```{r demographics merge}
 
-dem <- merge(dem.cope.glad,dem.cope.edgi)
-dem <- merge(dem,dem.cope.nbr)
+dem <- rbind(dem.cope.glad,dem.cope.edgi)
+dem <- left_join(dem,dem.cope.nbr)
 dem <- merge(dem,dem.ramp,all=TRUE)
 
+```
+
+get gender columns to add to treatment
+
+```{r gender from demo}
+
+demgen <- subset(dem,select = c("ID","Gender"))
 ```
 
 #### Rename the treatment variables and drop irrelevant ones
@@ -1065,6 +1072,264 @@ for (i in grep("reasonNo", names(treat_dat)))
 
 
 ```
+## Gender stratification for barriers
+
+Add gender to treatment data 
+
+```{r add gender to treat datgender}
+treat_dat <- merge(treat_dat,demgen,keep="all")
+```
+
+### barriers by gender
+
+
+***Emergency mental health team***
+```{r barriers by agency em mh gendergender}
+
+treat_dat %>%
+  group_by(wave,Gender) %>%
+  freq(preventhelp_emergency_mh)
+
+```
+By sample
+```{r barriers by agency em mh by samplegender}
+
+treat_dat %>%
+  group_by(wave,Sample,Gender) %>%
+  freq(preventhelp_emergency_mh)
+
+```
+
+***Existing mental health team***
+```{r barriers by agency existing mh gendergender}
+
+treat_dat %>%
+  group_by(wave,Gender) %>%
+  freq(preventhelp_existing_mh_team)
+
+```
+By sample
+```{r barriers by agency existing mh by samplegender}
+
+treat_dat %>%
+  group_by(wave,Sample,Gender) %>%
+  freq(preventhelp_existing_mh_team)
+
+```
+
+***Online talk therapy***
+```{r barriers by agency online talk gendergender}
+
+treat_dat %>%
+  group_by(wave,Gender) %>%
+  freq(preventhelp_online_talk_therapy)
+
+```
+By sample
+```{r barriers by agency online talk by sample gender}
+
+treat_dat %>%
+  group_by(wave,Sample,Gender) %>%
+  freq(preventhelp_online_talk_therapy)
+
+```
+
+***GP***
+```{r barriers by agency GP gendergender}
+
+treat_dat %>%
+  group_by(wave,Gender) %>%
+  freq(preventhelp_gp)
+
+```
+By sample
+```{r barriers by agency gp by samplegender}
+
+treat_dat %>%
+  group_by(wave,Sample,Gender) %>%
+  freq(preventhelp_gp)
+
+```
+
+***NHS 111***
+```{r barriers by agency nhs 111 gendergender}
+
+treat_dat %>%
+  group_by(wave,Gender) %>%
+  freq(preventhelp_nhs_111)
+
+```
+By sample
+```{r barriers by agency nhs 111 by sample gendergender}
+
+treat_dat %>%
+  group_by(wave,Sample,Gender) %>%
+  freq(preventhelp_nhs_111)
+
+```
+
+***Non NHS phone***
+```{r barriers by agency phone gendergender}
+
+treat_dat %>%
+  group_by(wave,Gender) %>%
+  freq(preventhelp_nonnhs_phone)
+
+```
+By sample
+```{r barriers by agencyphone by samplegender}
+
+treat_dat %>%
+  group_by(wave,Sample,Gender) %>%
+  freq(preventhelp_nonnhs_phone)
+
+```
+
+#### Self guided
+
+***Government website***
+```{r barriers by agency gov sitegender}
+
+treat_dat %>%
+  group_by(wave,Gender) %>%
+  freq(preventhelp_gov_website)
+
+```
+By sample
+```{r barriers by agency gove site by samplegender}
+
+treat_dat %>%
+  group_by(wave,Sample,Gender) %>%
+  freq(preventhelp_gov_website)
+
+```
+
+***Non-government website***
+```{r barriers by agency non gov sitegender}
+
+treat_dat %>%
+  group_by(wave,Gender) %>%
+  freq(preventhelp_nongov_website)
+
+```
+By sample
+```{r barriers by agency non gov site by samplegender}
+
+treat_dat %>%
+  group_by(wave,Sample,Gender) %>%
+  freq(preventhelp_nongov_website)
+
+```
+
+***Online self-therapy***
+```{r barriers by agency online self therapygender}
+
+treat_dat %>%
+  group_by(wave,Gender) %>%
+  freq(preventhelp_online_self_therapy)
+
+```
+By sample
+```{r barriers by agency online self therapy by samplegender}
+
+treat_dat %>%
+  group_by(wave,Sample,Gender) %>%
+  freq(preventhelp_online_self_therapy)
+
+```
+
+***Structured therapeutic activity***
+```{r barriers by agency structured therapeutic activitygender}
+
+treat_dat %>%
+  group_by(wave,Gender) %>%
+  freq(preventhelp_struc_therapy)
+
+```
+By sample
+```{r barriers by agency structured therapeutic activity by samplegender}
+
+treat_dat %>%
+  group_by(wave,Sample,Gender) %>%
+  freq(preventhelp_struc_therapy)
+
+```
+
+### Why not seek treatment by gender
+
+```{r no treat seek by gen feel fine}
+
+treat_dat %>%
+  group_by(Gender) %>%
+  freq(reasonNohelp_feel_fine)
+
+```
+
+```{r no treat seek by gen feel better}
+
+treat_dat %>%
+  group_by(Gender) %>%
+  freq(reasonNohelp_I_feel_better)
+
+```
+
+```{r no treat seek by dont feel bad}
+
+treat_dat %>%
+  group_by(Gender) %>%
+  freq(reasonNohelp_I_dont_think_I_feel_bad_enough)
+
+```
+
+```{r no treat seek want it dont think its there}
+
+treat_dat %>%
+  group_by(Gender) %>%
+  freq(reasonNohelp_I_want_help_dont_think_its_available)
+
+```
+
+```{r no treat seek past bad experiences}
+
+treat_dat %>%
+  group_by(Gender) %>%
+  freq(reasonNohelp_Bad_experiences_in_past)
+
+```
+
+```{r no treat seek want it havent}
+
+treat_dat %>%
+  group_by(Gender) %>%
+  freq(reasonNohelp_I_want_to_but_havent)
+
+```
+
+
+```{r no treat seek too busy}
+
+treat_dat %>%
+  group_by(Gender) %>%
+  freq(reasonNohelp_Too_busy)
+
+```
+
+```{r no treat seek didnt know}
+
+treat_dat %>%
+  group_by(Gender) %>%
+  freq(reasonNohelp_I_didnt_know_where_to_find)
+
+```
+
+```{r no treat seek reasonNohelp_other}
+
+treat_dat %>%
+  group_by(Gender) %>%
+  freq(reasonNohelp_other)
+
+```
+
 
 ## Geographic
 
@@ -1073,51 +1338,51 @@ Project postcode data onto map of the UK. Use downloaded long/lat data mapped to
 ### Create clean, labelled and flat outcode dataset
 
 ```{r process downloaded geographic data}
-setwd(wd)
-source("./scripts/Create_labelled_outcode_dataset.R")
-head(postcode_df_area)
+# setwd(wd)
+# source("./scripts/Create_labelled_outcode_dataset.R")
+# head(postcode_df_area)
 ```
 
 ### Create counts of treatment seeking and barriers by region
 
 ```{r process and count treatment by area}
-setwd(wd)
-source("./scripts/RAMP_postcode_cleaning.R")
+# setwd(wd)
+# source("./scripts/RAMP_postcode_cleaning.R")
 ```
 
 
 ### Merge sample data to downloaded UK data
 
 ```{r merge national and RAMP data}
-
-postcode_full_seek <- left_join(postcode_seek,postcode_df_area,by="Outcode")
-postcode_full_barrier <- left_join(postcode_barrier,postcode_df_area,by="Outcode")
-
-# drop rows with no ID data as this indicates they did not exist in the downloaded Uk reference data
-postcode_full_seek <- postcode_full_seek[(!is.na(postcode_full_seek$id) == T),]
-postcode_full_barrier <- postcode_full_barrier[(!is.na(postcode_full_barrier$id) == T),]
+# 
+# postcode_full_seek <- left_join(postcode_seek,postcode_df_area,by="Outcode")
+# postcode_full_barrier <- left_join(postcode_barrier,postcode_df_area,by="Outcode")
+# 
+# # drop rows with no ID data as this indicates they did not exist in the downloaded Uk reference data
+# postcode_full_seek <- postcode_full_seek[(!is.na(postcode_full_seek$id) == T),]
+# postcode_full_barrier <- postcode_full_barrier[(!is.na(postcode_full_barrier$id) == T),]
 
 ```
 
 ### create counts by county
 
 ```{r county count dataset}
-
-setwd(wd)
-source("./scripts/Count_treatment_by_County.R")
+# 
+# setwd(wd)
+# source("./scripts/Count_treatment_by_County.R")
 
 ```
 
 check treatment seeking
 ```{r check head and count looks fine seek}
-head(area_count_seek)
-sum(area_count_seek$nCounty)
+# head(area_count_seek)
+# sum(area_count_seek$nCounty)
 ```
 
 check treatment barriers
 ```{r check head and count looks fine barrier}
-head(area_count_barrier)
-sum(area_count_barrier$nCounty)
+# head(area_count_barrier)
+# sum(area_count_barrier$nCounty)
 ```
 ## start making the map
 
@@ -1128,3 +1393,12 @@ sum(area_count_barrier$nCounty)
 This would likely be a collider (sx severity is going to be associated with both cohort and treatment seeking)
 
 #### NOTE TO SELF:: fix any treatment barrier stuff
+#### make sure the counts are referring to the right thing!
+
+
+## To Do:
+
+### By gender:
+#### Reasons to not seek help
+#### Barriers
+

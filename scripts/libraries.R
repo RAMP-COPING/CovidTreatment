@@ -54,20 +54,20 @@ if(!require(Rfast)){
   install.packages("Rfast")
   library(Rfast)
 }
-
-if(!require(maps)){
-  install.packages("maps")
-  library(maps)
-}
-# get Uk from maps
-
-UK <- map_data("world") %>% filter(region=="UK")
-
-
-if(!require(mapproj)){
-  install.packages("mapproj")
-  library(mapproj)
-}
+# 
+# if(!require(maps)){
+#   install.packages("maps")
+#   library(maps)
+# }
+# # get Uk from maps
+# 
+# UK <- map_data("world") %>% filter(region=="UK")
+# 
+# 
+# if(!require(mapproj)){
+#   install.packages("mapproj")
+#   library(mapproj)
+# }
 
 if(!require(viridis)){
   install.packages("viridis")
