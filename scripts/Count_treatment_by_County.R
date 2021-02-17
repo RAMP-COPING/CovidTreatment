@@ -1,49 +1,57 @@
 # Add count per area (county) for treatment seeking and receipt
 
-postcode_full_seek$County <- ifelse(postcode_full_seek$District == "York","North Yorkshire",postcode_full_seek$County) 
-postcode_full_seek$County <- ifelse(nchar(postcode_full_seek$Area) >2,"Greater London",postcode_full_seek$County) #Ensure long area codes that indicate London regions are identified as Lonond
-
-lon_pat <- "([A-Z]{1})([[0-9]{1}])([A-Z]{1})" # detect london postcode patterns where it is letter_digit_letter in first half
-postcode_full_seek$County <- ifelse(str_detect(postcode_full_seek$Outcode,lon_pat) == TRUE,"Greater London",postcode_full_seek$County) 
-
 ## count number of people in postcode area for each county
-
-area_count_seek <- postcode_full_seek %>%
+postcode_full_County <- postcode_full %>%
   group_by(County) %>%
-  mutate(nCounty = sum(n))
+  summarise(SeekCountyTotal = sum(TotalAreaSought),
+            ReceiveCountyTotal = sum(TotalAreaReceived)) 
 
-## drop NA
-area_count_seek <- area_count_seek[(area_count_seek$County != "" & !is.na(area_count_seek$County)),]
+## add the gap between seeking and receipt per county 
 
-## keep only first row per county 
+postcode_full_County <- postcode_full_County %>%
+  mutate(CountyGap =  SeekCountyTotal - ReceiveCountyTotal)
 
-area_count_seek <-
-  area_count_seek %>% 
-  group_by(County) %>% 
-  slice(1) %>%
-  select(County,nCounty)
+### there are negative numbers. Likely because of errors when I filled in county where there were typos/blanks (see RAMP_postcode_cleaning).
+##For now, zero these, but should investigate
 
-## barrier
+postcode_full_County$CountyGap <- ifelse(postcode_full_County$CountyGap < 0,0,postcode_full_County$CountyGap)
 
-postcode_full_barrier$County <- ifelse(postcode_full_barrier$District == "York","North Yorkshire",postcode_full_barrier$County) 
-postcode_full_barrier$County <- ifelse(nchar(postcode_full_barrier$Area) >2,"Greater London",postcode_full_barrier$County) #Ensure long area codes that indicate London regions are identified as Lonond
 
-lon_pat <- "([A-Z]{1})([[0-9]{1}])([A-Z]{1})" # detect london postcode patterns where it is letter_digit_letter in first half
-postcode_full_barrier$County <- ifelse(str_detect(postcode_full_barrier$Outcode,lon_pat) == TRUE,"Greater London",postcode_full_barrier$County) 
+## count number of people in postcode area for each district
 
-## count number of people in postcode area for each county
+postcode_full_District<- postcode_full %>%
+  group_by(District) %>%
+  summarise(SeekDistrictTotal = sum(TotalAreaSought),
+            ReceiveDistrictTotal = sum(TotalAreaReceived))
 
-area_count_barrier <- postcode_full_barrier %>%
+## add the gap between seeking and receipt per District
+
+postcode_full_District <- postcode_full_District %>%
+  mutate(DistrictGap =  SeekDistrictTotal - ReceiveDistrictTotal)
+
+### there are negative numbers. Likely because of errors when I filled in county where there were typos/blanks (see RAMP_postcode_cleaning).
+##For now, zero these, but should investigate
+
+postcode_full_District$DistrictGap <- ifelse(postcode_full_District$DistrictGap < 0,0,postcode_full_District$DistrictGap)
+
+
+## add lat and long back onto datasets
+
+### slice first row for each county and distrcti
+
+longlatcounty <- postcode_df_area %>%
   group_by(County) %>%
-  mutate(nCounty = sum(n))
-
-## drop NA
-area_count_barrier <- area_count_barrier[(area_count_barrier$County != "" & !is.na(area_count_barrier$County)),]
-
-## keep only first row per county 
-
-area_count_barrier <-
-  area_count_barrier %>% 
-  group_by(County) %>% 
   slice(1) %>%
-  select(County,nCounty)
+  select("County","longitude","latitude")
+
+longlatdistrict <- postcode_df_area %>%
+  group_by(District) %>%
+  slice(1) %>%
+  select("District","longitude","latitude")
+
+### merge long lat onto the count daatsets
+
+
+postcode_full_County <- left_join(postcode_full_County,longlatcounty)
+
+postcode_full_District <- left_join(postcode_full_District,longlatdistrict)

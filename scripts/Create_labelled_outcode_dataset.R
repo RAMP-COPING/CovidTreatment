@@ -33,6 +33,18 @@ names(postcode_df_area)[2] <- "Outcode"
 ## Merge area and county data
 postcode_df_area <- left_join(postcode_df_area,city_label_flat,by=c("Outcode","Area"))
 
+## Some outcodes are blank (typos?) structure of this is such that they are all sandwiched between other outcodes from the same district.
+## use fill to copy district and county of previous entry for these situations to avoid unneccessary missingness
+
+postcode_df_area <- postcode_df_area %>%
+  mutate(District = na_if(District,""),
+         County = na_if(County,""))
+
+postcode_df_area <- postcode_df_area %>%
+  fill(District,.direction = "down") %>%
+  fill(County,.direction = "down")
+
+
 ## clean up
 
 rm(postcode_df,city_labels,city_label_flat)

@@ -185,7 +185,7 @@ keepcols.cope <- c("externalDataReference","dem.which_gender_do_you_identify_wit
 cols.cope <- c("ID","Gender")
 keepcols.nbr <- c("subjectid")
 cols.nbr <- c("ID")
-keepcols.ramp <- c("externalDataReference","dem2.how_old_are_you","dem2.which_gender_do_you_identify_with","dem2.where_in_the_uk_do_you_live.txt")
+keepcols.ramp <- c("Login ID","dem2.how_old_are_you","dem2.which_gender_do_you_identify_with","dem2.where_in_the_uk_do_you_live.txt")
 cols.ramp <- c("ID","Age","Gender","Postcode")
 ```
 
@@ -1365,50 +1365,140 @@ if(!require(mapproj)){
 ```
 
 ```{r process and count treatment by area}
-# setwd(wd)
-# source("./scripts/RAMP_postcode_cleaning.R")
+ setwd(wd)
+ source("./scripts/RAMP_postcode_cleaning.R")
 
 ```
 
-```{r process  outcode data}
-# setwd(wd)
-# source("./scripts/Create_labelled_outcode_dataset.R")
-```
 
 ### Merge sample data to downloaded UK data
 
 ```{r merge national and RAMP data}
 # 
-# postcode_full_seek <- left_join(postcode_seek,postcode_df_area,by="Outcode")
-# postcode_full_barrier <- left_join(postcode_barrier,postcode_df_area,by="Outcode")
+postcode_full_seek <- left_join(postcode_seek,postcode_df_area,by="Outcode")
+postcode_full <- left_join(postcode_full_seek,postcode_receive,by="Outcode")
 # 
 # # drop rows with no ID data as this indicates they did not exist in the downloaded Uk reference data
-# postcode_full_seek <- postcode_full_seek[(!is.na(postcode_full_seek$id) == T),]
-# postcode_full_barrier <- postcode_full_barrier[(!is.na(postcode_full_barrier$id) == T),]
+ postcode_full<- postcode_full[(!is.na(postcode_full$id) == T),]
+
 
 ```
 
-### create counts by county
+### create counts by county and district
 
 ```{r county count dataset}
-# 
-# setwd(wd)
-# source("./scripts/Count_treatment_by_County.R")
+ setwd(wd)
+ source("./scripts/Count_treatment_by_County.R")
 
 ```
 
-check treatment seeking
-```{r check head and count looks fine seek}
-# head(area_count_seek)
-# sum(area_count_seek$nCounty)
+
+check county data
+```{r check head and count looks fine county}
+head(postcode_full_County)
+
 ```
 
-check treatment barriers
-```{r check head and count looks fine barrier}
-# head(area_count_barrier)
-# sum(area_count_barrier$nCounty)
+check district data
+```{r check head and count looks fine district}
+head(postcode_full_District)
+
 ```
-## start making the map
+
+## start making the maps
+
+### Treatment seeking by county (no labels)
+
+
+```{r map for seeking by county colour no label,warning=FALSE}
+
+mapcolour <- 
+ postcode_full_County %>%
+  
+ ggplot() +
+    geom_polygon(data = UK, aes(x=long, y = lat, group = group), fill="grey", alpha=0.5) +
+    geom_point( aes(x=longitude, y=latitude, size=SeekCountyTotal, color=CountyGap), alpha=0.8) +
+    scale_size_continuous(range=c(1,20)) +
+  scale_color_viridis(trans="log",alpha = 1,option = "D") +
+    theme_void() + ylim(50,59) + coord_map() + theme(legend.position="right") 
+
+
+#ggsave(paste0(wdirect,"RAMPparticipantMap_colour.png"),mapcolour,dpi=300)
+
+mapcolour
+
+```
+
+ Treatment seeking by district (no labels)
+
+
+```{r map for seeking by district colour no label,warning=FALSE}
+
+mapcolour <- 
+ postcode_full_District %>%
+  
+ ggplot() +
+    geom_polygon(data = UK, aes(x=long, y = lat, group = group), fill="grey", alpha=0.5) +
+    geom_point( aes(x=longitude, y=latitude, size=SeekDistrictTotal, color=DistrictGap), alpha=0.5) +
+    scale_size_continuous(range=c(1,7)) +
+  scale_fill_gradient(low = "green",high = "red") +
+    theme_void() + ylim(50,59) + coord_map() + theme(legend.position="right") 
+
+
+#ggsave(paste0(wdirect,"RAMPparticipantMap_colour.png"),mapcolour,dpi=300)
+
+mapcolour
+
+```
+
+### Labelled the 5 counties with the greatest treatment gap
+
+#### county
+Can change this to the most people seeking treatment etc later
+```{r map for seeking by county colour labelled,warning=FALSE}
+
+mapcolourlabel <- 
+ postcode_full_County %>%
+  
+ ggplot() +
+    geom_polygon(data = UK, aes(x=long, y = lat, group = group), fill="grey", alpha=0.5) +
+    geom_point( aes(x=longitude, y=latitude, size=SeekCountyTotal, color=CountyGap), alpha=0.8) +
+    geom_text_repel( data=postcode_full_County %>% arrange(CountyGap) %>% tail(5), aes(x=longitude, y=latitude, label=County), size=4) +
+   geom_point( data=postcode_full_County %>% arrange(CountyGap) %>% tail(5), aes(x=longitude, y=latitude), color="#78D9C5", size=2) +
+    scale_size_continuous(range=c(1,20)) +
+  scale_color_viridis(trans="log",alpha = 1,option = "cividis") +
+    theme_void() + ylim(50,59) + coord_map() + theme(legend.position="right") 
+
+
+#ggsave(paste0(wdirect,"RAMPparticipantMap_colour.png"),mapcolour,dpi=300)
+
+mapcolourlabel
+
+```
+
+
+#### district
+Can change this to the most people seeking treatment etc later
+```{r map for seeking by district colour labelled,warning=FALSE}
+
+mapcolourlabel <- 
+ postcode_full_District %>%
+  
+ ggplot() +
+    geom_polygon(data = UK, aes(x=long, y = lat, group = group), fill="grey", alpha=0.5) +
+    geom_point( aes(x=longitude, y=latitude, size=SeekDistrictTotal, color=DistrictGap), alpha=0.8) +
+    geom_text_repel( data=postcode_full_District %>% arrange(DistrictGap) %>% tail(5), aes(x=longitude, y=latitude, label=District), size=4) +
+   geom_point( data=postcode_full_District %>% arrange(DistrictGap) %>% tail(5), aes(x=longitude, y=latitude), color="#78D9C5", size=2) +
+    scale_size_continuous(range=c(1,7)) +
+  scale_color_viridis(trans="log",alpha = 1,option = "cividis") +
+    theme_void() + ylim(50,59) + coord_map() + theme(legend.position="right") 
+
+
+#ggsave(paste0(wdirect,"RAMPparticipantMap_colour.png"),mapcolour,dpi=300)
+
+mapcolourlabel
+
+```
 
 ## Analytic decision notes
 
