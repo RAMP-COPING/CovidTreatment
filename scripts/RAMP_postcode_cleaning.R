@@ -1,7 +1,6 @@
 ## treatment maps postcode dataset creation for RAMP
 
 ## Add postcode to the treatment data
-
 treat_dat <- merge(treat_dat,dem,all = TRUE)
 
 ## ensure all letters are uppercase. rename postcode to outcode and trim whitespace
@@ -10,6 +9,10 @@ treat_dat <- treat_dat %>%
   mutate(Outcode = toupper(Postcode))
 
 treat_dat$Outcode <- str_squish(treat_dat$Outcode)
+
+## Change "york" postcode entry for RAMP partiicpant to a York district postcode
+
+treat_dat$Outcode[(treat_dat$Outcode == "YORK")] <- "YO1"
 
 ## Any treatment sought counts by region (i.e. how many people sought treatment at least once)
 
@@ -59,6 +62,7 @@ postcode_seek <- postcode_seek[(postcode_seek$Outcode != "217"),]
 postcode_seek <- postcode_seek[(postcode_seek$Outcode != "2334"),]
 postcode_seek <- postcode_seek[(postcode_seek$Outcode != "44"),]
 postcode_seek <- postcode_seek[(postcode_seek$Outcode != "68"),]
+postcode_seek <- postcode_seek[(postcode_seek$Outcode != ""),]
 
 
 postcode_receive <- postcode_receive[(!is.na(postcode_receive$Outcode) == T),]
@@ -71,3 +75,6 @@ postcode_receive <- postcode_receive[(postcode_receive$Outcode != "217"),]
 postcode_receive <- postcode_receive[(postcode_receive$Outcode != "2334"),]
 postcode_receive <- postcode_receive[(postcode_receive$Outcode != "44"),]
 postcode_receive <- postcode_receive[(postcode_receive$Outcode != "68"),]
+postcode_receive <- postcode_receive[(postcode_receive$Outcode != ""),]
+
+

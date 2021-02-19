@@ -86,7 +86,7 @@ remove(list = ls())
 
 #### Call in set up scripts
 
-```{r source files}
+```{r Setup, source files}
 #source data directory: data_path
 source("/Users/kirstin/Dropbox/SGDP/RAMP/Projects/Treatment/file_paths.R")
 setwd(wd)
@@ -143,6 +143,9 @@ demCOPE.glad <- readRDS(file = paste0(data_path, "/coping_glad/dem_coping_glad.R
 demCOPE.edgi <- readRDS(file = paste0(data_path, "/coping_edgi/dem_coping_edgi.RDS"))
 demCOPE.nbr <- readRDS(file = paste0(data_path, "/coping_nbr/dem_coping_nbr.RDS"))
 
+
+GLADpostcode <- fread(paste0(postpath,"/GLAD_COPING_postcodes.csv"))
+EDGIpostcode <- fread(paste0(postpath,"/EDGI_COPING_postcodes.csv"))
 ```
 
 #### Create a wave columns in treatment data
@@ -178,6 +181,7 @@ treatRAMP <- treatRAMP %>%
 
 ```
 
+
 #### select only relevant demographics
 
 ```{r demographic select list}
@@ -187,6 +191,9 @@ keepcols.nbr <- c("subjectid")
 cols.nbr <- c("ID")
 keepcols.ramp <- c("Login ID","dem2.how_old_are_you","dem2.which_gender_do_you_identify_with","dem2.where_in_the_uk_do_you_live.txt")
 cols.ramp <- c("ID","Age","Gender","Postcode")
+
+names.postcode <- c("ID","Postcode")
+
 ```
 
 
@@ -200,7 +207,30 @@ names(dem.cope.glad) <- cols.cope
 names(dem.cope.edgi) <- cols.cope
 names(dem.cope.nbr) <- cols.nbr
 names(dem.ramp) <- cols.ramp
+names(GLADpostcode) <- names.postcode
+names(EDGIpostcode) <- names.postcode
+
+
 ```
+Clean postcode to keep only outcode for COPING
+
+```{r clean COPING postcodes}
+
+setwd(wd)
+source("./scripts/clean_COPING_postcode_data.R")
+
+```
+
+Add postcode to COPING
+
+```{r add postcode to coping}
+
+dem.cope.glad <- left_join(dem.cope.glad,GLADpostcode)
+dem.cope.edgi <- left_join(dem.cope.edgi,EDGIpostcode)
+
+```
+
+
 #### add sample columns 
 
 ```{r add sample col}
@@ -1428,8 +1458,7 @@ mapcolour <-
 mapcolour
 
 ```
-
- Treatment seeking by district (no labels)
+### Treatment seeking by district (no labels)
 
 
 ```{r map for seeking by district colour no label,warning=FALSE}
@@ -1438,10 +1467,10 @@ mapcolour <-
  postcode_full_District %>%
   
  ggplot() +
-    geom_polygon(data = UK, aes(x=long, y = lat, group = group), fill="grey", alpha=0.5) +
+    geom_polygon(data = UK, aes(x=long, y = lat, group = group), fill="grey", alpha=1) +
     geom_point( aes(x=longitude, y=latitude, size=SeekDistrictTotal, color=DistrictGap), alpha=0.5) +
     scale_size_continuous(range=c(1,7)) +
-  scale_fill_gradient(low = "green",high = "red") +
+  scale_color_viridis(trans="log",alpha = 1,option = "D") +
     theme_void() + ylim(50,59) + coord_map() + theme(legend.position="right") 
 
 
@@ -1466,7 +1495,7 @@ mapcolourlabel <-
     geom_text_repel( data=postcode_full_County %>% arrange(CountyGap) %>% tail(5), aes(x=longitude, y=latitude, label=County), size=4) +
    geom_point( data=postcode_full_County %>% arrange(CountyGap) %>% tail(5), aes(x=longitude, y=latitude), color="#78D9C5", size=2) +
     scale_size_continuous(range=c(1,20)) +
-  scale_color_viridis(trans="log",alpha = 1,option = "cividis") +
+  scale_color_viridis(trans="log",alpha = 1,option = "D") +
     theme_void() + ylim(50,59) + coord_map() + theme(legend.position="right") 
 
 
@@ -1477,9 +1506,10 @@ mapcolourlabel
 ```
 
 
-#### district
-Can change this to the most people seeking treatment etc later
-```{r map for seeking by district colour labelled,warning=FALSE}
+#### district labelled with marker points
+orange markers for top 5 biggest gap, with labels
+
+```{r map for seeking by district colour labelled markers,warning=FALSE}
 
 mapcolourlabel <- 
  postcode_full_District %>%
@@ -1487,10 +1517,85 @@ mapcolourlabel <-
  ggplot() +
     geom_polygon(data = UK, aes(x=long, y = lat, group = group), fill="grey", alpha=0.5) +
     geom_point( aes(x=longitude, y=latitude, size=SeekDistrictTotal, color=DistrictGap), alpha=0.8) +
-    geom_text_repel( data=postcode_full_District %>% arrange(DistrictGap) %>% tail(5), aes(x=longitude, y=latitude, label=District), size=4) +
-   geom_point( data=postcode_full_District %>% arrange(DistrictGap) %>% tail(5), aes(x=longitude, y=latitude), color="#78D9C5", size=2) +
+    geom_text_repel( data=postcode_full_District %>% arrange(DistrictGap) %>% tail(5), aes(x=longitude, y=latitude, label=District), size=5, face = "bold",colour = "black") +
+   geom_point( data=postcode_full_District %>% arrange(DistrictGap) %>% tail(5), aes(x=longitude, y=latitude), color="orange", size=2) +
     scale_size_continuous(range=c(1,7)) +
-  scale_color_viridis(trans="log",alpha = 1,option = "cividis") +
+  scale_color_viridis(trans="log",alpha = 1,option = "D") +
+    theme_void() + ylim(50,59) + coord_map() + theme(legend.position="right") 
+
+
+#ggsave(paste0(wdirect,"RAMPparticipantMap_colour.png"),mapcolour,dpi=300)
+
+mapcolourlabel
+
+```
+
+#### district labelled with marker points
+orange markers for top 5 biggest gap, WITHOUT labels
+
+```{r map for seeking by district colour markers no labels,warning=FALSE}
+
+mapcolourlabel <- 
+ postcode_full_District %>%
+  
+ ggplot() +
+    geom_polygon(data = UK, aes(x=long, y = lat, group = group), fill="grey", alpha=0.5) +
+    geom_point( aes(x=longitude, y=latitude, size=SeekDistrictTotal, color=DistrictGap), alpha=0.8) +
+
+   geom_point( data=postcode_full_District %>% arrange(DistrictGap) %>% tail(5), aes(x=longitude, y=latitude), color="orange", size=2) +
+    scale_size_continuous(range=c(1,10)) +
+  scale_color_viridis(trans="log",alpha = 1,option = "D") +
+    theme_void() + ylim(50,59) + coord_map() + theme(legend.position="right") 
+
+
+#ggsave(paste0(wdirect,"RAMPparticipantMap_colour.png"),mapcolour,dpi=300)
+
+mapcolourlabel
+
+```
+
+#### district - only top ten gap 
+Can change this to the most people seeking treatment etc later
+```{r map for seeking by district colour labelled top ten only,warning=FALSE}
+
+mapcolourlabel <- 
+ postcode_full_District %>%
+    arrange(DistrictGap) %>% 
+  tail(10) %>%
+  
+ ggplot() +
+    geom_polygon(data = UK, aes(x=long, y = lat, group = group), fill="grey", alpha=0.5) +
+    geom_point( aes(x=longitude, y=latitude, size=SeekDistrictTotal, color=DistrictGap), alpha=0.8) +
+    geom_text_repel( data=postcode_full_District %>% arrange(DistrictGap) %>% tail(10), aes(x=longitude, y=latitude, label=District), size=4, face = "bold",colour = "black") +
+
+    scale_size_continuous(range=c(1,10)) +
+  scale_color_viridis(trans="log",alpha = 1,option = "D") +
+    theme_void() + ylim(50,59) + coord_map() + theme(legend.position="right") 
+
+
+#ggsave(paste0(wdirect,"RAMPparticipantMap_colour.png"),mapcolour,dpi=300)
+
+mapcolourlabel
+
+```
+
+
+#### district - only top five gap 
+Can change this to the most people seeking treatment etc later
+```{r map for seeking by district colour labelled top five only,warning=FALSE}
+
+mapcolourlabel <- 
+ postcode_full_District %>%
+    arrange(DistrictGap) %>% 
+  tail(5) %>%
+  
+ ggplot() +
+    geom_polygon(data = UK, aes(x=long, y = lat, group = group), fill="grey", alpha=0.5) +
+    geom_point( aes(x=longitude, y=latitude, size=SeekDistrictTotal, color=DistrictGap), alpha=0.8) +
+    geom_text_repel( data=postcode_full_District %>% arrange(DistrictGap) %>% tail(5), aes(x=longitude, y=latitude, label=District), size=4, face = "bold",colour = "black") +
+
+    scale_size_continuous(range=c(1,10)) +
+  scale_color_viridis(trans="log",alpha = 1,option = "D") +
     theme_void() + ylim(50,59) + coord_map() + theme(legend.position="right") 
 
 
