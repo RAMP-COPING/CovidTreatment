@@ -12,7 +12,6 @@ postcode_full_County <- postcode_full_County %>%
   mutate(CountyGap =  SeekCountyTotal - ReceiveCountyTotal)
 
 
-
 ### there are negative numbers. Likely because of errors when I filled in county where there were typos/blanks (see RAMP_postcode_cleaning).
 ##For now, zero these, but should investigate
 

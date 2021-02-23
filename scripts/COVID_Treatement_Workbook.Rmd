@@ -146,6 +146,7 @@ demCOPE.nbr <- readRDS(file = paste0(data_path, "/coping_nbr/dem_coping_nbr.RDS"
 
 GLADpostcode <- fread(paste0(postpath,"/GLAD_COPING_postcodes.csv"))
 EDGIpostcode <- fread(paste0(postpath,"/EDGI_COPING_postcodes.csv"))
+NBRpostcode <- fread(paste0(postpath,"/NBR_postcodes_hash.csv"))
 ```
 
 #### Create a wave columns in treatment data
@@ -209,6 +210,7 @@ names(dem.cope.nbr) <- cols.nbr
 names(dem.ramp) <- cols.ramp
 names(GLADpostcode) <- names.postcode
 names(EDGIpostcode) <- names.postcode
+names(NBRpostcode) <- names.postcode
 
 
 ```
@@ -227,6 +229,7 @@ Add postcode to COPING
 
 dem.cope.glad <- left_join(dem.cope.glad,GLADpostcode)
 dem.cope.edgi <- left_join(dem.cope.edgi,EDGIpostcode)
+dem.cope.nbr <- left_join(dem.cope.nbr,NBRpostcode)
 
 ```
 
@@ -1102,6 +1105,7 @@ for (i in grep("reasonNo", names(treat_dat)))
 
 
 ```
+
 ## Gender stratification for barriers
 
 Add gender to treatment data 

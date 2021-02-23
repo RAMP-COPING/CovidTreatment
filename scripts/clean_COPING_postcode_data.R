@@ -12,6 +12,8 @@ EDGIpostcode <- EDGIpostcode %>%
   mutate(Postcode = toupper(Postcode)) %>%
   mutate(Postcode = str_replace(Postcode," ",""))
 
+
+
 ## keep outcode only
 ##Drop last 3 letters
 
