@@ -15,6 +15,7 @@ treat_dat$Outcode <- str_squish(treat_dat$Outcode)
 treat_dat$Outcode[(treat_dat$Outcode == "YORK")] <- "YO1"
 
 ## Any treatment sought counts by region (i.e. how many people sought treatment at least once)
+#### also add total respondents per area
 
 ### first gather so we have whether they sought by ID
   
@@ -26,11 +27,13 @@ wide_seek <- treat_dat %>%
                                  TRUE ~ NA_real_)) 
 
 ### then gather by postcode
-
 postcode_seek <- wide_seek %>%
   group_by(Outcode) %>%
-  summarise(AreaSought = paste(AnySought,collapse=",")) %>%
-  mutate(TotalAreaSought =  str_count(AreaSought,"1"))
+  summarise(AreaSought = paste(AnySought,collapse=","),
+            AreaAttempt = paste(TimesSought,collapse=",")) %>%
+  mutate(TotalAreaSought =  str_count(AreaSought,"1"),
+         TotalAreaAttemps = str_count(AreaAttempt,"1"),
+         TotalAreaResponses = stri_count_fixed(AreaAttempt,",")+1)
 
 ## sought but did not receive by area (ie hving sought, count of any one whor eceived treatment at least once)
 
@@ -42,14 +45,18 @@ wide_receive <- treat_dat %>%
   summarise(TimesReceived = paste(AnyReceived,collapse=",")) %>%
   mutate(AnyReceived = case_when(grepl("1",TimesReceived) ~ 1,
                                grepl("0",TimesReceived) ~ 0,
-                               TRUE ~ NA_real_)) 
+                               TRUE ~ NA_real_))
 
 ### then gather by postcode
 
+### NOTE: added the total responses field to both datasets to ensure they matched. They do, so removed from seek as we merge those datasets in next step
+
 postcode_receive <- wide_receive %>%
   group_by(Outcode) %>%
-  summarise(AreaReceived = paste(AnyReceived,collapse=",")) %>%
-  mutate(TotalAreaReceived =  str_count(AreaReceived,"1"))
+  summarise(AreaReceived = paste(AnyReceived,collapse=","),
+            AreaAttemptReceipt = paste(TimesReceived,collapse=",")) %>%
+  mutate(TotalAreaReceived =  str_count(AreaReceived,"1"),
+         TotalAreaAttemptsReceived = str_count(AreaAttemptReceipt,"1"))
 
 ## drop number only, prefer not to say, and other null rows
 postcode_seek <- postcode_seek[(!is.na(postcode_seek$Outcode) == T),]
