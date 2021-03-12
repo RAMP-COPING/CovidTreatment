@@ -32,7 +32,7 @@ postcode_seek <- wide_seek %>%
   summarise(AreaSought = paste(AnySought,collapse=","),
             AreaAttempt = paste(TimesSought,collapse=",")) %>%
   mutate(TotalAreaSought =  str_count(AreaSought,"1"),
-         TotalAreaAttemps = str_count(AreaAttempt,"1"),
+         TotalAreaAttempts = str_count(AreaAttempt,"1"),
          TotalAreaResponses = stri_count_fixed(AreaAttempt,",")+1)
 
 ## sought but did not receive by area (ie hving sought, count of any one whor eceived treatment at least once)

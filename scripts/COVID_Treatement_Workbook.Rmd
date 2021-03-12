@@ -1439,22 +1439,34 @@ head(postcode_full_District)
 
 ```
 
-## start making the maps
+## Seeking attempts by total responses maps
 
 ### Treatment seeking by county (no labels)
-
-
+Size of the circles = total number of responses
+Colour of circles = percent of responses that indicated treatment seeking
 ```{r map for seeking by county colour no label,warning=FALSE}
+
+bb <- c(10,50,100,500,1000,5000,10000,15000)
 
 mapcolour <- 
  postcode_full_County %>%
   
  ggplot() +
-    geom_polygon(data = UK, aes(x=long, y = lat, group = group), fill="grey", alpha=0.5) +
-    geom_point( aes(x=longitude, y=latitude, size=SeekCountyTotal, color=CountyGap), alpha=0.8) +
-    scale_size_continuous(range=c(1,20)) +
-  scale_color_viridis(trans="log",alpha = 1,option = "D") +
-    theme_void() + ylim(50,59) + coord_map() + theme(legend.position="right") 
+    geom_polygon(data = UK, aes(x=long, y = lat, group = group), 
+                 fill="grey", alpha=1) +
+    geom_point( aes(x=longitude, y=latitude, 
+                    size=TotalResponsesCounty, 
+                    color=SeekProportionTotalCounty), 
+                alpha=1) +
+    scale_size_continuous(range = c(1,30),
+                          breaks = bb,
+                          limits = c(1,15000)) +
+
+  scale_color_viridis(trans="log10",alpha = 1,option = "D") +
+  theme_void() + 
+  ylim(50,59) + 
+  coord_map() + 
+  theme(legend.position="right") 
 
 
 #ggsave(paste0(wdirect,"RAMPparticipantMap_colour.png"),mapcolour,dpi=300)
@@ -1463,19 +1475,31 @@ mapcolour
 
 ```
 ### Treatment seeking by district (no labels)
-
-
+Size of the circles = total number of responses
+Colour of circles = percent of responses that indicated treatment seeking
 ```{r map for seeking by district colour no label,warning=FALSE}
+
+bb <- c(10,100,500,1000,2000,3000)
 
 mapcolour <- 
  postcode_full_District %>%
   
  ggplot() +
-    geom_polygon(data = UK, aes(x=long, y = lat, group = group), fill="grey", alpha=1) +
-    geom_point( aes(x=longitude, y=latitude, size=SeekDistrictTotal, color=DistrictGap), alpha=0.5) +
-    scale_size_continuous(range=c(1,7)) +
-  scale_color_viridis(trans="log",alpha = 1,option = "D") +
-    theme_void() + ylim(50,59) + coord_map() + theme(legend.position="right") 
+    geom_polygon(data = UK, aes(x=long, y = lat, group = group), 
+                 fill="grey", alpha=1) +
+    geom_point( aes(x=longitude, y=latitude, 
+                    size=TotalResponsesDistrict, 
+                    color=SeekProportionTotalDistrict), 
+                alpha=1) +
+    scale_size_continuous(range = c(1,20),
+                          breaks = bb,
+                          limits = c(1,3000)) +
+
+  scale_color_viridis(trans="log10",alpha = 1,option = "D") +
+  theme_void() + 
+  ylim(50,59) + 
+  coord_map() + 
+  theme(legend.position="right") 
 
 
 #ggsave(paste0(wdirect,"RAMPparticipantMap_colour.png"),mapcolour,dpi=300)
@@ -1484,23 +1508,46 @@ mapcolour
 
 ```
 
+
 ### Labelled the 5 counties with the greatest treatment gap
 
 #### county
-Can change this to the most people seeking treatment etc later
+
+
 ```{r map for seeking by county colour labelled,warning=FALSE}
+bb <- c(10,50,100,500,1000,5000,10000,15000)
 
 mapcolourlabel <- 
  postcode_full_County %>%
   
  ggplot() +
     geom_polygon(data = UK, aes(x=long, y = lat, group = group), fill="grey", alpha=0.5) +
-    geom_point( aes(x=longitude, y=latitude, size=SeekCountyTotal, color=CountyGap), alpha=0.8) +
-    geom_text_repel( data=postcode_full_County %>% arrange(CountyGap) %>% tail(5), aes(x=longitude, y=latitude, label=County), size=4) +
-   geom_point( data=postcode_full_County %>% arrange(CountyGap) %>% tail(5), aes(x=longitude, y=latitude), color="#78D9C5", size=2) +
-    scale_size_continuous(range=c(1,20)) +
-  scale_color_viridis(trans="log",alpha = 1,option = "D") +
-    theme_void() + ylim(50,59) + coord_map() + theme(legend.position="right") 
+  
+    geom_point( aes(x=longitude, y=latitude, size=TotalResponsesCounty, color=SeekProportionTotalCounty), alpha=0.8) +
+  
+    geom_text_repel( data=postcode_full_County %>% 
+                       arrange(SeekProportionTotalCounty) %>% 
+                       tail(5), 
+                     aes(x=longitude, y=latitude, label=County), 
+                     size=4) +
+  
+   geom_point( data=postcode_full_County %>% 
+                 arrange(SeekProportionTotalCounty) %>% 
+                 tail(5), 
+               aes(x=longitude, y=latitude), 
+               color="#78D9C5", 
+               size=2) +
+  
+    scale_size_continuous(range = c(1,30),
+                          breaks = bb,
+                          limits = c(1,15000)) +
+
+  scale_color_viridis(trans="log10",alpha = 1,option = "D") +
+  
+  theme_void() + 
+  ylim(50,59) + 
+  coord_map() + 
+  theme(legend.position="right") 
 
 
 #ggsave(paste0(wdirect,"RAMPparticipantMap_colour.png"),mapcolour,dpi=300)
