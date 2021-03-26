@@ -1067,6 +1067,7 @@ treat_dat %>%
   freq(preventhelp_struc_therapy)
 
 ```
+
 ### Frequency of different levels of helpfulness by treatment type (supported/client led) by wave
 
 **For supported options**
@@ -1385,6 +1386,34 @@ treat_dat %>%
 
 ```
 
+
+### Frequency of different levels of helpfulness by treatment type (supported/client led) by wave by gender
+
+**For supported options**
+```{r check helpfulness by wave supported gender gender}
+treat_dat %>%
+  group_by(wave,gender) %>%
+  freq(Helpfulness_Supported)
+```
+By sample
+```{r check helpfulness by wave supported by sample gender}
+treat_dat %>%
+  group_by(wave,Sample,gender) %>%
+  freq(Helpfulness_Supported)
+```
+
+**For  client led options**
+```{r check helpfulness by wave client led gender}
+treat_dat %>%
+  group_by(wave,gender) %>%
+  freq(Helpfulness_SelfGuided)
+```
+By sample
+```{r check helpfulness by wave client led by sample gender}
+treat_dat %>%
+  group_by(wave,Sample,gender) %>%
+  freq(Helpfulness_SelfGuided)
+```
 
 ## Geographic
 
