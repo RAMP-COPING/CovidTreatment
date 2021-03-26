@@ -1067,7 +1067,7 @@ treat_dat %>%
   freq(preventhelp_struc_therapy)
 
 ```
-### Frequency of different levels of helpfulness by treatment type (cupported/client led) by wave
+### Frequency of different levels of helpfulness by treatment type (supported/client led) by wave
 
 **For supported options**
 ```{r check helpfulness by wave supported}
@@ -1114,7 +1114,28 @@ Add gender to treatment data
 treat_dat <- full_join(treat_dat,demgen)
 ```
 
-### barriers by gender
+
+### Treatment seeking rates by Gender
+
+
+```{r treatment seeking freq by wave gender}
+
+treat_dat %>%
+  group_by(wave,Gender) %>%
+  freq(soughthelp_for_self)
+
+```
+By sample
+
+```{r treatment seeking freq by wave by sample gender}
+
+treat_dat %>%
+  group_by(wave,Sample,Gender) %>%
+  freq(soughthelp_for_self)
+
+```
+
+### Reasons by gender
 
 
 ***Emergency mental health team***
