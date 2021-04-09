@@ -676,10 +676,153 @@ demgen <- subset(dem,select = c("ID","Gender","Sample"))
 # mental health diagnosis cleaning
 
 
-```{read MHD in}
+rename id columns so they all match
+
+```{r rename mhd id vars}
+
+MHD.RAMP <- MHD.RAMP %>%
+  rename(ID="Login ID")
+
+MHD.COPE.nbr <- MHD.COPE.nbr %>%
+  rename(ID="subjectid")
+
+MHD.COPE.glad <- MHD.COPE.glad %>%
+  rename(ID="externalDataReference")
+
 
 
 ```
+
+## Identify subset of diagnoses we have for all datasets.
+
+This includes the full range of MH questions we asked in RAMP
+
+```{r rename ramp var names to match COPING}
+
+names(MHD.RAMP) <- sub("mhq","mhd",names(MHD.RAMP))
+names(MHD.RAMP) <- sub(".1","",names(MHD.RAMP))
+names(MHD.COPE.glad) <- sub(".1","",names(MHD.COPE.glad))
+names(MHD.COPE.nbr) <- sub(".1","",names(MHD.COPE.nbr))
+
+```
+
+```{r find column columns}
+
+common_col_names <- intersect(names(MHD.RAMP),names(MHD.COPE.glad))
+common_col_names <- intersect(common_col_names,names(MHD.COPE.nbr))
+
+# remove the second personality option which says what specific personality disorder is diagnosed.
+common_col_names <- common_col_names[common_col_names != "mhd.personality_disorder_diagnosed"]
+
+```
+
+Rename EDGI colums to make sure we can compare
+
+```{r rename edgi mental health diagnosis names}
+
+MHD.COPE.edgi <- demCOPE.edgi.baseline
+names(MHD.COPE.edgi) <- sub("demographics","mhd",names(MHD.COPE.edgi))
+names(MHD.COPE.edgi) <- sub(".1","",names(MHD.COPE.edgi))
+names(MHD.COPE.edgi) <- sub("externalDataReference","ID",names(MHD.COPE.edgi))
+
+
+```
+
+find intersect with edgi columns
+
+```{r intersect mhd with edgi}
+common_col_names_edg <- intersect(common_col_names,names(MHD.COPE.edgi))
+
+```
+this shows that the only ones not common are eating disorder categories. makes sense as EDGI is ascertained on the basis of having one. So if we collapse across eating disorders we can assume that all edgi fall into this. Will add EDGI last to achieve this. 
+
+
+### select the appropriate columns and merge samples
+
+
+```{r select columns}
+
+MH.RAMP <- MHD.RAMP %>%
+  select(all_of(common_col_names)) %>%
+  mutate(Sample = "RAMP")
+
+MH.GLAD <- MHD.COPE.glad %>%
+  select(all_of(common_col_names)) %>%
+  mutate(Sample = "COPING",
+         SampleCOPE = "GLAD")
+
+MH.NBR <- MHD.COPE.nbr %>%
+  select(all_of(common_col_names)) %>%
+  mutate(Sample = "COPING",
+         SampleCOPE = "NBR")
+
+```
+
+
+```{r merge the three datasets}
+
+MH <- merge(MH.RAMP,MH.GLAD,all = "TRUE")
+MH <- merge(MH,MH.NBR,all = "TRUE")
+
+```
+
+
+```{r collapse all eating disorders together and drop the others}
+
+MH <- MH %>%
+  mutate(mhd.eating_disorder = case_when("mhd.anorexia_nervosa" == 1 |
+                                           "mhd.atypical_anorexia_nervosa" == 1|
+                                           "mhd.bulimia_nervosa" == 1 ~1)) %>%
+  select(-c(mhd.anorexia_nervosa,mhd.atypical_anorexia_nervosa,mhd.bulimia_nervosa))
+
+```
+
+EDGI all have eating disorders (ascertained for this)
+```{r creat eating disorder category for EDGI}
+
+MHD.COPE.edgi$mhd.eating_disorder <- 1
+
+```
+
+adjust common col list for EDGI
+
+```{r adjust common cols for edgi}
+
+common_col_names <- common_col_names[common_col_names != "mhd.anorexia_nervosa"]
+common_col_names <- common_col_names[common_col_names != "mhd.atypical_anorexia_nervosa"]
+common_col_names <- common_col_names[common_col_names !="mhd.bulimia_nervosa"]
+
+
+common_col_names <- append(common_col_names,"mhd.eating_disorder")
+
+```
+
+```{r select columns for EDGI}
+
+MH.EDGI <- MHD.COPE.edgi %>%
+  select(all_of(common_col_names)) %>%
+  mutate(Sample = "COPING",
+         SampleCOPE = "EDGI")
+
+```
+
+Merge EDGI onto rest
+
+```{r merge edgi MH to others}
+
+MH <- MH <- merge(MH,MH.EDGI,all = "TRUE")
+
+```
+
+drop start and end date (don't need it as we just need a single point per person)
+
+```{r drop start and end date}
+
+MH <- MH %>%
+  select(-c(startDate,endDate)) 
+
+```
+
 
 # Rename the treatment variables and drop irrelevant ones
 
@@ -1054,6 +1197,54 @@ dem %>%
 
 ```
 
+### Mental health diagnoses
+
+Clean so we match treatment data and dont have duplicates
+```{r drop all IDS that are not included in our treatment data from the MHD data}
+
+MH <- MH %>%
+  filter(MH$ID %in% treat_dat$ID) %>%
+  distinct(.)
+
+```
+
+List of diagnosis columns
+
+```{r list diagnoses cols}
+
+dia_cols <- c("mhd.depression", "mhd.mania_hypomania_bipolar_or_manicdepression", 
+"mhd.anxiety_nerves_or_generalised_anxiety_disorder", "mhd.social_anxiety_or_social_phobia", 
+"mhd.agoraphobia", "mhd.panic_disorder", "mhd.panic_attacks", 
+"mhd.obsessivecompulsive_disorder_ocd", "mhd.dont_know", "mhd.prefer_not_to_answer", 
+"mhd.schizophrenia", "mhd.psychosis_type_psychotic_illness", 
+"mhd.personality_disorder", "mhd.attention_deficit_hyperactivity_disorder","mhd.eating_disorder")
+  
+```
+
+#### everyone
+
+frequencies for all diagnoses
+```{r freq tables for diagnoses}
+
+for (i in dia_cols){
+  print(freq(MH[i]))
+}
+
+```
+
+
+#### By sample
+frequencies for all diagnoses
+```{r freq tables for diagnoses by sample}
+
+for (i in dia_cols){
+  print(i)
+    print(ctable(MH[,i],MH$Sample))
+}
+
+```
+
+## treat dat
 ### Response rates per wave
 
 ```{r response rates per wave}
@@ -1106,6 +1297,10 @@ treat_dat %>%
   freq(ReasonSeek)
 
 ```
+
+
+
+
 ### Frequency of treatment receipt by type and wave (any instances of treatment, not total instances)
 
 Seeking ANY instances of this type of treatment (i.e., if they sought supported help from 3 sources in a  wave, it will just register once)
