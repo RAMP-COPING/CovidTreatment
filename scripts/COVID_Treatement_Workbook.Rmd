@@ -136,7 +136,7 @@ demRAMP <- readRDS(file = paste0(data_path, "/ramp/dem_ramp.RDS"))
 ```
 
 COPING
-Note, external data refrence is a hash-id for coping. So it is consistent across aprticipants and matches, but is not linkable to GLAD ID
+Note, external data reference is a hash-id for coping. So it is consistent across participants and matches, but is not linkable to GLAD ID
 ```{r read in data coping}
 treatCOPE <- readRDS(file = paste0(cope_path, "/coping_followupa_ongoing/treatment_coping_followupa_ongoing.rds"))
 demCOPE.glad <- readRDS(file = paste0(data_path, "/coping_glad/dem_coping_glad.RDS"))
@@ -278,7 +278,7 @@ dem <- merge(dem,dem.ramp,all=TRUE)
 ```
 
 
-# Demographics cleaning and summaries
+# Demographics cleaning
 
 ## clean ethnicity
 Ethnicity:
@@ -406,11 +406,10 @@ dem <- dem %>%
 demgen <- subset(dem,select = c("ID","Gender","Sample"))
 ```
 
-## join to treatment data and summarise
 
 
 
-#### Rename the treatment variables and drop irrelevant ones
+## Rename the treatment variables and drop irrelevant ones
 
 used the [data dictionary](https://docs.google.com/spreadsheets/d/1Vp028XLxbcXeOdjeuI-3y-kVenKWDR4hW9iJ1tHpttI/edit#gid=1527211037) to identify the relevant items and rename them
 
@@ -443,7 +442,7 @@ treat_dat$wave <- factor(treat_dat$wave,
 
 #### Drop accidental duplicate IDs
 
-these are IDS that were allocated twice by qualtrics. Technical errors. Will drop all instances
+these are IDS that were allocated twice by qualtrics. Technical errors. Will drop all instances (we lose 80 IDs doing this)
 ```{r id  duplicates}
 
 DupIDdat <- treat_dat %>%
@@ -467,7 +466,7 @@ Now drop from our treatment data
 treat_dat <- treat_dat[(treat_dat$ID %!in% dupids),]
 ```
 
-#### make prefer not say NA for purposes of this analyses
+#### make seen but not responded NA 
 
 ```{r make -77 in treatment seeking NA}
 
@@ -687,9 +686,102 @@ setwd(wd)
 source("./scripts/Helpfulness_column_creation.R")
 ```
 
-# Aim 1 analyses
+# Analyses
 
 ## Descriptives
+
+
+### Demographics
+
+Age, ethnicity and gender for those who have responded to at least 1 wave of the treatment survey, dropping duplicates as per treat_dt step
+
+
+```{r drop all IDS that are not included in our treatment data from the demographics data}
+
+dem <- dem %>%
+  filter(dem$ID %in% treat_dat$ID) %>%
+  distinct(.)
+
+```
+
+
+**At the moment this is only keeping 15656 people, when we have 27926 distinct IDs in the treatment data. It is possible this is due to not having demographic info for the NBR sample, but need to check these numbers once NBR is added and look into it if these are still out**
+
+
+#### check numbers
+
+##### Ethnicity
+
+```{r ethnicity table}
+
+dem %>%
+  freq(Ethnicity)
+
+```
+By sample
+```{r ethnicity by Sample table}
+
+dem %>%
+  group_by(Sample) %>%
+  freq(Ethnicity)
+
+
+```
+##### Gender
+
+```{r Gender table}
+
+
+dem %>%
+  freq(Gender)
+
+```
+By sample
+```{r Gender by Sample table}
+
+
+dem %>%
+  group_by(Sample) %>%
+  freq(Gender)
+```
+
+##### Age (all brackets)
+
+
+```{r Age table}
+dem %>%
+  freq(AgeAll)
+
+```
+
+By sample
+```{r Age by Sample table}
+
+dem %>%
+  group_by(Sample) %>%
+  freq(AgeAll)
+
+```
+
+
+##### Age (81+ collapses)
+
+
+```{r Age 81+ table}
+
+dem %>%
+  freq(Age80up)
+
+```
+
+By sample
+```{r Age 81+  by Sample table}
+
+dem %>%
+  group_by(Sample) %>%
+  freq(Age80up)
+
+```
 
 ### Response rates per wave
 
