@@ -76,6 +76,11 @@ if(!require(Rfast)){
 #   library(mapproj)
 # }
 
+if(!require(forcats)){
+  install.packages("forcats")
+  library(forcats)
+}
+
 if(!require(viridis)){
   install.packages("viridis")
   library(viridis)

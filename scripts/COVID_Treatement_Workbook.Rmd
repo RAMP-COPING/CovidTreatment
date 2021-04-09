@@ -140,6 +140,8 @@ Note, external data refrence is a hash-id for coping. So it is consistent across
 ```{r read in data coping}
 treatCOPE <- readRDS(file = paste0(cope_path, "/coping_followupa_ongoing/treatment_coping_followupa_ongoing.rds"))
 demCOPE.glad <- readRDS(file = paste0(data_path, "/coping_glad/dem_coping_glad.RDS"))
+demCOPE.glad.AGEetc <- readRDS(file = paste0(data_path, "/glad/dem_glad.RDS"))
+
 demCOPE.edgi <- readRDS(file = paste0(data_path, "/coping_edgi/dem_coping_edgi.RDS"))
 demCOPE.nbr <- readRDS(file = paste0(data_path, "/coping_nbr/dem_coping_nbr.RDS"))
 
@@ -147,6 +149,20 @@ demCOPE.nbr <- readRDS(file = paste0(data_path, "/coping_nbr/dem_coping_nbr.RDS"
 GLADpostcode <- fread(paste0(postpath,"/GLAD_COPING_postcodes.csv"))
 EDGIpostcode <- fread(paste0(postpath,"/EDGI_COPING_postcodes.csv"))
 NBRpostcode <- fread(paste0(postpath,"/NBR_postcodes_hash.csv"))
+```
+
+
+# Get age,gender & ethnicity for GLAD, EDGI & NBR
+
+```{r age gender ethnicity GLAD}
+
+GLADdemvars <- demCOPE.glad.AGEetc %>%
+  select("dem.which_gender_do_you_identify_with","dem.questions_based_ethnic_origin","dem.how_old_are_you_now.txt") %>%
+  rename(Gender=dem.which_gender_do_you_identify_with,
+         Ethnicity=dem.questions_based_ethnic_origin,
+         Age.linear = dem.how_old_are_you_now.txt)
+  
+
 ```
 
 #### Create a wave columns in treatment data
@@ -190,8 +206,8 @@ keepcols.cope <- c("externalDataReference","dem.which_gender_do_you_identify_wit
 cols.cope <- c("ID","Gender")
 keepcols.nbr <- c("subjectid")
 cols.nbr <- c("ID")
-keepcols.ramp <- c("Login ID","dem2.how_old_are_you","dem2.which_gender_do_you_identify_with","dem2.where_in_the_uk_do_you_live.txt")
-cols.ramp <- c("ID","Age","Gender","Postcode")
+keepcols.ramp <- c("Login ID","dem2.how_old_are_you","dem2.which_gender_do_you_identify_with","dem2.where_in_the_uk_do_you_live.txt","dem2.what_is_your_ethnic_origin")
+cols.ramp <- c("ID","Age","Gender","Postcode","Ethnicity")
 
 names.postcode <- c("ID","Postcode")
 
@@ -248,9 +264,6 @@ treatCOPE$Sample <- "COPING"
 
 ```
 
-## SPACE FOR PREDICTOR CLEANING
-
-Will need to find and add predictor variables. Will add this here.
 
 #### merge demographcis
 
@@ -264,12 +277,138 @@ dem <- merge(dem,dem.ramp,all=TRUE)
 
 ```
 
-get gender columns to add to treatment
+
+# Demographics cleaning and summaries
+
+## clean ethnicity
+Ethnicity:
+
+-99: prefer not to say
+-88: Dont know
+-77: Seen but not answered
+1: White
+2: Mixed or multiple ethnicities
+3: Asian or Asian british
+4: Black or Black british
+5: Arab
+6 :Other
+
+```{r make and label ethnicity factors}
+
+dem <- dem %>%
+  mutate_at(vars(Ethnicity),
+            list(factor))  %>%
+  mutate(Ethnicity = fct_recode(Ethnicity, 
+                                "White"="1",
+                                "Mixed or multiple ethnicities"="2",
+                                "Asian or Asian British"="3",
+                                "Black or Black British"="4",
+                                "Arab"="5",
+                                "Other"="6",
+                                "Prefer not to say"="-99",
+                                "Don't know"="-88",
+                                "Did not respond"="-77"
+                                ))
+
+```
+
+
+## clean age
+Age cats:
+
+-77: Seen but not answered
+1: 16-18
+2: 19-25
+3: 26-35
+4: 36-45
+5: 46-55
+6: 56-65
+7: 66-70
+8: 71-75
+9: 76-80
+10: 81-85
+11: 86-90
+12: 91-100
+13: 100+
+
+```{r make and label age factors}
+
+dem <- dem %>%
+  mutate_at(vars(Age),
+            list(factor))  %>%
+  mutate(AgeAll = fct_recode(Age, 
+                                "16-18"="1",
+                                "19-25"="2",
+                                "26-35"="3",
+                                "36-45"="4",
+                                "46-55"="5",
+                                "56-65"="6",
+                                "66-70"="7",
+                                "71-75"="8",
+                                "76-80"="9",
+                                "81-85"="10",
+                                "86-90"="11",
+                                "91-100"="12",
+                                "100+"="13",
+                                "Did not respond"="-77"
+                                ),
+         Age80up = fct_recode(Age, 
+                                "16-18"="1",
+                                "19-25"="2",
+                                "26-35"="3",
+                                "36-45"="4",
+                                "46-55"="5",
+                                "56-65"="6",
+                                "66-70"="7",
+                                "71-75"="8",
+                                "76-80"="9",
+                                "81+"="10",
+                                "81+"="11",
+                                "81+"="12",
+                                "81+"="13",
+                                "Did not respond"="-77"
+                                ))
+
+```
+
+## clean gender
+Gender cats:
+
+-99: prefer not to say
+-88: Dont know
+-77: Seen but not answered
+0: Male
+1: female
+3: Non-binary
+4: prefer to self define
+
+```{r make and label gender factors}
+
+dem <- dem %>%
+  mutate_at(vars(Gender),
+            list(factor))  %>%
+  mutate(Gender = fct_recode(Gender, 
+                                "Male"="0",
+                                "Female"="1",
+                                "Non-binary"="2",
+                                "Prefer to self define"="3",
+                                "Prefer not to say"="-99",
+                                "Don't know"="-88",
+                                "Did not respond"="-77"
+                                ))
+
+```
+
+
+#### get gender columns to add to treatment
 
 ```{r gender from demo}
-
 demgen <- subset(dem,select = c("ID","Gender","Sample"))
 ```
+
+## join to treatment data and summarise
+
+
 
 #### Rename the treatment variables and drop irrelevant ones
 
@@ -1994,10 +2133,4 @@ This would likely be a collider (sx severity is going to be associated with both
 #### NOTE TO SELF:: fix any treatment barrier stuff
 #### make sure the counts are referring to the right thing!
 
-
-## To Do:
-
-### By gender:
-#### Reasons to not seek help
-#### Barriers
 
