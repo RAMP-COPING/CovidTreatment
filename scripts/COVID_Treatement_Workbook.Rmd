@@ -138,32 +138,276 @@ demRAMP <- readRDS(file = paste0(data_path, "/ramp/dem_ramp.RDS"))
 COPING
 Note, external data reference is a hash-id for coping. So it is consistent across participants and matches, but is not linkable to GLAD ID
 ```{r read in data coping}
+
 treatCOPE <- readRDS(file = paste0(cope_path, "/coping_followupa_ongoing/treatment_coping_followupa_ongoing.rds"))
+
 demCOPE.glad <- readRDS(file = paste0(data_path, "/coping_glad/dem_coping_glad.RDS"))
-demCOPE.glad.AGEetc <- readRDS(file = paste0(data_path, "/glad/dem_glad.RDS"))
+demCOPE.glad.baseline <- readRDS(file = paste0(data_path, "/glad/dem_glad.RDS"))
 
 demCOPE.edgi <- readRDS(file = paste0(data_path, "/coping_edgi/dem_coping_edgi.RDS"))
-demCOPE.nbr <- readRDS(file = paste0(data_path, "/coping_nbr/dem_coping_nbr.RDS"))
+demCOPE.edgi.baseline <- readRDS(file = paste0(data_path, "/edgi/demographics_edgi.RDS"))
 
+demCOPE.nbr <- readRDS(file = paste0(data_path, "/coping_nbr/dem_coping_nbr.RDS"))
+demCOPE.nbr.baseline <- fread(paste0(data_path, "/nbr/NBR_hlq_dem_data_hash.csv"))
 
 GLADpostcode <- fread(paste0(postpath,"/GLAD_COPING_postcodes.csv"))
 EDGIpostcode <- fread(paste0(postpath,"/EDGI_COPING_postcodes.csv"))
 NBRpostcode <- fread(paste0(postpath,"/NBR_postcodes_hash.csv"))
+
+MHD.COPE.glad <- readRDS(file = paste0(cope_path, "/coping_glad/mhd_coping_glad.rds"))
+#MHD.COPE.edgi <- readRDS(file = paste0(cope_path, "/coping_edgi/mhd_coping_edgi.rds")) THIS IS IN THE DEMOGRAPHICS
+MHD.COPE.nbr <- readRDS(file = paste0(cope_path, "/coping_nbr/mhd_coping_nbr.rds"))
+MHD.RAMP <- readRDS(file = paste0(cope_path, "/ramp/mhd_ramp.rds"))
+
 ```
 
 
 # Get age,gender & ethnicity for GLAD, EDGI & NBR
 
+## GLAD
 ```{r age gender ethnicity GLAD}
 
-GLADdemvars <- demCOPE.glad.AGEetc %>%
-  select("dem.which_gender_do_you_identify_with","dem.questions_based_ethnic_origin","dem.how_old_are_you_now.txt") %>%
-  rename(Gender=dem.which_gender_do_you_identify_with,
+GLADdemvars <- demCOPE.glad.baseline %>%
+  select("externalDataReference","dem.which_gender_do_you_identify_with","dem.questions_based_ethnic_origin","dem.how_old_are_you_now.txt") %>%
+  rename(ID=externalDataReference,
+         Gender=dem.which_gender_do_you_identify_with,
          Ethnicity=dem.questions_based_ethnic_origin,
          Age.linear = dem.how_old_are_you_now.txt)
-  
 
 ```
+
+
+### make age categorical
+
+Age cats:
+
+-77: Seen but not answered
+16-18
+19-25
+26-35
+36-45
+46-55
+56-65
+66-70
+71-75
+76-80
+81-85
+86-90
+91-100
+100+
+
+```{r age categorical GLAD}
+
+GLADdemvars <- GLADdemvars %>%
+  mutate(AgeAll = case_when(Age.linear >=16 & Age.linear <= 18 ~ "16-18",
+                            Age.linear >=19 & Age.linear <= 25 ~ "19-25",
+                            Age.linear >=26 & Age.linear <= 35 ~ "26-35",
+                            Age.linear >=36 & Age.linear <= 45 ~ "36-45",
+                            Age.linear >=46 & Age.linear <= 55 ~ "46-55",
+                            Age.linear >=56 & Age.linear <= 65 ~ "56-65",
+                            Age.linear >=66 & Age.linear <= 70 ~ "66-70",
+                            Age.linear >=71 & Age.linear <= 75 ~ "71-75",
+                            Age.linear >=76 & Age.linear <= 80 ~ "76-80",
+                            Age.linear >=81 & Age.linear <= 85 ~ "81-85",
+                            Age.linear >=86 & Age.linear <= 90 ~ "86-90",
+                            Age.linear >=91 & Age.linear <= 100 ~ "91-100",
+                            Age.linear >=101 ~ "100+",
+                            Age.linear ==-77 ~ "Did not respond"),
+         Age80up = case_when(Age.linear >=16 & Age.linear <= 18 ~ "16-18",
+                            Age.linear >=19 & Age.linear <= 25 ~ "19-25",
+                            Age.linear >=26 & Age.linear <= 35 ~ "26-35",
+                            Age.linear >=36 & Age.linear <= 45 ~ "36-45",
+                            Age.linear >=46 & Age.linear <= 55 ~ "46-55",
+                            Age.linear >=56 & Age.linear <= 65 ~ "56-65",
+                            Age.linear >=66 & Age.linear <= 70 ~ "66-70",
+                            Age.linear >=71 & Age.linear <= 75 ~ "71-75",
+                            Age.linear >=76 & Age.linear <= 80 ~ "76-80",
+                            Age.linear >=81  ~ "81+",
+                            Age.linear ==-77 ~ "Did not respond"))
+
+```
+
+
+## EDGI
+```{r age gender ethnicity EDGI}
+
+EDGIdemvars <- demCOPE.edgi.baseline %>%
+  select("externalDataReference","demographics.what_gender_do_you_identify_with","demographics.what_is_your_ethnic_origin","dem.how_old_are_you_now.txt") %>%
+  rename(ID=externalDataReference,
+         Gender=demographics.what_gender_do_you_identify_with,
+         Ethnicity=demographics.what_is_your_ethnic_origin,
+         Age.linear = dem.how_old_are_you_now.txt)
+
+```
+
+
+### make age categorical
+
+Age cats:
+
+-77: Seen but not answered
+16-18
+19-25
+26-35
+36-45
+46-55
+56-65
+66-70
+71-75
+76-80
+81-85
+86-90
+91-100
+100+
+
+```{r age categorical EDGI}
+
+EDGIdemvars <- EDGIdemvars %>%
+  mutate(AgeAll = case_when(Age.linear >=16 & Age.linear <= 18 ~ "16-18",
+                            Age.linear >=19 & Age.linear <= 25 ~ "19-25",
+                            Age.linear >=26 & Age.linear <= 35 ~ "26-35",
+                            Age.linear >=36 & Age.linear <= 45 ~ "36-45",
+                            Age.linear >=46 & Age.linear <= 55 ~ "46-55",
+                            Age.linear >=56 & Age.linear <= 65 ~ "56-65",
+                            Age.linear >=66 & Age.linear <= 70 ~ "66-70",
+                            Age.linear >=71 & Age.linear <= 75 ~ "71-75",
+                            Age.linear >=76 & Age.linear <= 80 ~ "76-80",
+                            Age.linear >=81 & Age.linear <= 85 ~ "81-85",
+                            Age.linear >=86 & Age.linear <= 90 ~ "86-90",
+                            Age.linear >=91 & Age.linear <= 100 ~ "91-100",
+                            Age.linear >=101 ~ "100+",
+                            Age.linear ==-77 ~ "Did not respond"),
+         Age80up = case_when(Age.linear >=16 & Age.linear <= 18 ~ "16-18",
+                            Age.linear >=19 & Age.linear <= 25 ~ "19-25",
+                            Age.linear >=26 & Age.linear <= 35 ~ "26-35",
+                            Age.linear >=36 & Age.linear <= 45 ~ "36-45",
+                            Age.linear >=46 & Age.linear <= 55 ~ "46-55",
+                            Age.linear >=56 & Age.linear <= 65 ~ "56-65",
+                            Age.linear >=66 & Age.linear <= 70 ~ "66-70",
+                            Age.linear >=71 & Age.linear <= 75 ~ "71-75",
+                            Age.linear >=76 & Age.linear <= 80 ~ "76-80",
+                            Age.linear >=81  ~ "81+",
+                            Age.linear ==-77 ~ "Did not respond"))
+
+```
+
+
+## NBR
+```{r age gender ethnicity NBR}
+
+NBRdemvars <- demCOPE.nbr.baseline %>%
+  select("nbr_id","gender","ethnicity2001","age") %>%
+  rename(ID=nbr_id,
+         Gender=gender,
+         Ethnicity=ethnicity2001,
+         Age.linear = age)
+
+```
+
+
+### make age categorical
+
+Age cats:
+
+-77: Seen but not answered
+16-18
+19-25
+26-35
+36-45
+46-55
+56-65
+66-70
+71-75
+76-80
+81-85
+86-90
+91-100
+100+
+
+```{r age categorical NBR}
+
+NBRdemvars <- NBRdemvars %>%
+  mutate(AgeAll = case_when(Age.linear >=16 & Age.linear <= 18 ~ "16-18",
+                            Age.linear >=19 & Age.linear <= 25 ~ "19-25",
+                            Age.linear >=26 & Age.linear <= 35 ~ "26-35",
+                            Age.linear >=36 & Age.linear <= 45 ~ "36-45",
+                            Age.linear >=46 & Age.linear <= 55 ~ "46-55",
+                            Age.linear >=56 & Age.linear <= 65 ~ "56-65",
+                            Age.linear >=66 & Age.linear <= 70 ~ "66-70",
+                            Age.linear >=71 & Age.linear <= 75 ~ "71-75",
+                            Age.linear >=76 & Age.linear <= 80 ~ "76-80",
+                            Age.linear >=81 & Age.linear <= 85 ~ "81-85",
+                            Age.linear >=86 & Age.linear <= 90 ~ "86-90",
+                            Age.linear >=91 & Age.linear <= 100 ~ "91-100",
+                            Age.linear >=101 ~ "100+",
+                            Age.linear ==-77 ~ "Did not respond"),
+         Age80up = case_when(Age.linear >=16 & Age.linear <= 18 ~ "16-18",
+                            Age.linear >=19 & Age.linear <= 25 ~ "19-25",
+                            Age.linear >=26 & Age.linear <= 35 ~ "26-35",
+                            Age.linear >=36 & Age.linear <= 45 ~ "36-45",
+                            Age.linear >=46 & Age.linear <= 55 ~ "46-55",
+                            Age.linear >=56 & Age.linear <= 65 ~ "56-65",
+                            Age.linear >=66 & Age.linear <= 70 ~ "66-70",
+                            Age.linear >=71 & Age.linear <= 75 ~ "71-75",
+                            Age.linear >=76 & Age.linear <= 80 ~ "76-80",
+                            Age.linear >=81  ~ "81+",
+                            Age.linear ==-77 ~ "Did not respond"))
+
+```
+
+
+### Map ethnicity categories
+
+-99: prefer not to say
+-88: Dont know
+-77: Seen but not answered
+
+White
+Mixed or multiple ethnicities
+Asian or Asian british
+Black or Black british
+Arab
+Other
+
+```{r recategorise NBR ethnicity}
+
+NBRdemvars <- NBRdemvars %>%
+  mutate(Ethnicity = case_when(Ethnicity == "A (White - British)" |
+                                 Ethnicity == "B (White - Irish)" |
+                                 Ethnicity == "C (White - Other White)" ~ "White",
+                               
+                               Ethnicity == "D (Mixed - White and Black Caribbean)" |
+                                 Ethnicity == "E (Mixed - White and Black African)" |
+                                 Ethnicity == "F (Mixed - White and Asian)" |
+                                 Ethnicity == "G (Mixed - Other Mixed)" ~ "Mixed or multiple ethnicities",
+                               
+                               Ethnicity == "H (Asian or Asian British - Indian)" |
+                                 Ethnicity == "J (Asian or Asian British - Pakistani)" |
+                                 Ethnicity == "K (Asian or Asian British - Bangladeshi)" |
+                                 Ethnicity == "L (Asian or Asian British - Other Asian)" ~ "Asian or Asian British",
+                               
+                               Ethnicity == "M (Black or Black British - Caribbean)" |
+                                 Ethnicity == "N (Black or Black British - African)" |
+                                 Ethnicity == "P (Black or Black British - Other Black)" ~ "Black or Black British",
+                               
+                               Ethnicity == "R (Other Ethnic - Chinese)" |
+                                 Ethnicity == "S (Other Ethnic - Other Ethnic)" ~ "Other",
+                               
+                               Ethnicity == "Z (Not Stated)" ~ "Seen but not answered"))
+                                 
+         
+
+```
+
+### clean gender other column from blank to labelled
+
+```{r NBR clean gender}
+NBRdemvars <- NBRdemvars %>%
+  mutate(Gender = case_when(Gender == "Male" ~ "Male",
+                            Gender == "Female" ~ "Female",
+                            Gender == "" ~ "Did not respond"))
+```
+
 
 #### Create a wave columns in treatment data
 Base this on dates of the follow ups drawn from qualtrics.
@@ -224,6 +468,8 @@ names(dem.cope.glad) <- cols.cope
 names(dem.cope.edgi) <- cols.cope
 names(dem.cope.nbr) <- cols.nbr
 names(dem.ramp) <- cols.ramp
+
+
 names(GLADpostcode) <- names.postcode
 names(EDGIpostcode) <- names.postcode
 names(NBRpostcode) <- names.postcode
@@ -249,14 +495,27 @@ dem.cope.nbr <- left_join(dem.cope.nbr,NBRpostcode)
 
 ```
 
+#### Add extra demographic variables
+
+```{r merge glad/edgi/nbr baseline demographics to their other demographics}
+
+dem.cope.glad <- left_join(dem.cope.glad, GLADdemvars)
+dem.cope.edgi <- left_join(dem.cope.edgi, EDGIdemvars)
+dem.cope.nbr <- left_join(dem.cope.nbr, NBRdemvars)
+
+```
+
 
 #### add sample columns 
 
 ```{r add sample col}
 
 dem.cope.glad$Sample <-  "COPING"
+dem.cope.glad$SampleCOPE <-  "GLAD"
 dem.cope.edgi$Sample <- "COPING"
+dem.cope.edgi$SampleCOPE <- "EDGI"
 dem.cope.nbr$Sample <- "COPING"
+dem.cope.nbr$SampleCOPE <- "NBR"
 dem.ramp$Sample <- "RAMP"
 
 treatRAMP$Sample <- "RAMP"
@@ -265,55 +524,11 @@ treatCOPE$Sample <- "COPING"
 ```
 
 
-#### merge demographcis
-
-Waiting till I can get age into GLAD & EDGI
-
-```{r demographics merge}
-
-dem <- rbind(dem.cope.glad,dem.cope.edgi)
-dem <- left_join(dem,dem.cope.nbr)
-dem <- merge(dem,dem.ramp,all=TRUE)
-
-```
-
 
 # Demographics cleaning
 
-## clean ethnicity
-Ethnicity:
+## clean age (RAMP)
 
--99: prefer not to say
--88: Dont know
--77: Seen but not answered
-1: White
-2: Mixed or multiple ethnicities
-3: Asian or Asian british
-4: Black or Black british
-5: Arab
-6 :Other
-
-```{r make and label ethnicity factors}
-
-dem <- dem %>%
-  mutate_at(vars(Ethnicity),
-            list(factor))  %>%
-  mutate(Ethnicity = fct_recode(Ethnicity, 
-                                "White"="1",
-                                "Mixed or multiple ethnicities"="2",
-                                "Asian or Asian British"="3",
-                                "Black or Black British"="4",
-                                "Arab"="5",
-                                "Other"="6",
-                                "Prefer not to say"="-99",
-                                "Don't know"="-88",
-                                "Did not respond"="-77"
-                                ))
-
-```
-
-
-## clean age
 Age cats:
 
 -77: Seen but not answered
@@ -333,7 +548,7 @@ Age cats:
 
 ```{r make and label age factors}
 
-dem <- dem %>%
+dem.ramp <- dem.ramp %>%
   mutate_at(vars(Age),
             list(factor))  %>%
   mutate(AgeAll = fct_recode(Age, 
@@ -371,6 +586,49 @@ dem <- dem %>%
 
 ```
 
+## Join RAMP, GLAD and EDGI
+
+```{r join ramp, edgi and glad dems}
+
+dem <- merge(dem.ramp,dem.cope.glad, all=TRUE)
+dem <- merge(dem,dem.cope.edgi, all=TRUE)
+
+```
+
+## clean ethnicity
+Ethnicity:
+
+-99: prefer not to say
+-88: Dont know
+-77: Seen but not answered
+1: White
+2: Mixed or multiple ethnicities
+3: Asian or Asian british
+4: Black or Black british
+5: Arab
+6 :Other
+
+```{r make and label ethnicity factors}
+
+dem <- dem %>%
+  mutate_at(vars(Ethnicity),
+            list(factor))  %>%
+  mutate(Ethnicity = fct_recode(Ethnicity, 
+                                "White"="1",
+                                "Mixed or multiple ethnicities"="2",
+                                "Asian or Asian British"="3",
+                                "Black or Black British"="4",
+                                "Arab"="5",
+                                "Other"="6",
+                                "Prefer not to say"="-99",
+                                "Don't know"="-88",
+                                "Did not respond"="-77"
+                                ))
+
+```
+
+
+
 ## clean gender
 Gender cats:
 
@@ -399,6 +657,14 @@ dem <- dem %>%
 
 ```
 
+#### merge demographics with NBR 
+
+```{r demographics merge}
+
+dem <- merge(dem,dem.cope.nbr,all=TRUE)
+
+```
+
 
 #### get gender columns to add to treatment
 
@@ -407,9 +673,15 @@ demgen <- subset(dem,select = c("ID","Gender","Sample"))
 ```
 
 
+# mental health diagnosis cleaning
 
 
-## Rename the treatment variables and drop irrelevant ones
+```{read MHD in}
+
+
+```
+
+# Rename the treatment variables and drop irrelevant ones
 
 used the [data dictionary](https://docs.google.com/spreadsheets/d/1Vp028XLxbcXeOdjeuI-3y-kVenKWDR4hW9iJ1tHpttI/edit#gid=1527211037) to identify the relevant items and rename them
 
@@ -730,7 +1002,6 @@ dem %>%
 ##### Gender
 
 ```{r Gender table}
-
 
 dem %>%
   freq(Gender)
