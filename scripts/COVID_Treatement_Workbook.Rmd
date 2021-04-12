@@ -824,6 +824,8 @@ MH <- MH %>%
 ```
 
 
+
+
 # Rename the treatment variables and drop irrelevant ones
 
 used the [data dictionary](https://docs.google.com/spreadsheets/d/1Vp028XLxbcXeOdjeuI-3y-kVenKWDR4hW9iJ1tHpttI/edit#gid=1527211037) to identify the relevant items and rename them
@@ -1114,7 +1116,7 @@ Age, ethnicity and gender for those who have responded to at least 1 wave of the
 ```{r drop all IDS that are not included in our treatment data from the demographics data}
 
 dem <- dem %>%
-  filter(dem$ID %in% treat_dat$ID) %>%
+  filter(dem$ID %in% treat_dat_byID$ID) %>%
   distinct(.)
 
 ```
@@ -1203,7 +1205,7 @@ Clean so we match treatment data and dont have duplicates
 ```{r drop all IDS that are not included in our treatment data from the MHD data}
 
 MH <- MH %>%
-  filter(MH$ID %in% treat_dat$ID) %>%
+  filter(MH$ID %in% treat_dat_byID$ID) %>%
   distinct(.)
 
 ```
