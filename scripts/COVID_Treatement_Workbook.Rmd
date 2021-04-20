@@ -1205,7 +1205,9 @@ Clean so we match treatment data and dont have duplicates
 ```{r drop all IDS that are not included in our treatment data from the MHD data}
 
 MH <- MH %>%
-  filter(MH$ID %in% treat_dat_byID$ID) %>%
+  filter(MH$ID %in% treat_dat_byID
+         
+         $ID) %>%
   distinct(.)
 
 ```
@@ -2147,6 +2149,7 @@ if(!require(mapproj)){
 
 ```
 
+
 ```{r process and count treatment by area}
  setwd(wd)
  source("./scripts/RAMP_postcode_cleaning.R")
@@ -2185,6 +2188,27 @@ head(postcode_full_County)
 check district data
 ```{r check head and count looks fine district}
 head(postcode_full_District)
+
+```
+
+## test building a UK map with districts plotted
+
+```{r map district project test}
+
+bb <- c(10,50,100,500,1000,5000,10000,15000)
+
+maptest <- 
+ postcode_full_County %>%
+ arrange(longitude) %>%
+  
+ ggplot() +
+    geom_polygon(data = UK, aes(x=long, y = lat, group = group), 
+                 fill="grey", alpha=1) +
+  geom_polygon( aes(x=longitude, y = latitude, group = County), 
+                 fill="black", alpha=1)  +
+  theme_void() + 
+  coord_map() + 
+  theme(legend.position="right") 
 
 ```
 
@@ -2683,6 +2707,75 @@ mapcolourlabel
 ```
 
 
+## Geographic: mapping alongside indices of multiple deprivation
+used most recent in all cases (2019 for England and Wales, 2020 for Scotland, 2017 for Northern Ireland)
+
+### Indices of multiple deprivation were downloaded from:
+
+[England](https://opendatacommunities.org/resource?uri=http%3A%2F%2Fopendatacommunities.org%2Fdata%2Fsocietal-wellbeing%2Fimd2019%2Findices)
+[Ireland](https://www.nisra.gov.uk/publications/nimdm17-soa-level-results)
+[Scotland](https://www.gov.scot/publications/scottish-index-of-multiple-deprivation-2020v2-ranks/)
+*note: using the revised 2020 version for Scotland. See note on Website. Description of indicators is available on sheet 2 of excel downloaded from this link*
+[Wales](https://statswales.gov.wales/Catalogue/Community-Safety-and-Social-Inclusion/Welsh-Index-of-Multiple-Deprivation/WIMD-2019/localauthorityanalysis)
+
+### Shapefiles for mapping districts were downloaded from:
+[GB (excluding Ireland)](https://www.ordnancesurvey.co.uk/business-government/products/boundaryline)
+[IRE](https://www.opendatani.gov.uk/dataset/osni-open-data-largescale-boundaries-ni-outline1)
+
+Projection of shapefiles converted to the Ordnance Survey Great Britain 1936 system (OSGB36 - EPSG code: 27700) to project into common space
+
+### Notes
+
+Using MDI rank for the time being - so ranks within each boundary will be comparable
+
+## clean IMD data
+
+```{r  clean indices of multiple deprivation data}
+
+source()
+
+```
+
+## create shapefiles for maps with polygons for plotting district boundaries
+
+```{r shapefile creation}
+
+source()
+
+```
+
+
+## combine the IMD and shapefiles
+
+```{r combine IMD and shapes}
+
+```
+
+
+## Plot IMD on map
+
+```{r IMD map plot}
+
+## draw plot using ggplot and geom_sf
+
+pl <- UK_ll %>% 
+  ggplot() + 
+  geom_sf(lwd = .1,color = 'black', aes(fill = TotalResponsesDistrict)) + 
+  theme_void() +
+  lims(fill = c(10,4000)) + 
+  scale_fill_viridis_c(option = 'plasma') + 
+  labs(title = "Title of the plot\nwith a sub title", 
+       fill = 'No. responses:') + 
+  theme(legend.position = 'left') +
+  theme(title = element_text(size = 12), 
+        legend.title = element_text(size = 8))
+
+```
+### only IMD
+
+### with treatmetn seeking
+
+### with treatment gap
 
 ## Analytic decision notes
 
