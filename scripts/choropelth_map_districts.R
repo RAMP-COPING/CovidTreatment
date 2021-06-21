@@ -41,7 +41,7 @@ IRE_ll <- IRE_ll %>%
          CODE = WardCode,
          NUMBER = OBJECTID) %>%
   relocate(NAME,FILE_NAME,NUMBER,CODE,AREA,Shape_Leng,Shape_Area,geometry) %>%
-  select(NAME,FILE_NAME,NUMBER,AREA,geometry)
+  select(NAME,FILE_NAME,NUMBER,CODE,AREA,geometry)
 
 GB_ll <- GB_ll %>%
   select(NAME,FILE_NAME,NUMBER,CODE,AREA,geometry)

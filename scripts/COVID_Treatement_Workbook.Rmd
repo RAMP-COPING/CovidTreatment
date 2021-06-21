@@ -105,8 +105,6 @@ knitr::opts_chunk$set(echo = FALSE,
 
 knitr::opts_chunk$set(fig.path="figures/")
 
-
-
 options(bitmapType = 'quartz') # to render fonts better
 ```
 
@@ -118,7 +116,6 @@ date = Sys.Date()
 #### R functions
 
 ```{r call in function library functions}
-
 # source all functions in the function library folder
 files.sources = paste0("../FunctionLib/",list.files("../FunctionLib"))
 sapply(files.sources, source)
@@ -2707,7 +2704,7 @@ mapcolourlabel
 ```
 
 
-## Geographic: mapping alongside indices of multiple deprivation
+## Mapping alongside indices of multiple deprivation
 used most recent in all cases (2019 for England and Wales, 2020 for Scotland, 2017 for Northern Ireland)
 
 ### Indices of multiple deprivation were downloaded from:
@@ -2732,7 +2729,8 @@ Using MDI rank for the time being - so ranks within each boundary will be compar
 
 ```{r  clean indices of multiple deprivation data}
 
-source()
+setwd(wd)
+source("./scripts/clean_MDI_data.R")
 
 ```
 
@@ -2740,7 +2738,8 @@ source()
 
 ```{r shapefile creation}
 
-source()
+setwd(wd)
+source("./scripts/choropelth_map_districts.R")
 
 ```
 
@@ -2748,7 +2747,8 @@ source()
 ## combine the IMD and shapefiles
 
 ```{r combine IMD and shapes}
-
+setwd(wd)
+source("./scripts/merge_mapShapefiles_and_IMD_data.R")
 ```
 
 
@@ -2759,8 +2759,9 @@ source()
 ## draw plot using ggplot and geom_sf
 
 pl <- UK_ll %>% 
+  left_join(IMD_only) %>%
   ggplot() + 
-  geom_sf(lwd = .1,color = 'black', aes(fill = TotalResponsesDistrict)) + 
+  geom_sf(lwd = .1,color = 'black', aes(fill = Rank)) + 
   theme_void() +
   lims(fill = c(10,4000)) + 
   scale_fill_viridis_c(option = 'plasma') + 
@@ -2769,6 +2770,8 @@ pl <- UK_ll %>%
   theme(legend.position = 'left') +
   theme(title = element_text(size = 12), 
         legend.title = element_text(size = 8))
+
+pl
 
 ```
 ### only IMD
