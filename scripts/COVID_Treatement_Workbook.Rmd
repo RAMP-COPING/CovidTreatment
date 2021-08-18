@@ -13,6 +13,7 @@ output:
     number_sections: false
     highlight: monochrome
     theme: cerulean
+    standalone: no
 code_folding: show
 
 html_notebook:
@@ -479,8 +480,8 @@ Clean postcode to keep only outcode for COPING
 
 ```{r clean COPING postcodes}
 
-setwd(wd)
-source("./scripts/clean_COPING_postcode_data.R")
+#setwd(wd)
+#source("./scripts/clean_COPING_postcode_data.R")
 
 ```
 
@@ -488,9 +489,9 @@ Add postcode to COPING
 
 ```{r add postcode to coping}
 
-dem.cope.glad <- left_join(dem.cope.glad,GLADpostcode)
-dem.cope.edgi <- left_join(dem.cope.edgi,EDGIpostcode)
-dem.cope.nbr <- left_join(dem.cope.nbr,NBRpostcode)
+#dem.cope.glad <- left_join(dem.cope.glad,GLADpostcode)
+#dem.cope.edgi <- left_join(dem.cope.edgi,EDGIpostcode)
+#dem.cope.nbr <- left_join(dem.cope.nbr,NBRpostcode)
 
 ```
 
@@ -2117,11 +2118,11 @@ treat_dat %>%
 
 ## Geographic
 
-Project postcode data onto map of the UK. Use downloaded long/lat data mapped to postcodes from ![this site](https://www.freemaptools.com/download-uk-postcode-lat-lng.htm) and city names from ![here](https://www.doogal.co.uk/UKPostcodes.php).
+Project postcode data onto map of the UK. Use downloaded long/lat data mapped to postcodes from [this site](https://www.freemaptools.com/download-uk-postcode-lat-lng.htm) and city names from [here](https://www.doogal.co.uk/UKPostcodes.php).
 
 ### Create clean, labelled and flat outcode dataset
 
-```{r process downloaded geographic data}
+```{r process downloaded geographic data, eval=FALSE}
 setwd(wd)
 source("./scripts/Create_labelled_outcode_dataset.R")
 head(postcode_df_area)
@@ -2131,7 +2132,7 @@ head(postcode_df_area)
 
 #### read in map libraries
 
-```{r read in map libs}
+```{r read in map libs, eval=FALSE}
 if(!require(maps)){
   install.packages("maps")
   library(maps)
@@ -2149,7 +2150,7 @@ if(!require(mapproj)){
 ```
 
 
-```{r process and count treatment by area}
+```{r process and count treatment by area, eval=FALSE}
  setwd(wd)
  source("./scripts/RAMP_postcode_cleaning.R")
 
@@ -2158,7 +2159,7 @@ if(!require(mapproj)){
 
 ### Merge sample data to downloaded UK data
 
-```{r merge national and RAMP data}
+```{r merge national and RAMP data, eval=FALSE}
 # 
 postcode_full_seek <- left_join(postcode_seek,postcode_df_area,by="Outcode")
 postcode_full <- left_join(postcode_full_seek,postcode_receive,by="Outcode")
@@ -2171,7 +2172,7 @@ postcode_full <- left_join(postcode_full_seek,postcode_receive,by="Outcode")
 
 ### create counts by county and district
 
-```{r county count dataset}
+```{r county count dataset, eval=FALSE}
  setwd(wd)
  source("./scripts/Count_treatment_by_County.R")
 
@@ -2179,20 +2180,20 @@ postcode_full <- left_join(postcode_full_seek,postcode_receive,by="Outcode")
 
 
 check county data
-```{r check head and count looks fine county}
+```{r check head and count looks fine county, eval=FALSE}
 head(postcode_full_County)
 
 ```
 
 check district data
-```{r check head and count looks fine district}
+```{r check head and count looks fine district, eval=FALSE}
 head(postcode_full_District)
 
 ```
 
 ## test building a UK map with districts plotted
 
-```{r map district project test}
+```{r map district project test, eval=FALSE}
 
 bb <- c(10,50,100,500,1000,5000,10000,15000)
 
@@ -2216,7 +2217,7 @@ maptest <-
 ### Treatment seeking by county (no labels)
 Size of the circles = total number of responses
 Colour of circles = percent of responses that indicated treatment seeking
-```{r map for seeking by county colour no label,warning=FALSE}
+```{r map for seeking by county colour no label,warning=FALSE, eval=FALSE}
 
 bb <- c(10,50,100,500,1000,5000,10000,15000)
 
@@ -2250,7 +2251,7 @@ mapcolour
 
 Size of the circles = total number of responses
 Colour of circles = percent of responses that indicated treatment seeking
-```{r map for seeking by district colour no label,warning=FALSE}
+```{r map for seeking by district colour no label,warning=FALSE, eval=FALSE}
 
 bb <- c(10,100,500,1000,2000,3000)
 
@@ -2285,7 +2286,7 @@ mapcolour
 ### Labelled the 5 counties ith greatest proporton seeking by total responses
 
 #### county
-```{r map for seeking by county colour labelled,warning=FALSE}
+```{r map for seeking by county colour labelled,warning=FALSE, eval=FALSE}
 bb <- c(10,50,100,500,1000,5000,10000,15000)
 
 mapcolourlabel <- 
@@ -2331,7 +2332,7 @@ mapcolourlabel
 #### district labelled with marker points for most percentage seek attempts by responses
 orange markers for top 5 biggest gap, with labels
 
-```{r map for seeking by district colour labelled markers,warning=FALSE}
+```{r map for seeking by district colour labelled markers,warning=FALSE, eval=FALSE}
 
 bb <- c(10,100,500,1000,2000,3000)
 
@@ -2377,7 +2378,7 @@ mapcolourlabel
 #### district labelled with marker points (no labels)
 orange markers for top 5 biggest gap, WITHOUT labels
 
-```{r map for seeking by district colour markers no labels,warning=FALSE}
+```{r map for seeking by district colour markers no labels,warning=FALSE, eval=FALSE}
 
 bb <- c(10,100,500,1000,2000,3000)
 
@@ -2415,7 +2416,7 @@ mapcolourlabel
 
 #### district - only top ten gap treatment seeking attemps
 
-```{r map for seeking by district colour labelled top ten only,warning=FALSE}
+```{r map for seeking by district colour labelled top ten only,warning=FALSE, eval=FALSE}
 
 bb <- c(100,300,500)
 
@@ -2462,7 +2463,7 @@ mapcolourlabel
 ### Treatment gap by county (no labels)
 Size of the circles = total number of seeking attempts
 Colour of circles = percent of times treatment was not received when it was sought
-```{r map for gap by county colour no label,warning=FALSE}
+```{r map for gap by county colour no label,warning=FALSE, eval=FALSE}
 
 bb <- c(10,100,500,1000,2000,3000)
 
@@ -2496,7 +2497,7 @@ mapcolour
 
 Size of the circles = total number of responses
 Colour of circles = percent of responses that indicated treatment gap
-```{r map for gap by district colour no label,warning=FALSE}
+```{r map for gap by district colour no label,warning=FALSE, eval=FALSE}
 
 bb <- c(10,50,100,300,500)
 
@@ -2531,7 +2532,7 @@ mapcolour
 ### Labelled the 5 counties ith greatest proporton gap by total responses
 
 #### county
-```{r map for gap by county colour labelled,warning=FALSE}
+```{r map for gap by county colour labelled,warning=FALSE, eval=FALSE}
 bb <- c(10,50,100,300,500)
 
 mapcolourlabel <- 
@@ -2577,7 +2578,7 @@ mapcolourlabel
 #### district labelled with marker points for most percentage seek attempts by responses
 orange markers for top 5 biggest gap, with labels
 
-```{r map for gap by district colour labelled markers,warning=FALSE}
+```{r map for gap by district colour labelled markers,warning=FALSE, eval=FALSE}
 
 bb <- c(10,50,100,300,500)
 
@@ -2623,7 +2624,7 @@ mapcolourlabel
 #### district labelled with marker points (no labels)
 orange markers for top 5 biggest gap, WITHOUT labels
 
-```{r map for gap by district colour markers no labels,warning=FALSE}
+```{r map for gap by district colour markers no labels,warning=FALSE, eval=FALSE}
 
 bb <- c(10,50,100,300,500)
 
@@ -2662,7 +2663,7 @@ mapcolourlabel
 #### district - only top ten gap treatment gap attemps
 
 Filtered to districts where fewer than 5 seek attempts in the district
-```{r map for gap by district colour labelled top ten only,warning=FALSE}
+```{r map for gap by district colour labelled top ten only,warning=FALSE, eval=FALSE}
 
 bb <- c(10,50,100,150)
 
@@ -2729,7 +2730,7 @@ Using MDI rank for the time being - so ranks within each boundary will be compar
 
 ## clean IMD data
 
-```{r  clean indices of multiple deprivation data}
+```{r  clean indices of multiple deprivation data, eval=FALSE}
 
 setwd(wd)
 source("./scripts/clean_MDI_data.R")
@@ -2738,7 +2739,7 @@ source("./scripts/clean_MDI_data.R")
 
 ## create shapefiles for maps with polygons for plotting district boundaries
 
-```{r shapefile creation}
+```{r shapefile creation, eval=FALSE}
 
 setwd(wd)
 source("./scripts/choropelth_map_districts.R")
@@ -2748,7 +2749,7 @@ source("./scripts/choropelth_map_districts.R")
 
 ## combine the IMD and shapefiles
 
-```{r combine IMD and shapes}
+```{r combine IMD and shapes, eval=FALSE}
 setwd(wd)
 source("./scripts/merge_mapShapefiles_and_IMD_data.R")
 ```
@@ -2756,7 +2757,7 @@ source("./scripts/merge_mapShapefiles_and_IMD_data.R")
 
 ## Plot IMD on map
 
-```{r IMD map plot}
+```{r IMD map plot, eval=FALSE}
 
 ## draw plot using ggplot and geom_sf
 
