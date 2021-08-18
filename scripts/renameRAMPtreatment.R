@@ -127,7 +127,6 @@ treatRAMP.renamed <- treatRAMP %>%
   rename(reasonhelp_new_med	 =	treatment.seeking_new_medication) %>%
   rename(reasonhelp_alt_support	 =	treatment.availability_lack_normal_support) %>%
   rename(reasonhelp_other	 = treatment.other_please_specify)   %>%
-  
   rename(reasonNohelp_feel_fine	 = treatment.reason_seek_feel_fine) %>%
   rename(reasonNohelp_I_feel_better	 = treatment.i_feel_better_than_i_normally_do) %>%
   rename(reasonNohelp_I_want_to_but_havent	 = treatment.i_want_to_get_help_but_i_havent_done_it_yet) %>%
@@ -198,7 +197,7 @@ treatCOPE.renamed <- treatCOPE %>%
   rename(reasonhelp_alt_support	 =	treatment.availability_lack_normal_support) %>%
   rename(reasonhelp_other	 = treatment.other_please_specify) %>%
   
-  rename(reasonNohelp_feel_fine	 = treatment.reason_seek_feel_fine) %>%
+  rename(reasonNohelp_feel_fine	 = treatment.seek_reason_feel_fine) %>%
   rename(reasonNohelp_I_feel_better	 = treatment.i_feel_better_than_i_normally_do) %>%
   rename(reasonNohelp_I_want_to_but_havent	 = treatment.i_want_to_get_help_but_i_havent_done_it_yet) %>%
   rename(reasonNohelp_Too_busy	 = treatment.busy_find) %>%

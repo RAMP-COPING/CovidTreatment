@@ -88,7 +88,7 @@ remove(list = ls())
 
 ```{r Setup, source files}
 #source data directory: data_path
-source("/Users/katherineyoung/OneDrive - King's College London/MQ_project/papers/RAMP-COPING_MH_treatment_paper/file_paths.R")
+source("../../file_paths.R")
 setwd(wd)
 source("./scripts/palettes.R")
 source("./scripts/libraries.R")
@@ -136,7 +136,7 @@ COPING
 Note, external data reference is a hash-id for coping. So it is consistent across participants and matches, but is not linkable to GLAD ID
 ```{r read in data coping}
 
-treatCOPE <- readRDS(file = paste0(data_path, "/coping_followupa_ongoing/treatment_coping_followupa_ongoing.rds"))
+treatCOPE <- readRDS(file = paste0(cope_path, "/coping_followupa_ongoing/treatment_coping_followupa_ongoing.rds"))
 
 demCOPE.glad <- readRDS(file = paste0(data_path, "/coping_glad/dem_coping_glad.RDS"))
 demCOPE.glad.baseline <- readRDS(file = paste0(data_path, "/glad/dem_glad.RDS"))
@@ -145,18 +145,16 @@ demCOPE.edgi <- readRDS(file = paste0(data_path, "/coping_edgi/dem_coping_edgi.R
 demCOPE.edgi.baseline <- readRDS(file = paste0(data_path, "/edgi/demographics_edgi.RDS"))
 
 demCOPE.nbr <- readRDS(file = paste0(data_path, "/coping_nbr/dem_coping_nbr.RDS"))
-#demCOPE.nbr.baseline <- fread(paste0(data_path, "/nbr/NBR_hlq_dem_data_hash.csv"))
-demCOPE.nbr.baseline <- fread(paste0(data_path, "/nbr_additional_info/coping_participants_export_20200730_hashed.csv"))
+demCOPE.nbr.baseline <- fread(paste0(data_path, "/nbr/NBR_hlq_dem_data_hash.csv"))
 
+GLADpostcode <- fread(paste0(postpath,"/GLAD_COPING_postcodes.csv"))
+EDGIpostcode <- fread(paste0(postpath,"/EDGI_COPING_postcodes.csv"))
+NBRpostcode <- fread(paste0(postpath,"/NBR_postcodes_hash.csv"))
 
-#GLADpostcode <- fread(paste0(postpath,"/GLAD_COPING_postcodes.csv"))
-#EDGIpostcode <- fread(paste0(postpath,"/EDGI_COPING_postcodes.csv"))
-#NBRpostcode <- fread(paste0(postpath,"/NBR_postcodes_hash.csv"))
-
-MHD.COPE.glad <- readRDS(file = paste0(data_path, "/coping_glad/mhd_coping_glad.rds"))
+MHD.COPE.glad <- readRDS(file = paste0(cope_path, "/coping_glad/mhd_coping_glad.rds"))
 #MHD.COPE.edgi <- readRDS(file = paste0(cope_path, "/coping_edgi/mhd_coping_edgi.rds")) THIS IS IN THE DEMOGRAPHICS
-MHD.COPE.nbr <- readRDS(file = paste0(data_path, "/coping_nbr/mhd_coping_nbr.rds"))
-MHD.RAMP <- readRDS(file = paste0(data_path, "/ramp/mhd_ramp.rds"))
+MHD.COPE.nbr <- readRDS(file = paste0(cope_path, "/coping_nbr/mhd_coping_nbr.rds"))
+MHD.RAMP <- readRDS(file = paste0(cope_path, "/ramp/mhd_ramp.rds"))
 
 ```
 
@@ -295,10 +293,10 @@ EDGIdemvars <- EDGIdemvars %>%
 ```{r age gender ethnicity NBR}
 
 NBRdemvars <- demCOPE.nbr.baseline %>%
-  select("NBR ID","gender","ethnicity","age") %>%
-  rename(ID=`NBR ID`,
+  select("nbr_id","gender","ethnicity2001","age") %>%
+  rename(ID=nbr_id,
          Gender=gender,
-         Ethnicity=ethnicity,
+         Ethnicity=ethnicity2001,
          Age.linear = age)
 
 ```
@@ -469,9 +467,9 @@ names(dem.cope.nbr) <- cols.nbr
 names(dem.ramp) <- cols.ramp
 
 
-#names(GLADpostcode) <- names.postcode
-#names(EDGIpostcode) <- names.postcode
-#names(NBRpostcode) <- names.postcode
+names(GLADpostcode) <- names.postcode
+names(EDGIpostcode) <- names.postcode
+names(NBRpostcode) <- names.postcode
 
 
 ```
