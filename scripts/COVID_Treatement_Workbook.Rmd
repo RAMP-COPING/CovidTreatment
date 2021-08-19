@@ -122,7 +122,90 @@ files.sources = paste0("../FunctionLib/",list.files("../FunctionLib"))
 sapply(files.sources, source)
 
 ```
+# Colour palettes
+Define colours for plotting this are the standard coping colours
+```{r Colour palettes: COPING}
+COPINGpalette2 <- c("#78D9C5",
+                    "#F5BE5E")
 
+COPINGpalette3 <- c("#78D9C5",
+                    "#F5BE5E",
+                    "#EEB6E9")
+
+COPINGpalette4 <- c("#78D9C5",
+                    "#F5BE5E",
+                    "#EEB6E9",
+                    "#DBDB73")
+
+COPINGpalette5 <- c("#78D9C5",
+                    "#F5BE5E",
+                    "#EEB6E9",
+                    "#DBDB73", 
+                    "#FFED98")
+
+COPINGpalette6 <- c("#78D9C5",
+                    "#F5BE5E",
+                    "#EEB6E9",
+                    "#DBDB73",
+                    "#FFED98",
+                    "#BFD2EB")
+
+COPINGpalette7 <- c("#78D9C5",
+                    "#F5BE5E",
+                    "#EEB6E9",
+                    "#DBDB73", 
+                    "#FFED98",
+                    "#BFD2EB", 
+                    "#808080")
+
+COPINGpaletteGRAD <- c("#F5BE5E",
+                       "#FFD284",
+                       "#FFEED1",
+                       "#B5B5B5",
+                       "#DEFFF8",
+                       "#94F6E1",
+                       "#78D9C5")
+
+COPINGNeuCenterpalette <- c("#78D9C5",
+                            "#808080",
+                            "#F5BE5E")
+
+RAMPworseGRADpalette <- c("#78D9C5",
+                          "#FFEED1",
+                          "#F5BE5E",
+                          "#FFB1B5")
+GLADpalette = c("#efc00b", 
+                "#b7dee8")  
+```
+
+Choose in this chunk which palette to use
+04.07.2020 - Default to 2 colour COPING palette
+```{r Choose colour palette}
+palette = COPINGpalette2
+```
+
+# ggplot theme
+Set up ggplot theme for the plots
+```{r ggplot theme}
+library(ggpubr)
+
+theme_personal <-  theme(
+    text = element_text(color = "black"),
+    axis.title = element_text(color = "black"),
+    axis.text = element_text(color = "black"),
+    axis.title.y = element_blank(), 
+    legend.background = element_blank(),
+    legend.box.background = element_blank(),
+    panel.background = element_blank(), 
+    panel.grid.minor.x = element_blank(),
+    panel.grid.major.x = element_line(
+      colour = "gray",
+      linetype = "dashed",
+      size = 0.2
+      ),
+    axis.ticks = element_blank()
+    )
+```
 # Data wrangling
 
 #### Data import
@@ -150,9 +233,9 @@ demCOPE.nbr <- readRDS(file = paste0(data_path, "/coping_nbr/dem_coping_nbr.RDS"
 demCOPE.nbr.baseline <- fread(paste0(data_path, "/nbr_additional_info/coping_participants_export_20200730_hashed.csv"))
 
 
-#GLADpostcode <- fread(paste0(postpath,"/GLAD_COPING_postcodes.csv"))
-#EDGIpostcode <- fread(paste0(postpath,"/EDGI_COPING_postcodes.csv"))
-#NBRpostcode <- fread(paste0(postpath,"/NBR_postcodes_hash.csv"))
+GLADpostcode <- fread(paste0(postpath,"/GLAD_COPING_postcodes.csv"))
+EDGIpostcode <- fread(paste0(postpath,"/EDGI_COPING_postcodes.csv"))
+NBRpostcode <- fread(paste0(postpath,"/NBR_postcodes_hash.csv"))
 
 MHD.COPE.glad <- readRDS(file = paste0(data_path, "/coping_glad/mhd_coping_glad.rds"))
 #MHD.COPE.edgi <- readRDS(file = paste0(cope_path, "/coping_edgi/mhd_coping_edgi.rds")) THIS IS IN THE DEMOGRAPHICS
@@ -470,9 +553,9 @@ names(dem.cope.nbr) <- cols.nbr
 names(dem.ramp) <- cols.ramp
 
 
-#names(GLADpostcode) <- names.postcode
-#names(EDGIpostcode) <- names.postcode
-#names(NBRpostcode) <- names.postcode
+names(GLADpostcode) <- names.postcode
+names(EDGIpostcode) <- names.postcode
+names(NBRpostcode) <- names.postcode
 
 
 ```
@@ -480,8 +563,8 @@ Clean postcode to keep only outcode for COPING
 
 ```{r clean COPING postcodes}
 
-#setwd(wd)
-#source("./scripts/clean_COPING_postcode_data.R")
+setwd(wd)
+source("./scripts/clean_COPING_postcode_data.R")
 
 ```
 
@@ -489,9 +572,9 @@ Add postcode to COPING
 
 ```{r add postcode to coping}
 
-#dem.cope.glad <- left_join(dem.cope.glad,GLADpostcode)
-#dem.cope.edgi <- left_join(dem.cope.edgi,EDGIpostcode)
-#dem.cope.nbr <- left_join(dem.cope.nbr,NBRpostcode)
+dem.cope.glad <- left_join(dem.cope.glad,GLADpostcode)
+dem.cope.edgi <- left_join(dem.cope.edgi,EDGIpostcode)
+dem.cope.nbr <- left_join(dem.cope.nbr,NBRpostcode)
 
 ```
 
@@ -1253,17 +1336,66 @@ for (i in dia_cols){
 
 ```{r response rates per wave}
 
-treat_dat %>%
+treat_dat_count <- treat_dat %>%
   group_by(wave) %>%
   count()
+
+treat_dat_count
+```
+```{r plot response rates per wave}
+
+treat_dat_count_plot <- treat_dat_count %>%
+  ggplot(mapping = aes(
+    x=wave,
+    y=n)
+    ) +
+    geom_bar(aes(),
+      stat="identity",
+     position = position_dodge2(preserve = "single")
+    ) +
+  labs(
+    x = "Time point",
+    y = "Number of participants") +
+  theme_personal +
+  scale_fill_manual(
+    values = COPINGpalette4
+  ) +
+  coord_flip()
+treat_dat_count_plot
+
+
 ```
 
 By sample
 ```{r response rates per wave by sample}
 
-treat_dat %>%
+treat_dat_count_by_sample <- treat_dat %>%
   group_by(wave,Sample) %>%
   count()
+```
+
+```{r plot response rates per wave per sample}
+
+treat_dat_count_by_sample_plot <- treat_dat_count_by_sample %>%
+  ggplot(mapping = aes(
+    x=wave,
+    y=n)
+    ) +
+    geom_bar(aes(fill = Sample),
+      stat="identity",
+     position = position_dodge2(preserve = "single")
+    ) +
+  labs(
+    x = "Time point",
+    y = "Number of participants") +
+  theme_personal +
+  scale_fill_manual(
+    values = COPINGpalette4
+  ) +
+  coord_flip()
+treat_dat_count_by_sample_plot
+
+
 ```
 
 ### Frequency of treatment seeking per wave
@@ -2132,7 +2264,7 @@ head(postcode_df_area)
 
 #### read in map libraries
 
-```{r read in map libs, eval=FALSE}
+```{r read in map libs}
 if(!require(maps)){
   install.packages("maps")
   library(maps)
@@ -2150,7 +2282,7 @@ if(!require(mapproj)){
 ```
 
 
-```{r process and count treatment by area, eval=FALSE}
+```{r process and count treatment by area}
  setwd(wd)
  source("./scripts/RAMP_postcode_cleaning.R")
 
@@ -2730,7 +2862,7 @@ Using MDI rank for the time being - so ranks within each boundary will be compar
 
 ## clean IMD data
 
-```{r  clean indices of multiple deprivation data, eval=FALSE}
+```{r  clean indices of multiple deprivation data}
 
 setwd(wd)
 source("./scripts/clean_MDI_data.R")
@@ -2739,7 +2871,7 @@ source("./scripts/clean_MDI_data.R")
 
 ## create shapefiles for maps with polygons for plotting district boundaries
 
-```{r shapefile creation, eval=FALSE}
+```{r shapefile creation}
 
 setwd(wd)
 source("./scripts/choropelth_map_districts.R")
@@ -2749,7 +2881,7 @@ source("./scripts/choropelth_map_districts.R")
 
 ## combine the IMD and shapefiles
 
-```{r combine IMD and shapes, eval=FALSE}
+```{r combine IMD and shapes}
 setwd(wd)
 source("./scripts/merge_mapShapefiles_and_IMD_data.R")
 ```
@@ -2757,7 +2889,7 @@ source("./scripts/merge_mapShapefiles_and_IMD_data.R")
 
 ## Plot IMD on map
 
-```{r IMD map plot, eval=FALSE}
+```{r IMD map plot}
 
 ## draw plot using ggplot and geom_sf
 
