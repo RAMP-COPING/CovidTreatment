@@ -1401,10 +1401,6 @@ treat_dat_count_by_sample_plot
 
 ```{r treatment seeking freq by wave}
 
-treat_dat %>%
-  group_by(wave) %>%
-  freq(soughthelp_for_self)
-
 treat_dat_seek_count <- treat_dat %>%
   group_by(wave) %>%
   count(soughthelp_for_self)
@@ -1417,6 +1413,11 @@ treat_dat_seek_count$prop_responders <- treat_dat_seek_count$`1` / treat_dat_see
 
 treat_dat_seek_count
 
+```
+
+```{r plot treatment seeking rates per wave}
+
+
 treat_dat_seek_count_plot <- treat_dat_seek_count[-c(1,9),]  %>%
   ggplot(mapping = aes(wave, prop_responders,fill = "placeholder")
     ) +
@@ -1424,31 +1425,10 @@ treat_dat_seek_count_plot <- treat_dat_seek_count[-c(1,9),]  %>%
       stat="identity",
      position = position_dodge2(preserve = "single")
     ) +
-  labs(x = "Time point",  y = "% seeking treatment") +
+  labs(title = "Treatment seeking", x = "Time point",  y = "Frequency of seeking treatment (%)") +
   theme_personal +
   theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
   theme(legend.position = "none") + 
-  scale_fill_manual(
-    values = COPINGpalette4
-  ) 
-treat_dat_seek_count_plot
-```
-
-```{r plot treatment seeking rates per wave}
-
-treat_dat_seek_count_plot <- treat_dat_seek_count  %>%
-  ggplot(mapping = aes(
-    x=wave,
-    y=n)
-    ) +
-    geom_bar(aes(),
-      stat="identity",
-     position = position_dodge2(preserve = "single")
-    ) +
-  labs(
-    x = "Time point",
-    y = "Number of participants") +
-  theme_personal +
   scale_fill_manual(
     values = COPINGpalette4
   ) 
@@ -1473,6 +1453,57 @@ treat_dat %>%
   group_by(wave) %>%
   freq(ReasonSeek)
 
+```
+
+```{r reason seek by wave count}
+
+ reasons_seek_count <- treat_dat %>%
+  group_by(wave) %>%
+  count(ReasonSeek)
+  
+reasons_seek_count <- pivot_wider(reasons_seek_count, names_from = ReasonSeek, values_from = n) 
+
+prop_seek_count <- reasons_seek_count
+
+prop_seek_count$total_responders <- prop_seek_count$`Existing mental health` + prop_seek_count$`Mental health crisis` + prop_seek_count$`Newly emerging symptoms` + prop_seek_count$`Seeking new treatment`
+
+prop_seek_count$`Existing mental health concern` <- prop_seek_count$`Existing mental health` / prop_seek_count$total_responders*100
+prop_seek_count$`Existing mental health` <- NULL
+
+prop_seek_count$`Mental health crisis` <- prop_seek_count$`Mental health crisis` / prop_seek_count$total_responders*100
+
+prop_seek_count$`Newly emerging symptoms` <- prop_seek_count$`Newly emerging symptoms` / prop_seek_count$total_responders*100
+
+prop_seek_count$`Seeking new treatment` <- prop_seek_count$`Seeking new treatment` / prop_seek_count$total_responders*100
+
+prop_seek_count
+```
+
+```{r reason seek by wave plot}
+
+prop_reasons <- prop_seek_count[-c(1,9),-c(2,6)] 
+
+long_prop_reasons <-  prop_reasons %>%
+pivot_longer(!wave, names_to = "ReasonSeek", values_to = "n")
+
+long_prop_reasons$ReasonSeek <- as.factor(long_prop_reasons$ReasonSeek)
+
+long_prop_reasons$ReasonSeek <- factor(long_prop_reasons$ReasonSeek, levels=c("Mental health crisis","Seeking new treatment","Newly emerging symptoms","Existing mental health concern"), ordered=TRUE)
+
+treat_dat_seek_count_plot <- long_prop_reasons %>%
+  ggplot(mapping = aes(wave, n, fill = ReasonSeek)
+    ) +
+    geom_bar(aes(),
+      stat="identity",
+     position = "stack"
+    ) +
+  labs(title = "Reasons for seeking treatment", x = "Time point",  y = "Reason for seeking treatment (%)") +
+  theme_personal +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+  scale_fill_manual(
+    values = rev(COPINGpalette4)
+  ) 
+treat_dat_seek_count_plot
 ```
 By sample
 ```{r reason seek by wave by sample}
