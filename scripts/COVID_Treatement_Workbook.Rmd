@@ -193,7 +193,6 @@ theme_personal <-  theme(
     text = element_text(color = "black"),
     axis.title = element_text(color = "black"),
     axis.text = element_text(color = "black"),
-    axis.title.y = element_blank(), 
     legend.background = element_blank(),
     legend.box.background = element_blank(),
     panel.background = element_blank(), 
@@ -1344,7 +1343,7 @@ treat_dat_count
 ```
 ```{r plot response rates per wave}
 
-treat_dat_count_plot <- treat_dat_count %>%
+treat_dat_count_plot <- treat_dat_count[-c(9), ]  %>%
   ggplot(mapping = aes(
     x=wave,
     y=n)
@@ -1375,8 +1374,8 @@ treat_dat_count_by_sample <- treat_dat %>%
 ```
 
 ```{r plot response rates per wave per sample}
-
-treat_dat_count_by_sample_plot <- treat_dat_count_by_sample %>%
+treat_dat_count_by_sample[-c(16),]
+treat_dat_count_by_sample_plot <- treat_dat_count_by_sample[-c(16),]  %>%
   ggplot(mapping = aes(
     x=wave,
     y=n)
@@ -1405,6 +1404,56 @@ treat_dat_count_by_sample_plot
 treat_dat %>%
   group_by(wave) %>%
   freq(soughthelp_for_self)
+
+treat_dat_seek_count <- treat_dat %>%
+  group_by(wave) %>%
+  count(soughthelp_for_self)
+  
+treat_dat_seek_count <- pivot_wider(treat_dat_seek_count, names_from = soughthelp_for_self, values_from = n) 
+
+treat_dat_seek_count$total_responders <- treat_dat_seek_count$`0` + treat_dat_seek_count$`1`
+
+treat_dat_seek_count$prop_responders <- treat_dat_seek_count$`1` / treat_dat_seek_count$total_responders*100
+
+treat_dat_seek_count
+
+treat_dat_seek_count_plot <- treat_dat_seek_count[-c(1,9),]  %>%
+  ggplot(mapping = aes(wave, prop_responders,fill = "placeholder")
+    ) +
+    geom_bar(aes(),
+      stat="identity",
+     position = position_dodge2(preserve = "single")
+    ) +
+  labs(x = "Time point",  y = "% seeking treatment") +
+  theme_personal +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+  theme(legend.position = "none") + 
+  scale_fill_manual(
+    values = COPINGpalette4
+  ) 
+treat_dat_seek_count_plot
+```
+
+```{r plot treatment seeking rates per wave}
+
+treat_dat_seek_count_plot <- treat_dat_seek_count  %>%
+  ggplot(mapping = aes(
+    x=wave,
+    y=n)
+    ) +
+    geom_bar(aes(),
+      stat="identity",
+     position = position_dodge2(preserve = "single")
+    ) +
+  labs(
+    x = "Time point",
+    y = "Number of participants") +
+  theme_personal +
+  scale_fill_manual(
+    values = COPINGpalette4
+  ) 
+treat_dat_seek_count_plot
+
 
 ```
 By sample
@@ -2254,7 +2303,7 @@ Project postcode data onto map of the UK. Use downloaded long/lat data mapped to
 
 ### Create clean, labelled and flat outcode dataset
 
-```{r process downloaded geographic data, eval=FALSE}
+```{r process downloaded geographic data}
 setwd(wd)
 source("./scripts/Create_labelled_outcode_dataset.R")
 head(postcode_df_area)
@@ -2291,7 +2340,7 @@ if(!require(mapproj)){
 
 ### Merge sample data to downloaded UK data
 
-```{r merge national and RAMP data, eval=FALSE}
+```{r merge national and RAMP data}
 # 
 postcode_full_seek <- left_join(postcode_seek,postcode_df_area,by="Outcode")
 postcode_full <- left_join(postcode_full_seek,postcode_receive,by="Outcode")
@@ -2304,7 +2353,7 @@ postcode_full <- left_join(postcode_full_seek,postcode_receive,by="Outcode")
 
 ### create counts by county and district
 
-```{r county count dataset, eval=FALSE}
+```{r county count dataset}
  setwd(wd)
  source("./scripts/Count_treatment_by_County.R")
 
@@ -2312,20 +2361,20 @@ postcode_full <- left_join(postcode_full_seek,postcode_receive,by="Outcode")
 
 
 check county data
-```{r check head and count looks fine county, eval=FALSE}
+```{r check head and count looks fine county}
 head(postcode_full_County)
 
 ```
 
 check district data
-```{r check head and count looks fine district, eval=FALSE}
+```{r check head and count looks fine district}
 head(postcode_full_District)
 
 ```
 
 ## test building a UK map with districts plotted
 
-```{r map district project test, eval=FALSE}
+```{r map district project test}
 
 bb <- c(10,50,100,500,1000,5000,10000,15000)
 
@@ -2349,7 +2398,7 @@ maptest <-
 ### Treatment seeking by county (no labels)
 Size of the circles = total number of responses
 Colour of circles = percent of responses that indicated treatment seeking
-```{r map for seeking by county colour no label,warning=FALSE, eval=FALSE}
+```{r map for seeking by county colour no label,warning=FALSE}
 
 bb <- c(10,50,100,500,1000,5000,10000,15000)
 
@@ -2383,7 +2432,7 @@ mapcolour
 
 Size of the circles = total number of responses
 Colour of circles = percent of responses that indicated treatment seeking
-```{r map for seeking by district colour no label,warning=FALSE, eval=FALSE}
+```{r map for seeking by district colour no label,warning=FALSE}
 
 bb <- c(10,100,500,1000,2000,3000)
 
@@ -2418,7 +2467,7 @@ mapcolour
 ### Labelled the 5 counties ith greatest proporton seeking by total responses
 
 #### county
-```{r map for seeking by county colour labelled,warning=FALSE, eval=FALSE}
+```{r map for seeking by county colour labelled,warning=FALSE}
 bb <- c(10,50,100,500,1000,5000,10000,15000)
 
 mapcolourlabel <- 
@@ -2464,7 +2513,7 @@ mapcolourlabel
 #### district labelled with marker points for most percentage seek attempts by responses
 orange markers for top 5 biggest gap, with labels
 
-```{r map for seeking by district colour labelled markers,warning=FALSE, eval=FALSE}
+```{r map for seeking by district colour labelled markers,warning=FALSE}
 
 bb <- c(10,100,500,1000,2000,3000)
 
@@ -2510,7 +2559,7 @@ mapcolourlabel
 #### district labelled with marker points (no labels)
 orange markers for top 5 biggest gap, WITHOUT labels
 
-```{r map for seeking by district colour markers no labels,warning=FALSE, eval=FALSE}
+```{r map for seeking by district colour markers no labels,warning=FALSE}
 
 bb <- c(10,100,500,1000,2000,3000)
 
@@ -2548,7 +2597,7 @@ mapcolourlabel
 
 #### district - only top ten gap treatment seeking attemps
 
-```{r map for seeking by district colour labelled top ten only,warning=FALSE, eval=FALSE}
+```{r map for seeking by district colour labelled top ten only,warning=FALSE}
 
 bb <- c(100,300,500)
 
@@ -2595,7 +2644,7 @@ mapcolourlabel
 ### Treatment gap by county (no labels)
 Size of the circles = total number of seeking attempts
 Colour of circles = percent of times treatment was not received when it was sought
-```{r map for gap by county colour no label,warning=FALSE, eval=FALSE}
+```{r map for gap by county colour no label,warning=FALSE}
 
 bb <- c(10,100,500,1000,2000,3000)
 
@@ -2629,7 +2678,7 @@ mapcolour
 
 Size of the circles = total number of responses
 Colour of circles = percent of responses that indicated treatment gap
-```{r map for gap by district colour no label,warning=FALSE, eval=FALSE}
+```{r map for gap by district colour no label,warning=FALSE}
 
 bb <- c(10,50,100,300,500)
 
@@ -2664,7 +2713,7 @@ mapcolour
 ### Labelled the 5 counties ith greatest proporton gap by total responses
 
 #### county
-```{r map for gap by county colour labelled,warning=FALSE, eval=FALSE}
+```{r map for gap by county colour labelled,warning=FALSE}
 bb <- c(10,50,100,300,500)
 
 mapcolourlabel <- 
@@ -2710,7 +2759,7 @@ mapcolourlabel
 #### district labelled with marker points for most percentage seek attempts by responses
 orange markers for top 5 biggest gap, with labels
 
-```{r map for gap by district colour labelled markers,warning=FALSE, eval=FALSE}
+```{r map for gap by district colour labelled markers,warning=FALSE}
 
 bb <- c(10,50,100,300,500)
 
@@ -2756,7 +2805,7 @@ mapcolourlabel
 #### district labelled with marker points (no labels)
 orange markers for top 5 biggest gap, WITHOUT labels
 
-```{r map for gap by district colour markers no labels,warning=FALSE, eval=FALSE}
+```{r map for gap by district colour markers no labels,warning=FALSE}
 
 bb <- c(10,50,100,300,500)
 
@@ -2795,7 +2844,7 @@ mapcolourlabel
 #### district - only top ten gap treatment gap attemps
 
 Filtered to districts where fewer than 5 seek attempts in the district
-```{r map for gap by district colour labelled top ten only,warning=FALSE, eval=FALSE}
+```{r map for gap by district colour labelled top ten only,warning=FALSE}
 
 bb <- c(10,50,100,150)
 
