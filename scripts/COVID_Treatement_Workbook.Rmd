@@ -1372,7 +1372,7 @@ treat_dat_count_by_sample <- treat_dat %>%
   group_by(wave,Sample) %>%
   count()
 ```
-
+###*Plot sample size*
 ```{r plot response rates per wave per sample}
 treat_dat_count_by_sample[-c(16),]
 treat_dat_count_by_sample_plot <- treat_dat_count_by_sample[-c(16),]  %>%
@@ -1436,11 +1436,59 @@ treat_dat_seek_count_plot
 
 
 ```
+
+###*Plot treatment gap*
+```{r plot treatment not received if sought}
+
+treat_dat_gap_count <- treat_dat %>%
+  group_by(wave) %>%
+  count(AnyReceived)
+  
+treat_dat_gap_count <- pivot_wider(treat_dat_gap_count, names_from = AnyReceived, values_from = n) 
+
+treat_dat_gap_count$total_sought <- treat_dat_seek_count$`1`
+
+treat_dat_gap_count$prop_received <- treat_dat_gap_count$`1` / treat_dat_gap_count$total_sought*100
+treat_dat_gap_count$prop_gap <- 100-treat_dat_gap_count$prop_received
+
+combined_seek_gap_plot <- treat_dat_gap_count[-c(1,9),c(1,5:6)]
+combined_seek_gap_plot$prop_seek <- treat_dat_seek_count$prop_responders[-c(1,9)]
+combined_seek_gap_plot$`Treatment received` <- (combined_seek_gap_plot$prop_seek/100*combined_seek_gap_plot$prop_received/100)*100
+combined_seek_gap_plot$`Treatment not received` <- (combined_seek_gap_plot$prop_seek/100*combined_seek_gap_plot$prop_gap/100)*100
+  
+#summary values per wave
+combined_seek_gap_plot[,c(1,5:6)]
+
+long_prop_receipt <- combined_seek_gap_plot[,c(1,5:6)] %>%
+  pivot_longer(!wave, names_to = "received",values_to = "percent")
+
+long_prop_receipt$received <- as.factor(long_prop_receipt$received)
+  
+treat_dat_received_plot <- long_prop_receipt %>%
+  ggplot(mapping = aes(wave, percent, fill = received)
+    ) +
+    geom_bar(aes(),
+      stat="identity",
+     position = "stack"
+    ) +
+  labs(title = "Frequencies of treatment seeking and receipt", x = "Time point",  y = "Proportion of sample (%)") +
+  theme_personal +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+  theme(legend.title = element_blank()) +
+  scale_fill_manual(
+    values = rev(COPINGpalette2)
+  ) 
+treat_dat_received_plot
+
+
+```
+
+
 By sample
 
 ```{r treatment seeking freq by wave by sample}
 
-treat_dat %>%
+txseek_by_sample <- treat_dat %>%
   group_by(wave,Sample) %>%
   freq(soughthelp_for_self)
 
@@ -1449,7 +1497,7 @@ treat_dat %>%
 
 ```{r reason seek by wave}
 
-treat_dat %>%
+txseek_by_wave <- treat_dat %>%
   group_by(wave) %>%
   freq(ReasonSeek)
 
@@ -1478,7 +1526,7 @@ prop_seek_count$`Seeking new treatment` <- prop_seek_count$`Seeking new treatmen
 
 prop_seek_count
 ```
-
+###*Plot reason seek*
 ```{r reason seek by wave plot}
 
 prop_reasons <- prop_seek_count[-c(1,9),-c(2,6)] 
@@ -1500,15 +1548,17 @@ treat_dat_seek_count_plot <- long_prop_reasons %>%
   labs(title = "Reasons for seeking treatment", x = "Time point",  y = "Reason for seeking treatment (%)") +
   theme_personal +
   theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+  theme(legend.title = element_blank()) +
   scale_fill_manual(
     values = rev(COPINGpalette4)
   ) 
+prop_reasons
 treat_dat_seek_count_plot
 ```
 By sample
 ```{r reason seek by wave by sample}
 
-treat_dat %>%
+reason_seek_by_wave_sample <- treat_dat %>%
   group_by(wave,Sample) %>%
   freq(ReasonSeek)
 
@@ -1525,14 +1575,18 @@ BUT they might ALSO have sought help from both routes (i.e., if they sought help
 
 **Supported**
 ```{r treatment sought by wave supported any}
-treat_dat %>%
+tx_supported_by_wave <- treat_dat %>%
   group_by(wave) %>%
-  freq(TypeSought.Supported.Any)
+  count(TypeSought.Supported.Any)
 
+supported_count <- pivot_wider(tx_supported_by_wave, names_from = TypeSought.Supported.Any, values_from = n) 
+
+supported_count <- supported_count[-c(1,9),]
+supported_count
 ```
 By sample
 ```{r treatment sought by wave supported any by sample}
-treat_dat %>%
+tx_seek_by_wave_supported <- treat_dat %>%
   group_by(wave,Sample) %>%
   freq(TypeSought.Supported.Any)
 
@@ -1540,9 +1594,14 @@ treat_dat %>%
 
 **Self guided**
 ```{r treatment sought by wave self guided any}
-treat_dat %>%
+tx_selfguided_by_wave <- treat_dat %>%
   group_by(wave) %>%
-  freq(TypeSought.SelfGuide.Any)
+  count(TypeSought.SelfGuide.Any)
+
+selfguided_count <- pivot_wider(tx_selfguided_by_wave, names_from = TypeSought.SelfGuide.Any, values_from = n) 
+
+selfguided_count <- selfguided_count[-c(1,9),]
+selfguided_count
 
 ```
 
@@ -1622,7 +1681,7 @@ treat_dat %>%
 ```
 
 ### Frequency of treatment receipt by wave (any instances of treatment, not total instances)
-Receiving ANY instances of this type of treatment (i.e., if they sought and received supported help from 3 sources ina  wave, it will just register once)
+Receiving ANY instances of this type of treatment (i.e., if they sought and received supported help from 3 sources in a  wave, it will just register once)
 
 Supported
 ```{r treatment receipt by wave any}
@@ -1718,7 +1777,7 @@ treat_dat %>%
 
 ```
 
-### Frequency of systemic / client barriers by wave and treatment type
+### Frequency of systemic / client reasons for non-receipt by wave and treatment type
 
 Barriers to receiving treatment by wave.
 
@@ -2384,7 +2443,7 @@ postcode_full <- left_join(postcode_full_seek,postcode_receive,by="Outcode")
 
 ### create counts by county and district
 
-```{r county count dataset}
+```{r county count dataset, eval=FALSE}
  setwd(wd)
  source("./scripts/Count_treatment_by_County.R")
 
@@ -2392,20 +2451,20 @@ postcode_full <- left_join(postcode_full_seek,postcode_receive,by="Outcode")
 
 
 check county data
-```{r check head and count looks fine county}
+```{r check head and count looks fine county, eval=FALSE}
 head(postcode_full_County)
 
 ```
 
 check district data
-```{r check head and count looks fine district}
+```{r check head and count looks fine district, eval=FALSE}
 head(postcode_full_District)
 
 ```
 
 ## test building a UK map with districts plotted
 
-```{r map district project test}
+```{r map district project test, eval=FALSE}
 
 bb <- c(10,50,100,500,1000,5000,10000,15000)
 
@@ -2429,7 +2488,7 @@ maptest <-
 ### Treatment seeking by county (no labels)
 Size of the circles = total number of responses
 Colour of circles = percent of responses that indicated treatment seeking
-```{r map for seeking by county colour no label,warning=FALSE}
+```{r map for seeking by county colour no label,warning=FALSE, eval=FALSE}
 
 bb <- c(10,50,100,500,1000,5000,10000,15000)
 
@@ -2463,7 +2522,7 @@ mapcolour
 
 Size of the circles = total number of responses
 Colour of circles = percent of responses that indicated treatment seeking
-```{r map for seeking by district colour no label,warning=FALSE}
+```{r map for seeking by district colour no label,warning=FALSE, eval=FALSE}
 
 bb <- c(10,100,500,1000,2000,3000)
 
@@ -2498,7 +2557,7 @@ mapcolour
 ### Labelled the 5 counties ith greatest proporton seeking by total responses
 
 #### county
-```{r map for seeking by county colour labelled,warning=FALSE}
+```{r map for seeking by county colour labelled,warning=FALSE, eval=FALSE}
 bb <- c(10,50,100,500,1000,5000,10000,15000)
 
 mapcolourlabel <- 
@@ -2544,7 +2603,7 @@ mapcolourlabel
 #### district labelled with marker points for most percentage seek attempts by responses
 orange markers for top 5 biggest gap, with labels
 
-```{r map for seeking by district colour labelled markers,warning=FALSE}
+```{r map for seeking by district colour labelled markers,warning=FALSE, eval=FALSE}
 
 bb <- c(10,100,500,1000,2000,3000)
 
@@ -2590,7 +2649,7 @@ mapcolourlabel
 #### district labelled with marker points (no labels)
 orange markers for top 5 biggest gap, WITHOUT labels
 
-```{r map for seeking by district colour markers no labels,warning=FALSE}
+```{r map for seeking by district colour markers no labels,warning=FALSE, eval=FALSE}
 
 bb <- c(10,100,500,1000,2000,3000)
 
@@ -2628,7 +2687,7 @@ mapcolourlabel
 
 #### district - only top ten gap treatment seeking attemps
 
-```{r map for seeking by district colour labelled top ten only,warning=FALSE}
+```{r map for seeking by district colour labelled top ten only,warning=FALSE, eval=FALSE}
 
 bb <- c(100,300,500)
 
@@ -2675,7 +2734,7 @@ mapcolourlabel
 ### Treatment gap by county (no labels)
 Size of the circles = total number of seeking attempts
 Colour of circles = percent of times treatment was not received when it was sought
-```{r map for gap by county colour no label,warning=FALSE}
+```{r map for gap by county colour no label,warning=FALSE, eval=FALSE}
 
 bb <- c(10,100,500,1000,2000,3000)
 
@@ -2709,7 +2768,7 @@ mapcolour
 
 Size of the circles = total number of responses
 Colour of circles = percent of responses that indicated treatment gap
-```{r map for gap by district colour no label,warning=FALSE}
+```{r map for gap by district colour no label,warning=FALSE, eval=FALSE}
 
 bb <- c(10,50,100,300,500)
 
@@ -2744,7 +2803,7 @@ mapcolour
 ### Labelled the 5 counties ith greatest proporton gap by total responses
 
 #### county
-```{r map for gap by county colour labelled,warning=FALSE}
+```{r map for gap by county colour labelled,warning=FALSE, eval=FALSE}
 bb <- c(10,50,100,300,500)
 
 mapcolourlabel <- 
@@ -2790,7 +2849,7 @@ mapcolourlabel
 #### district labelled with marker points for most percentage seek attempts by responses
 orange markers for top 5 biggest gap, with labels
 
-```{r map for gap by district colour labelled markers,warning=FALSE}
+```{r map for gap by district colour labelled markers,warning=FALSE, eval=FALSE}
 
 bb <- c(10,50,100,300,500)
 
@@ -2836,7 +2895,7 @@ mapcolourlabel
 #### district labelled with marker points (no labels)
 orange markers for top 5 biggest gap, WITHOUT labels
 
-```{r map for gap by district colour markers no labels,warning=FALSE}
+```{r map for gap by district colour markers no labels,warning=FALSE, eval=FALSE}
 
 bb <- c(10,50,100,300,500)
 
@@ -2875,7 +2934,7 @@ mapcolourlabel
 #### district - only top ten gap treatment gap attemps
 
 Filtered to districts where fewer than 5 seek attempts in the district
-```{r map for gap by district colour labelled top ten only,warning=FALSE}
+```{r map for gap by district colour labelled top ten only,warning=FALSE, eval=FALSE}
 
 bb <- c(10,50,100,150)
 
@@ -2942,7 +3001,7 @@ Using MDI rank for the time being - so ranks within each boundary will be compar
 
 ## clean IMD data
 
-```{r  clean indices of multiple deprivation data}
+```{r  clean indices of multiple deprivation data, eval=FALSE}
 
 setwd(wd)
 source("./scripts/clean_MDI_data.R")
@@ -2951,7 +3010,7 @@ source("./scripts/clean_MDI_data.R")
 
 ## create shapefiles for maps with polygons for plotting district boundaries
 
-```{r shapefile creation}
+```{r shapefile creation, eval=FALSE}
 
 setwd(wd)
 source("./scripts/choropelth_map_districts.R")
@@ -2961,7 +3020,7 @@ source("./scripts/choropelth_map_districts.R")
 
 ## combine the IMD and shapefiles
 
-```{r combine IMD and shapes}
+```{r combine IMD and shapes, eval=FALSE}
 setwd(wd)
 source("./scripts/merge_mapShapefiles_and_IMD_data.R")
 ```
@@ -2969,7 +3028,7 @@ source("./scripts/merge_mapShapefiles_and_IMD_data.R")
 
 ## Plot IMD on map
 
-```{r IMD map plot}
+```{r IMD map plot, eval=FALSE}
 
 ## draw plot using ggplot and geom_sf
 
