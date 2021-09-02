@@ -1137,12 +1137,12 @@ treat_dat_byIDSamp$AnySeek <- ifelse(treat_dat_byIDSamp$n > 0,"Sought help at le
 ##### Client level vs systemic barriers
 identify if treatment was received when sought according to category
 
-```{r run script to relabel and clean treatment hep and barrier factors}
+```{r run script to relabel and clean treatment help and barrier factors}
 setwd(wd)
 ## factorise and label barrier and helpfulness 
 source("./scripts/relabel_barriers_help_factors.R")
-
 ```
+
 
 Identify whether barriers are systemic or client-level
 ```{r dummy type of barriers}
@@ -1846,6 +1846,50 @@ treat_dat %>%
   group_by(wave,Sample) %>%
   freq(PreventHelp_Supported.Systemic)
 ```
+###*Plot overall reasons not recceived*
+```{r check barriers overall supported systemic}
+
+reason_not_received <- tibble(reason = c("Systemic","Client","Other"),`Self guided` = 1:3, `Supported` = 1:3)
+
+reason_not_received[1,2] <- sum(treat_dat$PreventHelp_SelfGuided.Systemic==1,na.rm=TRUE)
+reason_not_received[2,2] <- sum(treat_dat$PreventHelp_SelfGuided.Client==1,na.rm=TRUE)
+reason_not_received[3,2] <- sum(treat_dat$PreventHelp_SelfGuided.Other==1,na.rm=TRUE)
+reason_not_received[1,3] <- sum(treat_dat$PreventHelp_Supported.Systemic==1,na.rm=TRUE)
+reason_not_received[2,3] <- sum(treat_dat$PreventHelp_Supported.Client==1,na.rm=TRUE)
+reason_not_received[3,3] <- sum(treat_dat$PreventHelp_Supported.Other==1,na.rm=TRUE)
+
+self_guided_total <- sum(reason_not_received$`Self guided`)
+supported_total <- sum(reason_not_received$`Supported`)
+
+reason_not_received_percent <- reason_not_received[,1:3]
+
+reason_not_received_percent$`Self guided` <- reason_not_received$`Self guided` / self_guided_total*100
+reason_not_received_percent$`Supported` <- reason_not_received$`Supported` / supported_total*100
+
+long_percent_reasons_not_received <-  reason_not_received_percent %>%
+pivot_longer(!reason, names_to = "Type", values_to = "n")
+
+long_percent_reasons_not_received$reason <- as.factor(long_percent_reasons_not_received$reason)
+
+long_percent_reasons_not_received$reason <- factor(long_percent_reasons_not_received$reason, levels=c("Client","Systemic","Other"), ordered=TRUE)
+
+treat_dat_not_received_plot <- long_percent_reasons_not_received %>%
+  ggplot(mapping = aes(Type, n, fill = reason)
+    ) +
+    geom_bar(aes(),
+      stat="identity",
+     position = "stack"
+    ) +
+  labs(title = "Reasons for treatment non-receipt", x = "Type of treatment",  y = "Proportion of responses (%)") +
+  theme_personal +
+  coord_flip() +
+  theme(legend.title = element_blank()) +
+  scale_fill_manual(
+    values = rev(COPINGpalette3)
+  ) 
+treat_dat_not_received_plot
+
+```
 
 **Client-level**
 ```{r check barriers by wave supported client level}
@@ -2114,6 +2158,51 @@ By sample
 treat_dat %>%
   group_by(wave,Sample) %>%
   freq(Helpfulness_SelfGuided)
+```
+
+###*Plot helpfulness*
+```{r plot helpfulness}
+
+helpfulness_freq_supported <- treat_dat %>%
+  freq(Helpfulness_Supported)
+
+helpfulness_freq_self_guided <- treat_dat %>%
+  freq(Helpfulness_SelfGuided)
+
+helpfulness_supported <- as.data.frame(helpfulness_freq_supported)
+helpfulness_selfguided <- as.data.frame(helpfulness_freq_self_guided)
+
+helpfulness <- helpfulness_supported[1:7,c(1,2)]
+helpfulness$`Self guided` <- helpfulness_selfguided[1:7,c(2)]
+helpfulness$`Supported` <- helpfulness$`% Valid`
+helpful_attritbutes <- attributes(helpfulness)
+helpfulness$labels <- helpful_attritbutes$row.names
+
+helpfulness <- helpfulness[,c(3:5)]
+
+long_helpfulness <-  helpfulness %>%
+pivot_longer(!labels, names_to = "Type", values_to = "n")
+
+long_helpfulness$labels <- as.factor(long_helpfulness$labels)
+
+long_helpfulness$labels <- factor(long_helpfulness$labels, levels=c("Extremely helpful","Very helpful","Somewhat helpful","Neither helpful nor unhelpful","Somewhat unhelpful","Very unhelpful","Extremely unhelpful"), ordered=TRUE)
+
+helpfulness_plot <- long_helpfulness %>%
+  ggplot(mapping = aes(Type, n, fill = labels)
+    ) +
+    geom_bar(aes(),
+      stat="identity",
+     position = "stack"
+    ) +
+  labs(title = "Helpfulness", x = "Type of treatment",  y = "Proportion of responses (%)") +
+  theme_personal +
+  coord_flip() +
+  theme(legend.title = element_blank()) +
+  scale_fill_manual(
+    values = (COPINGpalette7)
+  ) 
+helpfulness_plot
+
 ```
 
 ### Frequency of reasons for NOT seeking help
