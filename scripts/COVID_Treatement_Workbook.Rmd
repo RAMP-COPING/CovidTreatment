@@ -1110,6 +1110,22 @@ treat_dat_byIDSamp <- treat_dat %>%
   tally(soughthelp_for_self)
 
 ```
+##### Reason not sought
+```{r reason not sought}
+
+reason_not_sought <- tibble(reason = c("Feel fine","Feel better","Not bad enough","Don't think help available","Bad past experience","Didn't know where to find","Too busy","Want to but haven't","Other"),category = c("Mild or no current symptoms","Mild or no current symptoms","Mild or no current symptoms","Systemic","Systemic","Systemic","Client","Client","Other"), n = 1:9)
+
+reason_not_sought[1,3] <- sum(treat_dat$reasonNohelp_feel_fine==1,na.rm=TRUE)
+reason_not_sought[2,3] <- sum(treat_dat$reasonNohelp_I_feel_better==1,na.rm=TRUE)
+reason_not_sought[3,3] <- sum(treat_dat$reasonNohelp_I_dont_think_I_feel_bad_enough==1,na.rm=TRUE)
+reason_not_sought[4,3] <- sum(treat_dat$reasonNohelp_I_want_help_dont_think_its_available==1,na.rm=TRUE)
+reason_not_sought[5,3] <- sum(treat_dat$reasonNohelp_Bad_experiences_in_past==1,na.rm=TRUE)
+reason_not_sought[6,3] <- sum(treat_dat$reasonNohelp_I_didnt_know_where_to_find==1,na.rm=TRUE)
+reason_not_sought[7,3] <- sum(treat_dat$reasonNohelp_Too_busy==1,na.rm=TRUE)
+reason_not_sought[8,3] <- sum(treat_dat$reasonNohelp_I_want_to_but_havent==1,na.rm=TRUE)
+reason_not_sought[9,3] <- sum(treat_dat$reasonNohelp_other==1,na.rm=TRUE)
+
+```
 
 ```{r treatment seek in any wave}
 
@@ -1117,7 +1133,6 @@ treat_dat_byID$AnySeek <- ifelse(treat_dat_byID$n > 0,"Sought help at least once
 treat_dat_byIDSamp$AnySeek <- ifelse(treat_dat_byIDSamp$n > 0,"Sought help at least once", "Never sought help")
 
 ```
-
 
 ##### Client level vs systemic barriers
 identify if treatment was received when sought according to category
@@ -1563,7 +1578,40 @@ reason_seek_by_wave_sample <- treat_dat %>%
   freq(ReasonSeek)
 
 ```
+###*Plot reason not seek*
+```{r reason not seek plot}
+total_reasons <- sum(reason_not_sought$n)
+reason_not_sought$percent <- reason_not_sought$n/total_reasons*100
 
+summary_reason_not_sought <- reason_not_sought %>%
+  group_by(category) %>%
+  summarise(total = sum(n))
+
+summary_reason_not_sought$percent <- summary_reason_not_sought$total/total_reasons*100
+
+reason_not_sought
+summary_reason_not_sought
+
+reorder_summary <- summary_reason_not_sought %>%
+  arrange(match(category, c("Other","Client","Systemic","Mild or no current symptoms"),desc(percent)))
+
+reorder_summary$category <- factor(reorder_summary$category, levels=c("Other","Client","Systemic","Mild or no current symptoms"), ordered=TRUE)
+
+pie <- reorder_summary %>%
+  ggplot(aes(x="", y=percent, fill=category)) +
+  geom_bar(width = 1, stat = "identity") +
+  scale_fill_manual(values = rev(COPINGpalette4)) +
+  coord_polar("y",start=0) +
+  theme_void() +
+  labs(fill = "Category of reason") +
+  geom_text(aes(y = c((round(percent,digits=1))),
+                x = c(1.2,1.2,1.2,1.2),
+                label=paste0(round((percent),0),"%")),
+            size=5,
+            position = position_stack(vjust = 0.5)
+  )
+pie
+```
 
 
 
