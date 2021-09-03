@@ -1466,7 +1466,7 @@ treat_dat_gap_count <- treat_dat %>%
   count(AnyReceived)
   
 treat_dat_gap_count <- pivot_wider(treat_dat_gap_count, names_from = AnyReceived, values_from = n) 
-
+treat_dat_gap_count <- treat_dat_gap_count[1:6,]
 treat_dat_gap_count$total_sought <- treat_dat_seek_count$`1`
 
 treat_dat_gap_count$prop_received <- treat_dat_gap_count$`1` / treat_dat_gap_count$total_sought*100
@@ -2283,44 +2283,71 @@ tx_gender_chisq$p.value
 
 ```
 
-###**Chi square test Gender by Treatment gap**
+###**Chi square test Gender by Treatment seeking and gap**
 ```{r Chi square test Gender by Treatment gap}
-tx_gap <- treat_dat %>%
+
+treat_dat_seek_gender <- treat_dat %>%
   group_by(Gender) %>%
-  count(TypeSought.Supported.Any)
-
-tx_selfguided <- treat_dat %>%
+  count(soughthelp_for_self)
+  
+treat_dat_gap_gender <- treat_dat %>%
   group_by(Gender) %>%
-  count(TypeSought.SelfGuide.Any)
+  count(AnyReceived)
 
-#summarise to just male-female for chi-square
-tx_supported_mf <- tx_supported[c(10:11,13:14),]
-tx_selfguided_mf <- tx_selfguided[c(10:11,13:14),]
+#pivot wider
+treat_dat_seek_gender <- pivot_wider(treat_dat_seek_gender, names_from = soughthelp_for_self, values_from = n) 
+treat_dat_gap_gender <- pivot_wider(treat_dat_gap_gender, names_from = AnyReceived, values_from = n) 
 
-tx_prop_mf <- tx_supported_mf[1]
-tx_prop_mf[1,2] <- "Supported"
-tx_prop_mf[2,2] <- "Self guided"
-tx_prop_mf[3,2] <- "Supported"
-tx_prop_mf[4,2] <- "Self guided"
-colnames(tx_prop_mf)[2] <- "Type"
+#limit to just male and female
+treat_dat_seek_gender <- treat_dat_seek_gender[4:5,]
+treat_dat_gap_gender <- treat_dat_gap_gender[4:5,]
 
-tx_prop_mf[1,3] <- tx_supported_mf$n[2]
-tx_prop_mf[2,3] <- tx_selfguided_mf$n[2]
-tx_prop_mf[3,3] <- tx_supported_mf$n[4]
-tx_prop_mf[4,3] <- tx_selfguided_mf$n[4]
+#drop NAs
+treat_dat_seek_gender <- treat_dat_seek_gender[,-c(4)]
 
-colnames(tx_prop_mf)[3] <- "n"
+#test for gender difference in treatment seeking
+colnames(treat_dat_seek_gender)[3] <- "n sought"
+colnames(treat_dat_seek_gender)[2] <- "n not sought"
 
-wide_tx_prop_mf <- tx_prop_mf %>%
-pivot_wider(id_cols = Gender, names_from = Type, values_from = n)
-
-wide_tx_prop_mf <- wide_tx_prop_mf %>%
+treat_dat_seek_gender <- treat_dat_seek_gender %>%
   as.data.frame()
 
-library("MASS")
-tx_gender_chisq <- chisq.test(wide_tx_prop_mf[-1])
+tx_seek_gender_chisq <- chisq.test(treat_dat_seek_gender[-1])
+tx_seek_gender_chisq$p.value
+
+tx_seek_gender_chisq
+#as proportions
+treat_dat_seek_gender$prop_sought <- treat_dat_seek_gender$`n sought`/(treat_dat_seek_gender$`n sought`+treat_dat_seek_gender$`n not sought`)
+treat_dat_seek_gender$prop_not_sought <- treat_dat_seek_gender$`n not sought`/(treat_dat_seek_gender$`n sought`+treat_dat_seek_gender$`n not sought`)
+
+treat_dat_seek_gender
+#===================================
+#limit to just those seeking
+treat_dat_seek_gender <- treat_dat_seek_gender[,c(1,3)]
+treat_dat_gap_gender <- treat_dat_gap_gender[,c(1,3)]
+
+#combine seeking and gap - test for gender difference in treatment gap
+treat_dat_gap_gender$total_sought <- treat_dat_seek_gender$`1`
+
+colnames(treat_dat_seek_gender)[2] <- "n sought"
+colnames(treat_dat_gap_gender)[2] <- "n received"
+
+treat_dat_gap_gender$`n not received` <- treat_dat_gap_gender$total_sought - treat_dat_gap_gender$`n received`
+
+treat_dat_gap_gender <- treat_dat_gap_gender[,c(1,2,4)]
+
+treat_dat_gap_gender <- treat_dat_gap_gender %>%
+  as.data.frame()
+
+tx_gender_chisq <- chisq.test(treat_dat_gap_gender[-1])
 tx_gender_chisq$p.value
 
+tx_gender_chisq
+#as proportions
+treat_dat_gap_gender$prop_received <- treat_dat_gap_gender$`n received`/(treat_dat_gap_gender$`n received`+treat_dat_gap_gender$`n not received`)
+treat_dat_gap_gender$prop_not_received <- treat_dat_gap_gender$`n not received`/(treat_dat_gap_gender$`n received`+treat_dat_gap_gender$`n not received`)
+
+treat_dat_gap_gender
 ```
 By sample
 
