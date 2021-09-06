@@ -2351,6 +2351,64 @@ treat_dat_gap_gender
 ```
 By sample
 
+###**Ordinal logistic regression: gender*helpfulness**
+```{r OLR gender and helpfulness}
+require(foreign)
+require(MASS)
+require(Hmisc)
+require(reshape2)
+
+helpfulness_freq_supported <- treat_dat %>%
+  freq(Helpfulness_Supported)
+
+helpfulness_freq_self_guided <- treat_dat %>%
+  freq(Helpfulness_SelfGuided)
+
+helpfulness_supported <- as.data.frame(helpfulness_freq_supported)
+helpfulness_selfguided <- as.data.frame(helpfulness_freq_self_guided)
+
+helpfulness_freq <- helpfulness_supported[1:7,c(1,2)]
+colnames(helpfulness_freq)[1] <- "Supported"
+helpfulness_freq$`Self guided` <- helpfulness_selfguided[1:7,1]
+helpfulness_freq$`% Valid` <- NULL
+
+helpfulness_freq$labels <- c("Extremely unhelpful","Very unhelpful","Somewhat unhelpful","Neither helpful nor unhelpful","Somewhat helpful","Very helpful","Extremely helpful")
+
+long_helpfulness_freq <-  helpfulness_freq %>%
+pivot_longer(!labels, names_to = "Type", values_to = "n")
+
+#Apply OLR see - https://stats.idre.ucla.edu/r/dae/ordinal-logistic-regression/
+long_helpfulness_freq$labels <- as.factor(long_helpfulness_freq$labels)
+m <- polr(labels ~ Type + n, data = long_helpfulness_freq, Hess=TRUE)
+summary(m)
+
+#calculate p values
+(ctable <- coef(summary(m)))
+p <- pnorm(abs(ctable[, "t value"]), lower.tail = FALSE) * 2
+(ctable <- cbind(ctable, "p value" = p))
+(ci <- confint(m)) 
+=======
+
+helpfulness_freq$`Supported` <- helpfulness$`% Valid`
+helpful_freq_attritbutes <- attributes(helpfulness_freq)
+helpfulness_freq$labels <- helpful_attritbutes$row.names
+
+helpfulness <- helpfulness[,c(3:5)]
+
+long_helpfulness <-  helpfulness %>%
+pivot_longer(!labels, names_to = "Type", values_to = "n")
+
+long_helpfulness$labels <- as.factor(long_helpfulness$labels)
+
+long_helpfulness$labels <- factor(long_helpfulness$labels, levels=c("Extremely helpful","Very helpful","Somewhat helpful","Neither helpful nor unhelpful","Somewhat unhelpful","Very unhelpful","Extremely unhelpful"), ordered=TRUE)
+
+
+================
+long_helpfulness
+
+summary(long_helpfulness$n)
+```
+
 ```{r treatment seeking freq by wave by sample gender}
 
 treat_dat %>%
