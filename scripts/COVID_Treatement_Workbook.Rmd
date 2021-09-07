@@ -176,6 +176,14 @@ RAMPworseGRADpalette <- c("#78D9C5",
                           "#FFB1B5")
 GLADpalette = c("#efc00b", 
                 "#b7dee8")  
+
+RAMPlikertpalette <- c("#78D9C5",
+                       "#8DD5B4",
+                       "#A2D0A3",
+                       "#B7CC92",
+                       "#CBC780",
+                       "#E0C36F",
+                    "#F5BE5E")
 ```
 
 Choose in this chunk which palette to use
@@ -1472,21 +1480,23 @@ treat_dat_gap_count$total_sought <- treat_dat_seek_count$`1`
 treat_dat_gap_count$prop_received <- treat_dat_gap_count$`1` / treat_dat_gap_count$total_sought*100
 treat_dat_gap_count$prop_gap <- 100-treat_dat_gap_count$prop_received
 
-combined_seek_gap_plot <- treat_dat_gap_count[,c(1,5:6)]
+combined_seek_gap_plot <- treat_dat_gap_count[,c(1,5:7)]
 combined_seek_gap_plot$prop_seek <- treat_dat_seek_count$prop_responders
-combined_seek_gap_plot$`Treatment received` <- (combined_seek_gap_plot$prop_seek/100*combined_seek_gap_plot$prop_received/100)*100
-combined_seek_gap_plot$`Treatment not received` <- (combined_seek_gap_plot$prop_seek/100*combined_seek_gap_plot$prop_gap/100)*100
-combined_seek_gap_plot$`Treatment not sought` <- 100-(combined_seek_gap_plot$`Treatment received`+combined_seek_gap_plot$`Treatment not received`)
+combined_seek_gap_plot$`Treatment sought and received` <- (combined_seek_gap_plot$prop_seek/100*combined_seek_gap_plot$prop_received/100)*100
+combined_seek_gap_plot$`Treatment sought but not received` <- (combined_seek_gap_plot$prop_seek/100*combined_seek_gap_plot$prop_gap/100)*100
+combined_seek_gap_plot$`Treatment not sought` <- 100-(combined_seek_gap_plot$`Treatment sought and received`+combined_seek_gap_plot$`Treatment sought but not received`)
   
 #summary values per wave
-combined_seek_gap_plot[,c(1,5:7)]
+combined_seek_gap_plot[,c(1,6:8)]
 
-long_prop_receipt <- combined_seek_gap_plot[,c(1,5:7)] %>%
+long_prop_receipt <- combined_seek_gap_plot[,c(1,6:8)] %>%
   pivot_longer(!wave, names_to = "received",values_to = "percent")
 
 long_prop_receipt$received <- as.factor(long_prop_receipt$received)
 
-long_prop_receipt$received <- factor(long_prop_receipt$received, levels=c("Treatment not sought","Treatment not received","Treatment received"), ordered=TRUE)
+long_prop_receipt$received <- factor(long_prop_receipt$received, levels=c("Treatment not sought","Treatment sought but not received","Treatment sought and received"), ordered=TRUE)
+
+long_prop_receipt$wave <-factor(long_prop_receipt$wave,levels=c("December 2020","November 2020","October 2020","September 2020","August 2020","July 2020"),ordered=TRUE)
   
 treat_dat_received_plot <- long_prop_receipt %>%
   ggplot(mapping = aes(wave, percent, fill = received)
@@ -1495,13 +1505,14 @@ treat_dat_received_plot <- long_prop_receipt %>%
       stat="identity",
      position = "stack"
     ) +
+  coord_flip() +
   labs(title = "Frequencies of treatment seeking and receipt", x = "Time point",  y = "Proportion of sample (%)") +
   theme_personal +
   theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
-  theme(legend.title = element_blank()) +
-  scale_fill_manual(
+  theme(legend.position = "top", legend.title = element_blank())  +
+    scale_fill_manual(
     values = rev(COPINGpalette3)
-  ) 
+  ) + guides(fill=guide_legend(nrow=2,byrow=TRUE))
 treat_dat_received_plot
 
 
@@ -1560,8 +1571,10 @@ pivot_longer(!wave, names_to = "ReasonSeek", values_to = "n")
 
 long_prop_reasons$ReasonSeek <- as.factor(long_prop_reasons$ReasonSeek)
 
-long_prop_reasons$ReasonSeek <- factor(long_prop_reasons$ReasonSeek, levels=c("Mental health crisis","Seeking new treatment","Newly emerging symptoms","Existing mental health concern"), ordered=TRUE)
+long_prop_reasons$ReasonSeek <- factor(long_prop_reasons$ReasonSeek, levels=c("Newly emerging symptoms","Mental health crisis","Seeking new treatment","Existing mental health concern"), ordered=TRUE)
 
+long_prop_reasons$wave <-factor(long_prop_reasons$wave,levels=c("December 2020","November 2020","October 2020","September 2020","August 2020","July 2020"),ordered=TRUE)
+  
 treat_dat_seek_count_plot <- long_prop_reasons %>%
   ggplot(mapping = aes(wave, n, fill = ReasonSeek)
     ) +
@@ -1569,15 +1582,20 @@ treat_dat_seek_count_plot <- long_prop_reasons %>%
       stat="identity",
      position = "stack"
     ) +
-  labs(title = "Reasons for seeking treatment", x = "Time point",  y = "Reason for seeking treatment (%)") +
+  coord_flip() +
+  labs(title = "Reasons for seeking treatment", x = "Time point",  y = "Proportion of sample (%)") +
   theme_personal +
+  theme(legend.position = "top") +
   theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
   theme(legend.title = element_blank()) +
   scale_fill_manual(
-    values = rev(COPINGpalette4)
-  ) 
+    values = rev(RAMPworseGRADpalette)
+  ) + guides(fill=guide_legend(nrow=2,byrow=TRUE))
 prop_reasons
 treat_dat_seek_count_plot
+
+#COPINGpalette4
+#RAMPworseGRADpalette
 ```
 By sample
 ```{r reason seek by wave by sample}
@@ -1604,19 +1622,19 @@ summary_reason_not_sought
 reorder_summary <- summary_reason_not_sought %>%
   arrange(match(category, c("Other","Client","Systemic","Mild or no current symptoms"),desc(percent)))
 
-reorder_summary$category <- factor(reorder_summary$category, levels=c("Other","Client","Systemic","Mild or no current symptoms"), ordered=TRUE)
+reorder_summary$category <- factor(reorder_summary$category, levels=c("Mild or no current symptoms","Systemic","Client","Other"), ordered=TRUE)
 
 pie <- reorder_summary %>%
   ggplot(aes(x="", y=percent, fill=category)) +
   geom_bar(width = 1, stat = "identity") +
-  scale_fill_manual(values = rev(COPINGpalette4)) +
+  scale_fill_manual(values = COPINGpalette4) +
   coord_polar("y",start=0) +
   theme_void() +
-  labs(fill = "Category of reason") +
+  labs(title = "   Reasons for not seeking treatment", fill = "Category of reason") +
   geom_text(aes(y = c((round(percent,digits=1))),
                 x = c(1.2,1.2,1.2,1.2),
                 label=paste0(round((percent),0),"%")),
-            size=5,
+            size=3,
             position = position_stack(vjust = 0.5)
   )
 pie
@@ -2207,7 +2225,7 @@ helpfulness_plot <- long_helpfulness %>%
   coord_flip() +
   theme(legend.title = element_blank()) +
   scale_fill_manual(
-    values = (COPINGpalette7)
+    values = (RAMPlikertpalette)
   ) 
 helpfulness_plot
 
@@ -2758,6 +2776,31 @@ By sample
 treat_dat %>%
   group_by(wave,Sample,Gender) %>%
   freq(Helpfulness_SelfGuided)
+```
+
+## *Multi-panel plot*
+```{r multi-panel plot graphs together}
+p1 <- ggarrange(treat_dat_received_plot,treat_dat_seek_count_plot,
+          labels = c("A","B"),
+          ncol = 2, nrow =1)
+  
+p2 <- ggarrange(pie, treat_dat_not_received_plot,
+          labels = c("C","D"),
+          ncol = 2, nrow =1)
+
+p3 <- ggarrange(helpfulness_plot,
+          labels = c("E"),
+          ncol = 1, nrow =1)
+
+ggarrange(p1,p2,p3,ncol=1,nrow=3)
+
+
+#treat_dat_count_by_sample_plot
+#treat_dat_received_plot
+#treat_dat_seek_count_plot
+#pie
+#treat_dat_not_received_plot
+#helpfulness_plot
 ```
 
 ## Geographic
