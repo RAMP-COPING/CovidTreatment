@@ -87,7 +87,7 @@ remove(list = ls())
 
 #### Call in set up scripts
 
-```{r Setup, source files}
+```{r Setup, source files, echo=FALSE}
 #source data directory: data_path
 source("/Users/katherineyoung/OneDrive - King's College London/MQ_project/papers/RAMP-COPING_MH_treatment_paper/file_paths.R")
 setwd(wd)
@@ -1331,7 +1331,7 @@ dia_cols <- c("mhd.depression", "mhd.mania_hypomania_bipolar_or_manicdepression"
 #### everyone
 
 frequencies for all diagnoses
-```{r freq tables for diagnoses}
+```{r freq tables for diagnoses, echo=FALSE}
 
 for (i in dia_cols){
   print(freq(MH[i]))
@@ -1342,7 +1342,7 @@ for (i in dia_cols){
 
 #### By sample
 frequencies for all diagnoses
-```{r freq tables for diagnoses by sample}
+```{r freq tables for diagnoses by sample, echo=FALSE}
 
 for (i in dia_cols){
   print(i)
@@ -1662,7 +1662,7 @@ selfguided_count
 ```
 
 By sample
-```{r treatment sought by wave self guided any by sample}
+```{r treatment sought by wave self guided any by sample, eval=FALSE}
 treat_dat %>%
   group_by(wave,Sample) %>%
   freq(TypeSought.SelfGuide.Any)
@@ -1706,14 +1706,14 @@ treat_dat_byIDSamp %>%
 ### Count of the number of different sources from which treatment was sought, by treatment type, wave
 
 Supported
-```{r num sources from which treatment sought supported}
+```{r num sources from which treatment sought supported, eval=FALSE}
 treat_dat %>%
   group_by(wave) %>%
   freq(TypeSought.Supported.total)
 
 ```
 By sample
-```{r num sources from which treatment sought supported by sample}
+```{r num sources from which treatment sought supported by sample, eval=FALSE}
 treat_dat %>%
   group_by(wave,Sample) %>%
   freq(TypeSought.Supported.total)
@@ -1722,14 +1722,14 @@ treat_dat %>%
 
 
 Self guided
-```{r num sources from which treatment sought self guided}
+```{r num sources from which treatment sought self guided, eval=FALSE}
 treat_dat %>%
   group_by(wave) %>%
   freq(TypeSought.SelfGuided.total)
 
 ```
 By sample
-```{r num sources from which treatment sought self guided by sample}
+```{r num sources from which treatment sought self guided by sample, eval=FALSE}
 treat_dat %>%
   group_by(wave,Sample) %>%
   freq(TypeSought.SelfGuided.total)
@@ -1747,7 +1747,7 @@ treat_dat %>%
 
 ```
 By sample
-```{r treatment receipt by wave any by sample}
+```{r treatment receipt by wave any by sample, eval=FALSE}
 treat_dat %>%
   group_by(wave,Sample) %>%
   freq(TypeReceived.Supported.Any)
@@ -1762,7 +1762,7 @@ treat_dat %>%
   freq(TypeReceived.SelfGuide.Any)
 ```
 By sample
-```{r treatment receipt by wave self guided any by sample}
+```{r treatment receipt by wave self guided any by sample, eval=FALSE}
 treat_dat %>%
   group_by(wave,Sample) %>%
   freq(TypeReceived.SelfGuide.Any)
@@ -1778,21 +1778,21 @@ treat_dat %>%
   freq(TypeReceived.Supported.total)
 ```
 By sample
-```{r treatment receipt by wave supported all by sample}
+```{r treatment receipt by wave supported all by sample, eval=FALSE}
 treat_dat %>%
   group_by(wave,Sample) %>%
   freq(TypeReceived.Supported.total)
 ```
 
 **Self guided**
-```{r treatment receipt by wave self guided all}
+```{r treatment receipt by wave self guided all, eval=FALSE}
 treat_dat %>%
   group_by(wave) %>%
   freq(TypeReceived.SelfGuided.total)
 ```
 
 By sample
-```{r treatment receipt by wave self guided all by sample}
+```{r treatment receipt by wave self guided all by sample, eval=FALSE}
 treat_dat %>%
   group_by(wave) %>%
   freq(TypeReceived.SelfGuided.total)
@@ -1802,14 +1802,14 @@ treat_dat %>%
 ### Count of the number of different sources from which treatment was RECEIVED, by treatment type, wave
 
 **Supported**
-```{r num sources from which treatment received supported}
+```{r num sources from which treatment received supported, eval=FALSE}
 treat_dat %>%
   group_by(wave) %>%
   freq(TypeReceived.Supported.total)
 
 ```
 By sample
-```{r num sources from which treatment received supported by sample}
+```{r num sources from which treatment received supported by sample, eval=FALSE}
 treat_dat %>%
   group_by(wave,Sample) %>%
   freq(TypeReceived.Supported.total)
@@ -1818,7 +1818,7 @@ treat_dat %>%
 
 
 **Self guided**
-```{r num sources from which treatment received self guided}
+```{r num sources from which treatment received self guided, eval=FALSE}
 treat_dat %>%
   group_by(wave) %>%
   freq(TypeReceived.SelfGuided.total)
@@ -1826,7 +1826,7 @@ treat_dat %>%
 ```
 
 By sample
-```{r num sources from which treatment received self guided by sample}
+```{r num sources from which treatment received self guided by sample, eval=FALSE}
 treat_dat %>%
   group_by(wave,Sample) %>%
   freq(TypeReceived.SelfGuided.total)
@@ -1843,13 +1843,13 @@ Does not capture anyone more than once per category. i.e. someone who encountere
 
 #### For supported options**
 **Systemic**
-```{r check barriers by wave supported systemic}
+```{r check barriers by wave supported systemic, eval=FALSE}
 treat_dat %>%
   group_by(wave) %>%
   freq(PreventHelp_Supported.Systemic)
 ```
 By sample
-```{r check barriers by wave supported systemic by sample}
+```{r check barriers by wave supported systemic by sample, eval=FALSE}
 treat_dat %>%
   group_by(wave,Sample) %>%
   freq(PreventHelp_Supported.Systemic)
@@ -1900,26 +1900,26 @@ treat_dat_not_received_plot
 ```
 
 **Client-level**
-```{r check barriers by wave supported client level}
+```{r check barriers by wave supported client level, eval=FALSE}
 treat_dat %>%
   group_by(wave) %>%
   freq(PreventHelp_Supported.Client)
 ```
 By sample
-```{r check barriers by wave supported client by sample}
+```{r check barriers by wave supported client by sample, eval=FALSE}
 treat_dat %>%
   group_by(wave,Sample) %>%
   freq(PreventHelp_Supported.Client)
 ```
 
 **Other**
-```{r check barriers by wave supported otherl}
+```{r check barriers by wave supported other, eval=FALSE}
 treat_dat %>%
   group_by(wave) %>%
   freq(PreventHelp_Supported.Other)
 ```
 By sample
-```{r check barriers by wave supported other by sample}
+```{r check barriers by wave supported other by sample, eval=FALSE}
 treat_dat %>%
   group_by(wave,Sample) %>%
   freq(PreventHelp_Supported.Other)
@@ -1927,39 +1927,39 @@ treat_dat %>%
 
 #### For self guided options**
 **Systemic**
-```{r check barriers by wave SelfGuided systemic}
+```{r check barriers by wave SelfGuided systemic, eval=FALSE}
 treat_dat %>%
   group_by(wave) %>%
   freq(PreventHelp_SelfGuided.Systemic)
 ```
 By sample
-```{r check barriers by wave SelfGuided systemic by sample}
+```{r check barriers by wave SelfGuided systemic by sample, eval=FALSE}
 treat_dat %>%
   group_by(wave,Sample) %>%
   freq(PreventHelp_SelfGuided.Systemic)
 ```
 
 **Client-level**
-```{r check barriers by wave SelfGuided client level}
+```{r check barriers by wave SelfGuided client level, eval=FALSE}
 treat_dat %>%
   group_by(wave) %>%
   freq(PreventHelp_SelfGuided.Client)
 ```
 By sample
-```{r check barriers by wave SelfGuided client by sample}
+```{r check barriers by wave SelfGuided client by sample, eval=FALSE}
 treat_dat %>%
   group_by(wave,Sample) %>%
   freq(PreventHelp_SelfGuided.Client)
 ```
 
 **Other**
-```{r check barriers by wave SelfGuided otherl}
+```{r check barriers by wave SelfGuided other, eval=FALSE}
 treat_dat %>%
   group_by(wave) %>%
   freq(PreventHelp_SelfGuided.Other)
 ```
 By sample
-```{r check barriers by wave SelfGuided other by sample}
+```{r check barriers by wave SelfGuided other by sample, eval=FALSE}
 treat_dat %>%
   group_by(wave,Sample) %>%
   freq(PreventHelp_SelfGuided.Other)
@@ -1969,7 +1969,7 @@ treat_dat %>%
 #### Supported
 
 ***Emergency mental health team***
-```{r barriers by agency em mh}
+```{r barriers by agency em mh, eval=FALSE}
 
 treat_dat %>%
   group_by(wave) %>%
@@ -1977,7 +1977,7 @@ treat_dat %>%
 
 ```
 By sample
-```{r barriers by agency em mh by sample}
+```{r barriers by agency em mh by sample, eval=FALSE}
 
 treat_dat %>%
   group_by(wave,Sample) %>%
@@ -1986,7 +1986,7 @@ treat_dat %>%
 ```
 
 ***Existing mental health team***
-```{r barriers by agency existing mh}
+```{r barriers by agency existing mh, eval=FALSE}
 
 treat_dat %>%
   group_by(wave) %>%
@@ -1994,7 +1994,7 @@ treat_dat %>%
 
 ```
 By sample
-```{r barriers by agency existing mh by sample}
+```{r barriers by agency existing mh by sample, eval=FALSE}
 
 treat_dat %>%
   group_by(wave,Sample) %>%
@@ -2003,7 +2003,7 @@ treat_dat %>%
 ```
 
 ***Online talk therapy***
-```{r barriers by agency online talk}
+```{r barriers by agency online talk, eval=FALSE}
 
 treat_dat %>%
   group_by(wave) %>%
@@ -2011,7 +2011,7 @@ treat_dat %>%
 
 ```
 By sample
-```{r barriers by agency online talk by sample }
+```{r barriers by agency online talk by sample, eval=FALSE}
 
 treat_dat %>%
   group_by(wave,Sample) %>%
@@ -2020,7 +2020,7 @@ treat_dat %>%
 ```
 
 ***GP***
-```{r barriers by agency GP}
+```{r barriers by agency GP, eval=FALSE}
 
 treat_dat %>%
   group_by(wave) %>%
@@ -2028,7 +2028,7 @@ treat_dat %>%
 
 ```
 By sample
-```{r barriers by agency gp by sample}
+```{r barriers by agency gp by sample, eval=FALSE}
 
 treat_dat %>%
   group_by(wave,Sample) %>%
@@ -2037,7 +2037,7 @@ treat_dat %>%
 ```
 
 ***NHS 111***
-```{r barriers by agency nhs 111}
+```{r barriers by agency nhs 111, eval=FALSE}
 
 treat_dat %>%
   group_by(wave) %>%
@@ -2045,7 +2045,7 @@ treat_dat %>%
 
 ```
 By sample
-```{r barriers by agency nhs 111 by sample}
+```{r barriers by agency nhs 111 by sample, eval=FALSE}
 
 treat_dat %>%
   group_by(wave,Sample) %>%
@@ -2054,7 +2054,7 @@ treat_dat %>%
 ```
 
 ***Non NHS phone***
-```{r barriers by agency phone}
+```{r barriers by agency phone, eval=FALSE}
 
 treat_dat %>%
   group_by(wave) %>%
@@ -2062,7 +2062,7 @@ treat_dat %>%
 
 ```
 By sample
-```{r barriers by agencyphone by sample}
+```{r barriers by agencyphone by sample, eval=FALSE}
 
 treat_dat %>%
   group_by(wave,Sample) %>%
@@ -2073,7 +2073,7 @@ treat_dat %>%
 #### Self guided
 
 ***Government website***
-```{r barriers by agency gov site}
+```{r barriers by agency gov site, eval=FALSE}
 
 treat_dat %>%
   group_by(wave) %>%
@@ -2081,7 +2081,7 @@ treat_dat %>%
 
 ```
 By sample
-```{r barriers by agency gove site by sample}
+```{r barriers by agency gove site by sample, eval=FALSE}
 
 treat_dat %>%
   group_by(wave,Sample) %>%
@@ -2090,7 +2090,7 @@ treat_dat %>%
 ```
 
 ***Non-government website***
-```{r barriers by agency non gov site}
+```{r barriers by agency non gov site, eval=FALSE}
 
 treat_dat %>%
   group_by(wave) %>%
@@ -2098,7 +2098,7 @@ treat_dat %>%
 
 ```
 By sample
-```{r barriers by agency non gov site by sample}
+```{r barriers by agency non gov site by sample, eval=FALSE}
 
 treat_dat %>%
   group_by(wave,Sample) %>%
@@ -2107,7 +2107,7 @@ treat_dat %>%
 ```
 
 ***Online self-therapy***
-```{r barriers by agency online self therapy}
+```{r barriers by agency online self therapy, eval=FALSE}
 
 treat_dat %>%
   group_by(wave) %>%
@@ -2115,7 +2115,7 @@ treat_dat %>%
 
 ```
 By sample
-```{r barriers by agency online self therapy by sample}
+```{r barriers by agency online self therapy by sample, eval=FALSE}
 
 treat_dat %>%
   group_by(wave,Sample) %>%
@@ -2124,7 +2124,7 @@ treat_dat %>%
 ```
 
 ***Structured therapeutic activity***
-```{r barriers by agency structured therapeutic activity}
+```{r barriers by agency structured therapeutic activity, eval=FALSE}
 
 treat_dat %>%
   group_by(wave) %>%
@@ -2132,7 +2132,7 @@ treat_dat %>%
 
 ```
 By sample
-```{r barriers by agency structured therapeutic activity by sample}
+```{r barriers by agency structured therapeutic activity by sample, eval=FALSE}
 
 treat_dat %>%
   group_by(wave,Sample) %>%
@@ -2143,26 +2143,26 @@ treat_dat %>%
 ### Frequency of different levels of helpfulness by treatment type (supported/client led) by wave
 
 **For supported options**
-```{r check helpfulness by wave supported}
+```{r check helpfulness by wave supported, eval=FALSE}
 treat_dat %>%
   group_by(wave) %>%
   freq(Helpfulness_Supported)
 ```
 By sample
-```{r check helpfulness by wave supported by sample}
+```{r check helpfulness by wave supported by sample, eval=FALSE}
 treat_dat %>%
   group_by(wave,Sample) %>%
   freq(Helpfulness_Supported)
 ```
 
 **For  client led options**
-```{r check helpfulness by wave client led}
+```{r check helpfulness by wave client led, eval=FALSE}
 treat_dat %>%
   group_by(wave) %>%
   freq(Helpfulness_SelfGuided)
 ```
 By sample
-```{r check helpfulness by wave client led by sample}
+```{r check helpfulness by wave client led by sample, eval=FALSE}
 treat_dat %>%
   group_by(wave,Sample) %>%
   freq(Helpfulness_SelfGuided)
@@ -2216,7 +2216,7 @@ helpfulness_plot
 ### Frequency of reasons for NOT seeking help
 
 overall
-```{r check }
+```{r check, eval=FALSE}
 
 for (i in grep("reasonNo", names(treat_dat)))
   print(freq(treat_dat[i]))
@@ -2236,7 +2236,7 @@ treat_dat <- full_join(treat_dat,demgen)
 ### Treatment seeking rates by Gender
 
 
-```{r treatment seeking freq by wave gender}
+```{r treatment seeking freq by wave gender, eval=FALSE}
 
 treat_dat %>%
   group_by(wave,Gender) %>%
@@ -2277,9 +2277,16 @@ pivot_wider(id_cols = Gender, names_from = Type, values_from = n)
 wide_tx_prop_mf <- wide_tx_prop_mf %>%
   as.data.frame()
 
-library("MASS")
 tx_gender_chisq <- chisq.test(wide_tx_prop_mf[-1])
 tx_gender_chisq$p.value
+
+tx_gender_chisq
+
+#as proportions
+wide_tx_prop_mf$prop_supported <- wide_tx_prop_mf$Supported/(wide_tx_prop_mf$`Self guided` + wide_tx_prop_mf$Supported)
+wide_tx_prop_mf$prop_selfguided <- wide_tx_prop_mf$`Self guided`/(wide_tx_prop_mf$`Self guided` + wide_tx_prop_mf$Supported)
+
+wide_tx_prop_mf
 
 ```
 
@@ -2320,15 +2327,14 @@ tx_seek_gender_chisq
 treat_dat_seek_gender$prop_sought <- treat_dat_seek_gender$`n sought`/(treat_dat_seek_gender$`n sought`+treat_dat_seek_gender$`n not sought`)
 treat_dat_seek_gender$prop_not_sought <- treat_dat_seek_gender$`n not sought`/(treat_dat_seek_gender$`n sought`+treat_dat_seek_gender$`n not sought`)
 
+#combine seeking and gap - test for gender difference in treatment gap
 treat_dat_seek_gender
+
 #===================================
 #limit to just those seeking
-treat_dat_seek_gender <- treat_dat_seek_gender[,c(1,3)]
+
 treat_dat_gap_gender <- treat_dat_gap_gender[,c(1,3)]
-
-#combine seeking and gap - test for gender difference in treatment gap
-treat_dat_gap_gender$total_sought <- treat_dat_seek_gender$`1`
-
+treat_dat_gap_gender$total_sought <- treat_dat_seek_gender$`n sought`
 colnames(treat_dat_seek_gender)[2] <- "n sought"
 colnames(treat_dat_gap_gender)[2] <- "n received"
 
@@ -2351,8 +2357,14 @@ treat_dat_gap_gender
 ```
 By sample
 
-###**Ordinal logistic regression: gender*helpfulness**
-```{r OLR gender and helpfulness}
+###**Ordinal logistic regression: tx_type*helpfulness**
+
+```{r OLR treatment type and helpfulness}
+if(!require(MASS)){
+  install.packages("MASS")
+  library(MASS)
+}
+
 require(foreign)
 require(MASS)
 require(Hmisc)
@@ -2383,33 +2395,85 @@ m <- polr(labels ~ Type + n, data = long_helpfulness_freq, Hess=TRUE)
 summary(m)
 
 #calculate p values
-(ctable <- coef(summary(m)))
+ctable <- coef(summary(m))
 p <- pnorm(abs(ctable[, "t value"]), lower.tail = FALSE) * 2
 (ctable <- cbind(ctable, "p value" = p))
+#calculate confidence intervals
 (ci <- confint(m)) 
-=======
 
-helpfulness_freq$`Supported` <- helpfulness$`% Valid`
-helpful_freq_attritbutes <- attributes(helpfulness_freq)
-helpfulness_freq$labels <- helpful_attritbutes$row.names
-
-helpfulness <- helpfulness[,c(3:5)]
-
-long_helpfulness <-  helpfulness %>%
-pivot_longer(!labels, names_to = "Type", values_to = "n")
-
-long_helpfulness$labels <- as.factor(long_helpfulness$labels)
-
-long_helpfulness$labels <- factor(long_helpfulness$labels, levels=c("Extremely helpful","Very helpful","Somewhat helpful","Neither helpful nor unhelpful","Somewhat unhelpful","Very unhelpful","Extremely unhelpful"), ordered=TRUE)
-
-
-================
-long_helpfulness
-
-summary(long_helpfulness$n)
 ```
 
-```{r treatment seeking freq by wave by sample gender}
+###**Ordinal logistic regression: gender*helpfulness**
+```{r OLR gender and helpfulness}
+
+#group helpfulness by gender
+gender_helpful_self_guide <- treat_dat %>%
+  group_by(Gender) %>%
+  freq(Helpfulness_SelfGuided)
+
+gender_helpful_supported <- treat_dat %>%
+  group_by(Gender) %>%
+  freq(Helpfulness_Supported)
+
+#limit to just M and F
+gender_helpful_self_guide <- gender_helpful_self_guide[-c(1:3,6:8)]
+gender_helpful_supported <- gender_helpful_supported[-c(1:3,6:8)]
+
+MF_helpful_self_guide <- as.data.frame(gender_helpful_self_guide)
+MF_helpful_supported <- as.data.frame(gender_helpful_supported)
+
+#limit to just frequency column, remove NA/total rows
+MF_helpful_self_guide <- MF_helpful_self_guide[-c(8:9),c(1,6)]
+MF_helpful_supported <- MF_helpful_supported[-c(8:9),c(1,6)]
+
+#rename columns
+colnames(MF_helpful_self_guide)[1] <- "Male"
+colnames(MF_helpful_supported)[1] <- "Male"
+colnames(MF_helpful_self_guide)[2] <- "Female"
+colnames(MF_helpful_supported)[2] <- "Female"
+MF_helpful_self_guide$labels <- c("Extremely unhelpful","Very unhelpful","Somewhat unhelpful","Neither helpful nor unhelpful","Somewhat helpful","Very helpful","Extremely helpful")
+MF_helpful_supported$labels <- c("Extremely unhelpful","Very unhelpful","Somewhat unhelpful","Neither helpful nor unhelpful","Somewhat helpful","Very helpful","Extremely helpful")
+
+long_MF_helpful_self_guide <- MF_helpful_self_guide %>% 
+pivot_longer(!labels, names_to = "Gender", values_to = "n")
+
+long_MF_helpful_supported <- MF_helpful_supported %>% pivot_longer(!labels, names_to = "Gender", values_to = "n")
+
+long_MF_helpful_self_guide$labels <- as.factor(long_MF_helpful_self_guide$labels)
+long_MF_helpful_supported$labels <- as.factor(long_MF_helpful_supported$labels)
+```
+
+####Effect of gender on helpfulness: self-guided interventions
+```{r Effect of gender on helpfulness: self-guided interventions}
+
+#Apply OLR see - https://stats.idre.ucla.edu/r/dae/ordinal-logistic-regression/
+
+#effect of gender on helpfulness - self guided
+m_mf_self <- polr(labels ~ Gender + n, data = long_MF_helpful_self_guide, Hess=TRUE)
+summary(m_mf_self)
+
+#calculate p values
+ctable_mf_self <- coef(summary(m_mf_self))
+p_mf_self <- pnorm(abs(ctable[, "t value"]), lower.tail = FALSE) * 2
+(ctable_mf_self <- cbind(ctable_mf_self, "p value" = p_mf_self))
+(ci_mf_self <- confint(m_mf_self)) 
+```
+
+####Effect of gender on helpfulness: supported interventions
+```{r Effect of gender on helpfulness: supported interventions}
+#effect of gender on helpfulness - supported
+m_mf_supp <- polr(labels ~ Gender + n, data = long_MF_helpful_supported, Hess=TRUE)
+summary(m_mf_supp)
+
+#calculate p values
+ctable_mf_supp <- coef(summary(m_mf_supp))
+p_mf_supp <- pnorm(abs(ctable[, "t value"]), lower.tail = FALSE) * 2
+(ctable_mf_supp <- cbind(ctable_mf_supp, "p value" = p_mf_supp))
+(ci_mf_supp <- confint(m_mf_supp)) 
+
+```
+
+```{r treatment seeking freq by wave by sample gender,eval=FALSE}
 
 treat_dat %>%
   group_by(wave,Sample,Gender) %>%
@@ -2421,7 +2485,7 @@ treat_dat %>%
 
 
 ***Emergency mental health team***
-```{r barriers by agency em mh gendergender}
+```{r barriers by agency em mh gendergender,eval=FALSE}
 
 treat_dat %>%
   group_by(wave,Gender) %>%
@@ -2429,7 +2493,7 @@ treat_dat %>%
 
 ```
 By sample
-```{r barriers by agency em mh by samplegender}
+```{r barriers by agency em mh by samplegender,eval=FALSE}
 
 treat_dat %>%
   group_by(wave,Sample,Gender) %>%
@@ -2438,7 +2502,7 @@ treat_dat %>%
 ```
 
 ***Existing mental health team***
-```{r barriers by agency existing mh gendergender}
+```{r barriers by agency existing mh gendergender,eval=FALSE}
 
 treat_dat %>%
   group_by(wave,Gender) %>%
@@ -2446,7 +2510,7 @@ treat_dat %>%
 
 ```
 By sample
-```{r barriers by agency existing mh by samplegender}
+```{r barriers by agency existing mh by samplegender,eval=FALSE}
 
 treat_dat %>%
   group_by(wave,Sample,Gender) %>%
@@ -2455,7 +2519,7 @@ treat_dat %>%
 ```
 
 ***Online talk therapy***
-```{r barriers by agency online talk gendergender}
+```{r barriers by agency online talk gendergender,eval=FALSE}
 
 treat_dat %>%
   group_by(wave,Gender) %>%
@@ -2463,7 +2527,7 @@ treat_dat %>%
 
 ```
 By sample
-```{r barriers by agency online talk by sample gender}
+```{r barriers by agency online talk by sample gender,eval=FALSE}
 
 treat_dat %>%
   group_by(wave,Sample,Gender) %>%
@@ -2472,7 +2536,7 @@ treat_dat %>%
 ```
 
 ***GP***
-```{r barriers by agency GP gendergender}
+```{r barriers by agency GP gendergender,eval=FALSE}
 
 treat_dat %>%
   group_by(wave,Gender) %>%
@@ -2480,7 +2544,7 @@ treat_dat %>%
 
 ```
 By sample
-```{r barriers by agency gp by samplegender}
+```{r barriers by agency gp by samplegender,eval=FALSE}
 
 treat_dat %>%
   group_by(wave,Sample,Gender) %>%
@@ -2489,7 +2553,7 @@ treat_dat %>%
 ```
 
 ***NHS 111***
-```{r barriers by agency nhs 111 gendergender}
+```{r barriers by agency nhs 111 gendergender,eval=FALSE}
 
 treat_dat %>%
   group_by(wave,Gender) %>%
@@ -2497,7 +2561,7 @@ treat_dat %>%
 
 ```
 By sample
-```{r barriers by agency nhs 111 by sample gendergender}
+```{r barriers by agency nhs 111 by sample gendergender,eval=FALSE}
 
 treat_dat %>%
   group_by(wave,Sample,Gender) %>%
@@ -2506,7 +2570,7 @@ treat_dat %>%
 ```
 
 ***Non NHS phone***
-```{r barriers by agency phone gendergender}
+```{r barriers by agency phone gendergender,eval=FALSE}
 
 treat_dat %>%
   group_by(wave,Gender) %>%
@@ -2514,7 +2578,7 @@ treat_dat %>%
 
 ```
 By sample
-```{r barriers by agencyphone by samplegender}
+```{r barriers by agencyphone by samplegender,eval=FALSE}
 
 treat_dat %>%
   group_by(wave,Sample,Gender) %>%
@@ -2525,7 +2589,7 @@ treat_dat %>%
 #### Self guided
 
 ***Government website***
-```{r barriers by agency gov sitegender}
+```{r barriers by agency gov sitegender,eval=FALSE}
 
 treat_dat %>%
   group_by(wave,Gender) %>%
@@ -2533,7 +2597,7 @@ treat_dat %>%
 
 ```
 By sample
-```{r barriers by agency gove site by samplegender}
+```{r barriers by agency gove site by samplegender,eval=FALSE}
 
 treat_dat %>%
   group_by(wave,Sample,Gender) %>%
@@ -2542,7 +2606,7 @@ treat_dat %>%
 ```
 
 ***Non-government website***
-```{r barriers by agency non gov sitegender}
+```{r barriers by agency non gov sitegender,eval=FALSE}
 
 treat_dat %>%
   group_by(wave,Gender) %>%
@@ -2550,7 +2614,7 @@ treat_dat %>%
 
 ```
 By sample
-```{r barriers by agency non gov site by samplegender}
+```{r barriers by agency non gov site by samplegender,eval=FALSE}
 
 treat_dat %>%
   group_by(wave,Sample,Gender) %>%
@@ -2559,7 +2623,7 @@ treat_dat %>%
 ```
 
 ***Online self-therapy***
-```{r barriers by agency online self therapygender}
+```{r barriers by agency online self therapygender,eval=FALSE}
 
 treat_dat %>%
   group_by(wave,Gender) %>%
@@ -2567,7 +2631,7 @@ treat_dat %>%
 
 ```
 By sample
-```{r barriers by agency online self therapy by samplegender}
+```{r barriers by agency online self therapy by samplegender,eval=FALSE}
 
 treat_dat %>%
   group_by(wave,Sample,Gender) %>%
@@ -2576,7 +2640,7 @@ treat_dat %>%
 ```
 
 ***Structured therapeutic activity***
-```{r barriers by agency structured therapeutic activitygender}
+```{r barriers by agency structured therapeutic activitygender,eval=FALSE}
 
 treat_dat %>%
   group_by(wave,Gender) %>%
@@ -2584,7 +2648,7 @@ treat_dat %>%
 
 ```
 By sample
-```{r barriers by agency structured therapeutic activity by samplegender}
+```{r barriers by agency structured therapeutic activity by samplegender,eval=FALSE}
 
 treat_dat %>%
   group_by(wave,Sample,Gender) %>%
@@ -2594,7 +2658,7 @@ treat_dat %>%
 
 ### Why not seek treatment by gender
 
-```{r no treat seek by gen feel fine}
+```{r no treat seek by gen feel fine,eval=FALSE}
 
 treat_dat %>%
   group_by(Gender) %>%
@@ -2602,7 +2666,7 @@ treat_dat %>%
 
 ```
 
-```{r no treat seek by gen feel better}
+```{r no treat seek by gen feel better,eval=FALSE}
 
 treat_dat %>%
   group_by(Gender) %>%
@@ -2610,7 +2674,7 @@ treat_dat %>%
 
 ```
 
-```{r no treat seek by dont feel bad}
+```{r no treat seek by dont feel bad,eval=FALSE}
 
 treat_dat %>%
   group_by(Gender) %>%
@@ -2618,7 +2682,7 @@ treat_dat %>%
 
 ```
 
-```{r no treat seek want it dont think its there}
+```{r no treat seek want it dont think its there,eval=FALSE}
 
 treat_dat %>%
   group_by(Gender) %>%
@@ -2626,7 +2690,7 @@ treat_dat %>%
 
 ```
 
-```{r no treat seek past bad experiences}
+```{r no treat seek past bad experiences,eval=FALSE}
 
 treat_dat %>%
   group_by(Gender) %>%
@@ -2634,7 +2698,7 @@ treat_dat %>%
 
 ```
 
-```{r no treat seek want it havent}
+```{r no treat seek want it havent,eval=FALSE}
 
 treat_dat %>%
   group_by(Gender) %>%
@@ -2643,7 +2707,7 @@ treat_dat %>%
 ```
 
 
-```{r no treat seek too busy}
+```{r no treat seek too busy,eval=FALSE}
 
 treat_dat %>%
   group_by(Gender) %>%
@@ -2651,7 +2715,7 @@ treat_dat %>%
 
 ```
 
-```{r no treat seek didnt know}
+```{r no treat seek didnt know,eval=FALSE}
 
 treat_dat %>%
   group_by(Gender) %>%
@@ -2659,7 +2723,7 @@ treat_dat %>%
 
 ```
 
-```{r no treat seek reasonNohelp_other}
+```{r no treat seek reasonNohelp_other,eval=FALSE}
 
 treat_dat %>%
   group_by(Gender) %>%
@@ -2671,26 +2735,26 @@ treat_dat %>%
 ### Frequency of different levels of helpfulness by treatment type (supported/client led) by wave by gender
 
 **For supported options**
-```{r check helpfulness by wave supported Gender}
+```{r check helpfulness by wave supported Gender,eval=FALSE}
 treat_dat %>%
   group_by(wave,Gender) %>%
   freq(Helpfulness_Supported)
 ```
 By sample
-```{r check helpfulness by wave supported by sample Gender}
+```{r check helpfulness by wave supported by sample Gender,eval=FALSE}
 treat_dat %>%
   group_by(wave,Sample,Gender) %>%
   freq(Helpfulness_Supported)
 ```
 
 **For  client led options**
-```{r check helpfulness by wave client led Gender}
+```{r check helpfulness by wave client led Gender,eval=FALSE}
 treat_dat %>%
   group_by(wave,Gender) %>%
   freq(Helpfulness_SelfGuided)
 ```
 By sample
-```{r check helpfulness by wave client led by sample Gender}
+```{r check helpfulness by wave client led by sample Gender,eval=FALSE}
 treat_dat %>%
   group_by(wave,Sample,Gender) %>%
   freq(Helpfulness_SelfGuided)
