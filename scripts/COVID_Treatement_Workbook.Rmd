@@ -1512,13 +1512,16 @@ treat_dat_received_plot <- long_prop_receipt %>%
      position = "stack"
     ) +
   coord_flip() +
-  labs(title = "Frequencies of treatment seeking and receipt", x = "Time point",  y = "Proportion of sample (%)") +
+  labs( x = "Time point",  y = "Proportion of sample (%)") +
   theme_personal +
   theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
   theme(legend.position = "top", legend.title = element_blank())  +
     scale_fill_manual(
     values = rev(COPINGpalette3)
-  ) + guides(fill=guide_legend(nrow=2,byrow=TRUE))
+  ) + 
+  theme(legend.text = element_text(size = 8)) +
+  theme(legend.key.size = unit(.25, "cm")) +
+  guides(fill=guide_legend(nrow=3,byrow=TRUE))
 treat_dat_received_plot
 
 #average treatment gap across waves
@@ -1599,14 +1602,16 @@ treat_dat_seek_count_plot <- long_prop_reasons %>%
      position = "stack"
     ) +
   coord_flip() +
-  labs(title = "Reasons for seeking treatment", x = "Time point",  y = "Proportion of sample (%)") +
+  labs( x = "Time point",  y = "Proportion of sample (%)") +
   theme_personal +
   theme(legend.position = "top") +
   theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
   theme(legend.title = element_blank()) +
+    theme(legend.text = element_text(size = 8)) +
+  theme(legend.key.size = unit(.25, "cm")) +
   scale_fill_manual(
     values = rev(RAMPworseGRADpalette)
-  ) + guides(fill=guide_legend(nrow=2,byrow=TRUE))
+  ) + guides(fill=guide_legend(nrow=4,byrow=TRUE))
 prop_reasons
 treat_dat_seek_count_plot
 
@@ -1646,7 +1651,7 @@ pie <- reorder_summary %>%
   scale_fill_manual(values = COPINGpalette4) +
   coord_polar("y",start=0) +
   theme_void() +
-  labs(title = "   Reasons for not seeking treatment", fill = "Category of reason") +
+  labs( fill = "Category of reason") +
   geom_text(aes(y = c((round(percent,digits=1))),
                 x = c(1.2,1.2,1.2,1.2),
                 label=paste0(round((percent),0),"%")),
@@ -1905,7 +1910,7 @@ treat_dat %>%
   group_by(wave,Sample) %>%
   freq(PreventHelp_Supported.Systemic)
 ```
-###*Plot overall reasons not recceived*
+###*Plot overall reasons not received*
 ```{r check barriers overall supported systemic}
 
 reason_not_received <- tibble(reason = c("Systemic","Client","Other"),`Self guided` = 1:3, `Supported` = 1:3)
@@ -1949,10 +1954,12 @@ treat_dat_not_received_plot <- long_percent_reasons_not_received %>%
       stat="identity",
      position = "stack"
     ) +
-  labs(title = "Reasons for treatment non-receipt", x = "Type of treatment",  y = "Proportion of responses (%)") +
+  theme(legend.position = "right", legend.title = element_blank())  +
+  labs(x = "Type of treatment",  y = "Proportion of responses (%)") +
   theme_personal +
-  coord_flip() +
   theme(legend.title = element_blank()) +
+  theme(legend.text = element_text(size = 8)) +
+  theme(legend.key.size = unit(.25, "cm")) +
   scale_fill_manual(
     values = rev(COPINGpalette3)
   ) 
@@ -2250,6 +2257,16 @@ helpfulness$labels <- helpful_attritbutes$row.names
 
 helpfulness <- helpfulness[,c(3:5)]
 
+#output helpfulness data
+helpfulness
+
+#at least 'somewhat' helpful 
+#self-guided
+sum(helpfulness$`Self guided`[5:7])
+#supported
+sum(helpfulness$Supported[5:7])
+
+#format for plot
 long_helpfulness <-  helpfulness %>%
 pivot_longer(!labels, names_to = "Type", values_to = "n")
 
@@ -2264,10 +2281,12 @@ helpfulness_plot <- long_helpfulness %>%
       stat="identity",
      position = "stack"
     ) +
-  labs(title = "Helpfulness", x = "Type of treatment",  y = "Proportion of responses (%)") +
+  theme(legend.position = "right", legend.title = element_blank())  +
+  labs( x = "Type of treatment",  y = "Proportion of responses (%)") +
   theme_personal +
-  coord_flip() +
   theme(legend.title = element_blank()) +
+  theme(legend.text = element_text(size = 8)) +
+  theme(legend.key.size = unit(.25, "cm")) +
   scale_fill_manual(
     values = (RAMPlikertpalette)
   ) 
@@ -2296,8 +2315,6 @@ treat_dat <- full_join(treat_dat,demgen)
 
 
 ### Treatment seeking rates by Gender
-
-
 ```{r treatment seeking freq by gender}
 
 treat_sought <- treat_dat %>%
@@ -2386,8 +2403,8 @@ reason_not_received_percent_nbsd
 
 
 ```
-###**Chi square test Gender by Type of treatment sought**
-```{r treatment sought supported vs. self-guided}
+###**Chi square test Gender by Type of treatment sought --- FIX THIS**
+```{r treatment sought supported vs. self-guided, eval=FALSE}
 tx_supported <- treat_dat %>%
   group_by(Gender) %>%
   count(TypeSought.Supported.Any)
@@ -2397,8 +2414,8 @@ tx_selfguided <- treat_dat %>%
   count(TypeSought.SelfGuide.Any)
 
 #summarise to just male-female for chi-square
-tx_supported_mf <- tx_supported[c(10:11,13:14),]
-tx_selfguided_mf <- tx_selfguided[c(10:11,13:14),]
+tx_supported_mf <- tx_supported[c(9:10,12:13),]
+tx_selfguided_mf <- tx_selfguided[c(9:10,12:13),]
 
 tx_prop_mf <- tx_supported_mf[1]
 tx_prop_mf[1,2] <- "Supported"
@@ -2910,28 +2927,23 @@ treat_dat %>%
 ```
 
 ## *Multi-panel plot*
-```{r multi-panel plot graphs together}
-p1 <- ggarrange(treat_dat_received_plot,treat_dat_seek_count_plot,
-          labels = c("A","B"),
-          ncol = 2, nrow =1)
+```{r multi-panel plot graphs together, fig.height=10,fig.width=7.8}
+p1 <- ggarrange(NULL,NULL,treat_dat_received_plot,treat_dat_seek_count_plot,
+          labels = c("A: Treatment seeking","B: Reasons for seeking treatment","",""),hjust = 0,
+          ncol = 2, nrow =2,heights=c(.1,1))
   
-p2 <- ggarrange(pie, treat_dat_not_received_plot,
-          labels = c("C","D"),
-          ncol = 2, nrow =1)
-
-p3 <- ggarrange(helpfulness_plot,
-          labels = c("E"),
+p2 <- ggarrange(pie, 
+          labels = c("C: Reasons for not seeking treatment"),hjust = 0,vjust=1,
           ncol = 1, nrow =1)
 
-ggarrange(p1,p2,p3,ncol=1,nrow=3)
+p3 <- ggarrange(NULL,NULL,treat_dat_not_received_plot, helpfulness_plot,
+          labels = c("D: Reasons for not receiving treatment","E: Treatment helpfulness","",""),hjust = 0,
+          ncol = 2, nrow =2,widths=c(.95,1.05),heights=c(.1,1))
 
+multiplot <- ggarrange(p1,NULL,p2,NULL,p3,ncol=1,nrow=5,heights = c(1,.05,1,.05,1))
 
-#treat_dat_count_by_sample_plot
-#treat_dat_received_plot
-#treat_dat_seek_count_plot
-#pie
-#treat_dat_not_received_plot
-#helpfulness_plot
+multiplot
+
 ```
 
 ## Geographic
