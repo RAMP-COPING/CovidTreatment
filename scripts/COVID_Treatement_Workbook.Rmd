@@ -1442,6 +1442,12 @@ treat_dat_seek_count$prop_responders <- treat_dat_seek_count$`1` / treat_dat_see
 
 treat_dat_seek_count
 
+#Overall number of reports
+sum(treat_dat_seek_count$`1`)/sum(treat_dat_seek_count$total_responders)
+
+#Overall proportion of treatment seekers
+mean(treat_dat_seek_count$prop_responders)
+
 ```
 
 ```{r plot treatment seeking rates per wave}
@@ -1480,7 +1486,7 @@ treat_dat_gap_count$total_sought <- treat_dat_seek_count$`1`
 treat_dat_gap_count$prop_received <- treat_dat_gap_count$`1` / treat_dat_gap_count$total_sought*100
 treat_dat_gap_count$prop_gap <- 100-treat_dat_gap_count$prop_received
 
-combined_seek_gap_plot <- treat_dat_gap_count[,c(1,5:7)]
+combined_seek_gap_plot <- treat_dat_gap_count[,c(1,4:6)]
 combined_seek_gap_plot$prop_seek <- treat_dat_seek_count$prop_responders
 combined_seek_gap_plot$`Treatment sought and received` <- (combined_seek_gap_plot$prop_seek/100*combined_seek_gap_plot$prop_received/100)*100
 combined_seek_gap_plot$`Treatment sought but not received` <- (combined_seek_gap_plot$prop_seek/100*combined_seek_gap_plot$prop_gap/100)*100
@@ -1515,6 +1521,16 @@ treat_dat_received_plot <- long_prop_receipt %>%
   ) + guides(fill=guide_legend(nrow=2,byrow=TRUE))
 treat_dat_received_plot
 
+#average treatment gap across waves
+mean(treat_dat_gap_count$prop_gap)
+
+#rates of treatment gap by source type
+
+#supported
+(1-sum(treat_dat$TypeReceived.Supported.total,na.rm=TRUE)/sum(treat_dat$TypeSought.Supported.total,na.rm=TRUE))*100
+
+#self-guided
+(1-sum(treat_dat$TypeReceived.SelfGuided.total,na.rm=TRUE)/sum(treat_dat$TypeSought.SelfGuided.total,na.rm=TRUE))*100
 
 ```
 
@@ -1655,7 +1671,7 @@ tx_supported_by_wave <- treat_dat %>%
 
 supported_count <- pivot_wider(tx_supported_by_wave, names_from = TypeSought.Supported.Any, values_from = n) 
 
-supported_count <- supported_count[-c(1,9),]
+supported_count <- supported_count[-c(7),]
 supported_count
 ```
 By sample
@@ -1674,8 +1690,25 @@ tx_selfguided_by_wave <- treat_dat %>%
 
 selfguided_count <- pivot_wider(tx_selfguided_by_wave, names_from = TypeSought.SelfGuide.Any, values_from = n) 
 
-selfguided_count <- selfguided_count[-c(1,9),]
+selfguided_count <- selfguided_count[-c(7),]
 selfguided_count
+
+```
+
+**COMPARISON of FREQ of support type**
+```{r comparison of source type}
+total_n_supported <- sum(supported_count$`Sought Supported`)
+total_n_selfguided <- sum(selfguided_count$`Sought Self-guided`)
+
+#total supported
+total_n_supported
+#as %
+total_n_supported / (total_n_supported+total_n_selfguided)*100
+
+#total self-guided
+total_n_selfguided
+#as %
+total_n_selfguided / (total_n_supported+total_n_selfguided)*100
 
 ```
 
@@ -1891,6 +1924,16 @@ reason_not_received_percent <- reason_not_received[,1:3]
 
 reason_not_received_percent$`Self guided` <- reason_not_received$`Self guided` / self_guided_total*100
 reason_not_received_percent$`Supported` <- reason_not_received$`Supported` / supported_total*100
+
+#Output table of reasons not received overall
+reason_not_received_overall <- reason_not_received[,1]
+reason_not_received_overall$n <- reason_not_received$`Self guided` + reason_not_received$Supported
+reason_not_received_overall$percent <- reason_not_received_overall$n/sum(reason_not_received_overall$n)*100
+
+reason_not_received_overall
+
+#Output table of reasons not received by source
+reason_not_received_percent
 
 long_percent_reasons_not_received <-  reason_not_received_percent %>%
 pivot_longer(!reason, names_to = "Type", values_to = "n")
