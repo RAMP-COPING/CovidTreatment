@@ -1960,6 +1960,7 @@ treat_dat_not_received_plot
 
 ```
 
+
 **Client-level**
 ```{r check barriers by wave supported client level, eval=FALSE}
 treat_dat %>%
@@ -2297,11 +2298,92 @@ treat_dat <- full_join(treat_dat,demgen)
 ### Treatment seeking rates by Gender
 
 
-```{r treatment seeking freq by wave gender, eval=FALSE}
+```{r treatment seeking freq by gender}
 
-treat_dat %>%
-  group_by(wave,Gender) %>%
-  freq(soughthelp_for_self)
+treat_sought <- treat_dat %>%
+  group_by(Gender) %>%
+  count(soughthelp_for_self)
+
+#summarise to just male-female for chi-square
+tx_sought_mf <- treat_sought[c(10:11,13:14),]
+
+wide_tx_sought_mf <- tx_sought_mf %>%
+  pivot_wider(id_cols = Gender, names_from = soughthelp_for_self, values_from = n)
+
+tx_sought_gender_chisq <- chisq.test(wide_tx_sought_mf[-1])
+tx_sought_gender_chisq$p.value
+
+tx_sought_gender_chisq
+
+#as proportions
+wide_tx_sought_mf$prop_sought <- wide_tx_sought_mf$`1`/(wide_tx_sought_mf$`1` + wide_tx_sought_mf$`0`)*100
+wide_tx_sought_mf$prop_not_sought <- wide_tx_sought_mf$`0`/(wide_tx_sought_mf$`1` + wide_tx_sought_mf$`0`)*100
+
+wide_tx_sought_mf
+
+#N for chisq test
+sum(wide_tx_sought_mf$`0`) + sum(wide_tx_sought_mf$`1`)
+```
+
+###*Summary reasons not received - BY GENDER*
+```{r reasons not received - by gender}
+
+reason_not_received_female <- tibble(reason = c("Systemic","Client","Other"), `Self guided` = 1:3, `Supported` = 1:3)
+
+reason_not_received_male <- tibble(reason = c("Systemic","Client","Other"), `Self guided` = 1:3, `Supported` = 1:3)
+
+reason_not_received_nbsd <- tibble(reason = c("Systemic","Client","Other"), `Self guided` = 1:3, `Supported` = 1:3)
+
+female_treat_dat <- filter(treat_dat, Gender == "Female")
+male_treat_dat <- filter(treat_dat, Gender == "Male")
+nbsd_treat_dat <- filter(treat_dat, Gender == "Non-binary" | Gender == "Prefer to self define")
+
+reason_not_received_female[1,2] <- sum(female_treat_dat$PreventHelp_SelfGuided.Systemic==1,na.rm=TRUE)
+reason_not_received_female[2,2] <- sum(female_treat_dat$PreventHelp_SelfGuided.Client==1,na.rm=TRUE)
+reason_not_received_female[3,2] <- sum(female_treat_dat$PreventHelp_SelfGuided.Other==1,na.rm=TRUE)
+reason_not_received_female[1,3] <- sum(female_treat_dat$PreventHelp_Supported.Systemic==1,na.rm=TRUE)
+reason_not_received_female[2,3] <- sum(female_treat_dat$PreventHelp_Supported.Client==1,na.rm=TRUE)
+reason_not_received_female[3,3] <- sum(female_treat_dat$PreventHelp_Supported.Other==1,na.rm=TRUE)
+
+reason_not_received_male[1,2] <- sum(male_treat_dat$PreventHelp_SelfGuided.Systemic==1,na.rm=TRUE)
+reason_not_received_male[2,2] <- sum(male_treat_dat$PreventHelp_SelfGuided.Client==1,na.rm=TRUE)
+reason_not_received_male[3,2] <- sum(male_treat_dat$PreventHelp_SelfGuided.Other==1,na.rm=TRUE)
+reason_not_received_male[1,3] <- sum(male_treat_dat$PreventHelp_Supported.Systemic==1,na.rm=TRUE)
+reason_not_received_male[2,3] <- sum(male_treat_dat$PreventHelp_Supported.Client==1,na.rm=TRUE)
+reason_not_received_male[3,3] <- sum(male_treat_dat$PreventHelp_Supported.Other==1,na.rm=TRUE)
+
+reason_not_received_nbsd[1,2] <- sum(nbsd_treat_dat$PreventHelp_SelfGuided.Systemic==1,na.rm=TRUE)
+reason_not_received_nbsd[2,2] <- sum(nbsd_treat_dat$PreventHelp_SelfGuided.Client==1,na.rm=TRUE)
+reason_not_received_nbsd[3,2] <- sum(nbsd_treat_dat$PreventHelp_SelfGuided.Other==1,na.rm=TRUE)
+reason_not_received_nbsd[1,3] <- sum(nbsd_treat_dat$PreventHelp_Supported.Systemic==1,na.rm=TRUE)
+reason_not_received_nbsd[2,3] <- sum(nbsd_treat_dat$PreventHelp_Supported.Client==1,na.rm=TRUE)
+reason_not_received_nbsd[3,3] <- sum(nbsd_treat_dat$PreventHelp_Supported.Other==1,na.rm=TRUE)
+
+self_guided_total_female <- sum(reason_not_received_female$`Self guided`)
+supported_total_female <- sum(reason_not_received_female$`Supported`)
+self_guided_total_male <- sum(reason_not_received_male$`Self guided`)
+supported_total_male <- sum(reason_not_received_male$`Supported`)
+self_guided_total_nbsd <- sum(reason_not_received_nbsd$`Self guided`)
+supported_total_nbsd <- sum(reason_not_received_nbsd$`Supported`)
+
+reason_not_received_percent_female <- reason_not_received_female[,1:3]
+reason_not_received_percent_male <- reason_not_received_male[,1:3]
+reason_not_received_percent_nbsd <- reason_not_received_nbsd[,1:3]
+
+reason_not_received_percent_female$`Self guided` <- reason_not_received_percent_female$`Self guided` / self_guided_total_female*100
+reason_not_received_percent_female$`Supported` <- reason_not_received_female$`Supported` / supported_total_female*100
+
+reason_not_received_percent_male$`Self guided` <- reason_not_received_percent_male$`Self guided` / self_guided_total_male*100
+reason_not_received_percent_male$`Supported` <- reason_not_received_male$`Supported` / supported_total_male*100
+
+reason_not_received_percent_nbsd$`Self guided` <- reason_not_received_percent_nbsd$`Self guided` / self_guided_total_nbsd*100
+reason_not_received_percent_nbsd$`Supported` <- reason_not_received_nbsd$`Supported` / supported_total_nbsd*100
+
+
+reason_not_received_percent_female
+reason_not_received_percent_male
+reason_not_received_percent_nbsd
+
 
 ```
 ###**Chi square test Gender by Type of treatment sought**
@@ -2348,6 +2430,9 @@ wide_tx_prop_mf$prop_supported <- wide_tx_prop_mf$Supported/(wide_tx_prop_mf$`Se
 wide_tx_prop_mf$prop_selfguided <- wide_tx_prop_mf$`Self guided`/(wide_tx_prop_mf$`Self guided` + wide_tx_prop_mf$Supported)
 
 wide_tx_prop_mf
+
+#N for chisq test
+sum(wide_tx_prop_mf$Supported) + sum(wide_tx_prop_mf$`Self guided`)
 
 ```
 
@@ -2415,6 +2500,9 @@ treat_dat_gap_gender$prop_received <- treat_dat_gap_gender$`n received`/(treat_d
 treat_dat_gap_gender$prop_not_received <- treat_dat_gap_gender$`n not received`/(treat_dat_gap_gender$`n received`+treat_dat_gap_gender$`n not received`)
 
 treat_dat_gap_gender
+
+#N for chisq test
+sum(treat_dat_gap_gender$`n received`) + sum(treat_dat_gap_gender$`n not received`)
 ```
 By sample
 
