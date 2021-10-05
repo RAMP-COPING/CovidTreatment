@@ -2531,11 +2531,100 @@ reason_not_received_percent_nbsd$`Supported` <- reason_not_received_nbsd$`Suppor
 reason_not_received_percent_female
 reason_not_received_percent_male
 reason_not_received_percent_nbsd
+```
 
+###**Chi square test Gender by reasons for not receiving treatment**
+```{r treatment received by gender - supported and self-guided}
+#supported
+reason_not_received_supported <- tibble(reason = c("Systemic","Client","Other"), `Male` = 1:3, `Female` = 1:3)
+reason_not_received_supported$Male <- reason_not_received_male$Supported
+reason_not_received_supported$Female <- reason_not_received_female$Supported
+
+reasons_gender_supported <- as.data.frame(reason_not_received_supported)
+
+reasons_gender_supported_chisq <- chisq.test(reasons_gender_supported[-1])
+reasons_gender_supported_chisq$p.value
+
+reasons_gender_supported_chisq
+
+#N for chisq test
+sum(reasons_gender_supported$Male) + sum(reasons_gender_supported$Female)
+
+#as percentages
+total_male_supported <- sum(reasons_gender_supported$Male)
+total_female_supported <- sum(reasons_gender_supported$Female)
+
+reasons_gender_supported$Male_prop <- reasons_gender_supported$Male/total_male_supported*100
+reasons_gender_supported$Female_prop <- reasons_gender_supported$Female/total_female_supported*100
+
+
+#selfguided
+reason_not_received_sg <- tibble(reason = c("Systemic","Client","Other"), `Male` = 1:3, `Female` = 1:3)
+reason_not_received_sg$Male <- reason_not_received_male$`Self guided`
+reason_not_received_sg$Female <- reason_not_received_female$`Self guided`
+
+reasons_gender_sg <- as.data.frame(reason_not_received_sg)
+
+reasons_gender_sg_chisq <- chisq.test(reasons_gender_sg[-1])
+reasons_gender_sg_chisq$p.value
+
+reasons_gender_sg_chisq
+
+#N for chisq test
+sum(reasons_gender_sg$Male) + sum(reasons_gender_sg$Female)
+
+#as percentages
+total_male_sg <- sum(reasons_gender_sg$Male)
+total_female_sg <- sum(reasons_gender_sg$Female)
+
+reasons_gender_sg$Male_prop <- reasons_gender_sg$Male/total_male_sg*100
+reasons_gender_sg$Female_prop <- reasons_gender_sg$Female/total_female_sg*100
 
 ```
-###**Chi square test Gender by Type of treatment sought --- FIX THIS**
-```{r treatment sought supported vs. self-guided, eval=FALSE}
+###**Plot Gender by reasons for not receiving treatment**
+```{r PLOT treatment received by gender - supported and self-guided}
+reasons_gender_treatment <- tibble(reason = c("Systemic","Client","Other","Systemic","Client","Other"),source=c("Supported","Supported","Supported","Self-guided","Self-guided","Self-guided"), `Male` = 1:6, `Female` = 1:6)
+
+reasons_gender_treatment$Male[1:3] <- reasons_gender_supported$Male_prop
+reasons_gender_treatment$Male[4:6] <- reasons_gender_sg$Male_prop
+reasons_gender_treatment$Female[1:3] <- reasons_gender_supported$Female_prop
+reasons_gender_treatment$Female[4:6] <- reasons_gender_sg$Female_prop
+
+long_reasons_gender_treatment <-  reasons_gender_treatment %>%
+pivot_longer(cols = Male:Female, names_to = "Gender", values_to = "prop")
+
+long_reasons_gender_treatment$reason <- as.factor(long_reasons_gender_treatment$reason)
+
+long_reasons_gender_treatment$reason <- factor(long_reasons_gender_treatment$reason, levels = c("Other","Client","Systemic"),ordered = TRUE)
+
+long_reasons_gender_treatment$source <- factor(long_reasons_gender_treatment$source, levels = c("Supported","Self-guided"),ordered = TRUE)
+
+long_reasons_gender_treatment$Gender <- factor(long_reasons_gender_treatment$Gender, levels = c("Male","Female"),ordered = TRUE)
+
+
+long_reasons_gender_treatment_plot <- long_reasons_gender_treatment %>%
+  ggplot(mapping = aes(Gender, prop, fill = reason)
+    ) +
+    geom_bar(aes(),
+      stat="identity",
+     position = "stack"
+    ) +
+  theme(legend.position = "right", legend.title = element_blank())  +
+  labs(x = "Type of treatment",  y = "Proportion of responses (%)") +
+  theme_personal +
+  theme(legend.title = element_blank()) +
+  theme(legend.text = element_text(size = 8)) +
+  theme(legend.key.size = unit(.25, "cm")) +
+  coord_flip() +
+  facet_grid(source ~ .) +
+  scale_fill_manual(
+    values = rev(COPINGpalette3)
+  ) 
+long_reasons_gender_treatment_plot
+
+```
+###**Chi square test Gender by Type of treatment sought**
+```{r treatment sought supported vs. self-guided}
 tx_supported <- treat_dat %>%
   group_by(Gender) %>%
   count(TypeSought.Supported.Any)
@@ -2545,8 +2634,8 @@ tx_selfguided <- treat_dat %>%
   count(TypeSought.SelfGuide.Any)
 
 #summarise to just male-female for chi-square
-tx_supported_mf <- tx_supported[c(9:10,12:13),]
-tx_selfguided_mf <- tx_selfguided[c(9:10,12:13),]
+tx_supported_mf <- tx_supported[c(10:11,13:14),]
+tx_selfguided_mf <- tx_selfguided[c(10:11,13:14),]
 
 tx_prop_mf <- tx_supported_mf[1]
 tx_prop_mf[1,2] <- "Supported"
