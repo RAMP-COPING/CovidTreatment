@@ -1486,6 +1486,48 @@ treat_dat_gap_count$total_sought <- treat_dat_seek_count$`1`
 treat_dat_gap_count$prop_received <- treat_dat_gap_count$`1` / treat_dat_gap_count$total_sought*100
 treat_dat_gap_count$prop_gap <- 100-treat_dat_gap_count$prop_received
 
+count_seek_gap_plot <- treat_dat_gap_count[,c(1,5:6)]
+colnames(count_seek_gap_plot)[2] <- "Received"
+colnames(count_seek_gap_plot)[3] <- "Not received"
+
+count_seek_gap_plot
+#mean treatment gap (as proportion of those seeking)
+mean(count_seek_gap_plot$`Not received`)
+sd(count_seek_gap_plot$`Not received`)
+
+long_n_receipt <- count_seek_gap_plot %>%
+  pivot_longer(!wave, names_to = "received",values_to = "percent")
+
+long_n_receipt$received <- as.factor(long_n_receipt$received)
+
+long_n_receipt$received <- factor(long_n_receipt$received, levels=c("Not received","Received"), ordered=TRUE)
+
+long_n_receipt$wave <-factor(long_n_receipt$wave,levels=c("December 2020","November 2020","October 2020","September 2020","August 2020","July 2020"),ordered=TRUE)
+  
+treat_dat_received_plot <- long_n_receipt %>%
+  ggplot(mapping = aes(wave, percent, fill = received)
+    ) +
+    geom_bar(aes(),
+      stat="identity",
+     position = "stack"
+    ) +
+  coord_flip() +
+  labs( x = "Time point",  y = "Proportion of sample (%)") +
+  theme_personal +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+  theme(legend.position = "top", legend.title = element_blank())  +
+    scale_fill_manual(
+    values = rev(COPINGpalette2)
+  ) + 
+  theme(legend.text = element_text(size = 8)) +
+  theme(legend.key.size = unit(.25, "cm")) +
+  guides(fill=guide_legend(nrow=3,byrow=TRUE))
+
+treat_dat_received_plot
+
+```
+
+```{r plot treatment not received if sought - legacy,eval=FALSE}
 combined_seek_gap_plot <- treat_dat_gap_count[,c(1,4:6)]
 combined_seek_gap_plot$prop_seek <- treat_dat_seek_count$prop_responders
 combined_seek_gap_plot$`Treatment sought and received` <- (combined_seek_gap_plot$prop_seek/100*combined_seek_gap_plot$prop_received/100)*100
@@ -1493,9 +1535,9 @@ combined_seek_gap_plot$`Treatment sought but not received` <- (combined_seek_gap
 combined_seek_gap_plot$`Treatment not sought` <- 100-(combined_seek_gap_plot$`Treatment sought and received`+combined_seek_gap_plot$`Treatment sought but not received`)
   
 #summary values per wave
-combined_seek_gap_plot[,c(1,6:8)]
+combined_seek_gap_plot[,c(1,6:7)]
 
-long_prop_receipt <- combined_seek_gap_plot[,c(1,6:8)] %>%
+long_prop_receipt <- combined_seek_gap_plot[,c(1,6:7)] %>%
   pivot_longer(!wave, names_to = "received",values_to = "percent")
 
 long_prop_receipt$received <- as.factor(long_prop_receipt$received)
@@ -1967,7 +2009,96 @@ treat_dat_not_received_plot
 
 ```
 
+###*Plot reasons not received by source*
+```{r Plot reasons not received by source,fig.height=3,fig.width=7}
 
+reason_not_received_by_source <- tibble(source = c("Emergency mental health team","Existing mental health team", "GP","Online talk therapy","NHS 111","Non NHS phone","Government website","Non-government website","Online self-therapy","Structured therapeutic activity","Other"),`Systemic` = 1:11, `Client` = 1:11,`Other` = 1:11)
+
+reason_not_received_by_source[1,2] <- sum(treat_dat$preventhelp_emergency_mh=="Systemic",na.rm=TRUE)
+reason_not_received_by_source[1,3] <- sum(treat_dat$preventhelp_emergency_mh=="Client-level",na.rm=TRUE)
+reason_not_received_by_source[1,4] <- sum(treat_dat$preventhelp_emergency_mh=="Other",na.rm=TRUE)
+
+reason_not_received_by_source[2,2] <- sum(treat_dat$preventhelp_existing_mh_team=="Systemic",na.rm=TRUE)
+reason_not_received_by_source[2,3] <- sum(treat_dat$preventhelp_existing_mh_team=="Client-level",na.rm=TRUE)
+reason_not_received_by_source[2,4] <- sum(treat_dat$preventhelp_existing_mh_team=="Other",na.rm=TRUE)
+
+reason_not_received_by_source[3,2] <- sum(treat_dat$preventhelp_gp=="Systemic",na.rm=TRUE)
+reason_not_received_by_source[3,3] <- sum(treat_dat$preventhelp_gp=="Client-level",na.rm=TRUE)
+reason_not_received_by_source[3,4] <- sum(treat_dat$preventhelp_gp=="Other",na.rm=TRUE)
+
+reason_not_received_by_source[4,2] <- sum(treat_dat$preventhelp_online_talk_therapy=="Systemic",na.rm=TRUE)
+reason_not_received_by_source[4,3] <- sum(treat_dat$preventhelp_online_talk_therapy=="Client-level",na.rm=TRUE)
+reason_not_received_by_source[4,4] <- sum(treat_dat$preventhelp_online_talk_therapy=="Other",na.rm=TRUE)
+
+reason_not_received_by_source[5,2] <- sum(treat_dat$preventhelp_nhs_111=="Systemic",na.rm=TRUE)
+reason_not_received_by_source[5,3] <- sum(treat_dat$preventhelp_nhs_111=="Client-level",na.rm=TRUE)
+reason_not_received_by_source[5,4] <- sum(treat_dat$preventhelp_nhs_111=="Other",na.rm=TRUE)
+
+reason_not_received_by_source[6,2] <- sum(treat_dat$preventhelp_nonnhs_phone=="Systemic",na.rm=TRUE)
+reason_not_received_by_source[6,3] <- sum(treat_dat$preventhelp_nonnhs_phone=="Client-level",na.rm=TRUE)
+reason_not_received_by_source[6,4] <- sum(treat_dat$preventhelp_nonnhs_phone=="Other",na.rm=TRUE)
+
+reason_not_received_by_source[7,2] <- sum(treat_dat$preventhelp_gov_website=="Systemic",na.rm=TRUE)
+reason_not_received_by_source[7,3] <- sum(treat_dat$preventhelp_gov_website=="Client-level",na.rm=TRUE)
+reason_not_received_by_source[7,4] <- sum(treat_dat$preventhelp_gov_website=="Other",na.rm=TRUE)
+
+reason_not_received_by_source[8,2] <- sum(treat_dat$preventhelp_nongov_website=="Systemic",na.rm=TRUE)
+reason_not_received_by_source[8,3] <- sum(treat_dat$preventhelp_nongov_website=="Client-level",na.rm=TRUE)
+reason_not_received_by_source[8,4] <- sum(treat_dat$preventhelp_nongov_website=="Other",na.rm=TRUE)
+
+reason_not_received_by_source[9,2] <- sum(treat_dat$preventhelp_online_self_therapy=="Systemic",na.rm=TRUE)
+reason_not_received_by_source[9,3] <- sum(treat_dat$preventhelp_online_self_therapy=="Client-level",na.rm=TRUE)
+reason_not_received_by_source[9,4] <- sum(treat_dat$preventhelp_online_self_therapy=="Other",na.rm=TRUE)
+
+reason_not_received_by_source[10,2] <- sum(treat_dat$preventhelp_struc_therapy=="Systemic",na.rm=TRUE)
+reason_not_received_by_source[10,3] <- sum(treat_dat$preventhelp_struc_therapy=="Client-level",na.rm=TRUE)
+reason_not_received_by_source[10,4] <- sum(treat_dat$preventhelp_struc_therapy=="Other",na.rm=TRUE)
+
+reason_not_received_by_source[11,2] <- sum(treat_dat$preventhelp_other=="Systemic",na.rm=TRUE)
+reason_not_received_by_source[11,3] <- sum(treat_dat$preventhelp_other=="Client-level",na.rm=TRUE)
+reason_not_received_by_source[11,4] <- sum(treat_dat$preventhelp_other=="Other",na.rm=TRUE)
+
+reason_not_received_by_source$total <- reason_not_received_by_source$Systemic + reason_not_received_by_source$Client + reason_not_received_by_source$Other
+
+reason_not_received_by_source_percent <- reason_not_received_by_source[,1:4]
+
+reason_not_received_by_source_percent$Systemic <- reason_not_received_by_source$Systemic / reason_not_received_by_source$total*100
+reason_not_received_by_source_percent$Client <- reason_not_received_by_source$Client / reason_not_received_by_source$total*100
+reason_not_received_by_source_percent$Other <- reason_not_received_by_source$Other / reason_not_received_by_source$total*100
+
+reason_not_received_by_source
+reason_not_received_by_source_percent
+
+#format for plot
+long_reason_not_received_by_source_percent <-  reason_not_received_by_source_percent %>%
+pivot_longer(!source, names_to = "reason", values_to = "percent")
+
+long_reason_not_received_by_source_percent$source <- as.factor(long_reason_not_received_by_source_percent$source)
+
+long_reason_not_received_by_source_percent$reason <- factor(long_reason_not_received_by_source_percent$reason, levels=c("Other","Client","Systemic"), ordered=TRUE)
+
+long_reason_not_received_by_source_percent$source <- factor(long_reason_not_received_by_source_percent$source,levels=c("Other","Structured therapeutic activity","Online self-therapy","Non-government website","Government website","Non NHS phone","NHS 111","Online talk therapy","GP","Existing mental health team","Emergency mental health team"), ordered = TRUE)
+
+treat_dat_not_received_by_source_plot <- long_reason_not_received_by_source_percent %>%
+  ggplot(mapping = aes(source, percent, fill = reason)
+    ) +
+    geom_bar(aes(),
+      stat="identity",
+     position = "stack"
+    ) +
+  coord_flip() +
+  theme(legend.position = "right", legend.title = element_blank())  +
+  labs(x = "Type of treatment",  y = "Proportion of responses (%)") +
+  theme_personal +
+  theme(legend.title = element_blank()) +
+  theme(legend.text = element_text(size = 8)) +
+  theme(legend.key.size = unit(.25, "cm")) +
+  scale_fill_manual(
+    values = rev(COPINGpalette3)
+  ) 
+treat_dat_not_received_by_source_plot
+
+```
 **Client-level**
 ```{r check barriers by wave supported client level, eval=FALSE}
 treat_dat %>%
@@ -2928,8 +3059,9 @@ treat_dat %>%
 
 ## *Multi-panel plot*
 ```{r multi-panel plot graphs together, fig.height=10,fig.width=7.8}
+
 p1 <- ggarrange(NULL,NULL,treat_dat_received_plot,treat_dat_seek_count_plot,
-          labels = c("A: Treatment seeking","B: Reasons for seeking treatment","",""),hjust = 0,
+          labels = c("A: Treatment *seeking*","B: Reasons for seeking treatment","",""),hjust = 0,
           ncol = 2, nrow =2,heights=c(.1,1))
   
 p2 <- ggarrange(pie, 
