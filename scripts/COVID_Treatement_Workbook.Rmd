@@ -2636,6 +2636,23 @@ tx_selfguided <- treat_dat %>%
 #summarise to just male-female for chi-square
 tx_supported_mf <- tx_supported[c(10:11,13:14),]
 tx_selfguided_mf <- tx_selfguided[c(10:11,13:14),]
+#compare nbsd
+tx_supported_nbsd <- tx_supported[c(16:17,19:20),]
+tx_selfguided_nbsd <- tx_selfguided[c(16:17,19:20),]
+
+tx_supported_nbsd <- pivot_wider(tx_supported_nbsd,names_from = TypeSought.Supported.Any, values_from = n)
+total_supported_nbsd <- sum(tx_supported_nbsd$`Sought Supported`)
+
+tx_selfguided_nbsd <- pivot_wider(tx_selfguided_nbsd,names_from = TypeSought.SelfGuide.Any, values_from = n)
+total_selfguided_nbsd <- sum(tx_selfguided_nbsd$`Sought Self-guided`)
+
+#prop_sought_supported_nbsd
+print("prop_sought_supported_nbsd: ")
+total_supported_nbsd/(total_supported_nbsd+total_selfguided_nbsd)*100 
+
+#prop_sought_selfguided_nbsd
+print("prop_sought_selfguided_nbsd: ")
+total_selfguided_nbsd/(total_supported_nbsd+total_selfguided_nbsd)*100 
 
 tx_prop_mf <- tx_supported_mf[1]
 tx_prop_mf[1,2] <- "Supported"
@@ -2658,7 +2675,6 @@ wide_tx_prop_mf <- wide_tx_prop_mf %>%
   as.data.frame()
 
 tx_gender_chisq <- chisq.test(wide_tx_prop_mf[-1])
-tx_gender_chisq$p.value
 
 tx_gender_chisq
 
@@ -2670,6 +2686,35 @@ wide_tx_prop_mf
 
 #N for chisq test
 sum(wide_tx_prop_mf$Supported) + sum(wide_tx_prop_mf$`Self guided`)
+```
+###**Plot Gender by Type of treatment sought**
+```{r Plot treatment sought supported vs. self-guided}
+
+percent_treatment_type_gender <- wide_tx_prop_mf[,c(1,4:5)]
+colnames(percent_treatment_type_gender)[2] <- "Supported"
+colnames(percent_treatment_type_gender)[3] <- "Self-guided"
+percent_treatment_type_gender <- percent_treatment_type_gender %>%  pivot_longer(!Gender,names_to="type",values_to = "percent")
+percent_treatment_type_gender$percent <- percent_treatment_type_gender$percent*100
+
+percent_treatment_type_gender_plot <- percent_treatment_type_gender %>%
+  ggplot(mapping = aes(Gender, percent, fill = type)
+    ) +
+    geom_bar(aes(),
+      stat="identity",
+     position = "stack"
+    ) +
+  labs( x = "Gender",  y = "Proportion of sample (%)") +
+  theme_personal +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+  theme(legend.position = "top", legend.title = element_blank())  +
+    scale_fill_manual(
+    values = rev(COPINGpalette2)
+  ) + 
+  theme(legend.text = element_text(size = 8)) +
+  theme(legend.key.size = unit(.25, "cm")) +
+  guides(fill=guide_legend(nrow=3,byrow=TRUE))
+
+percent_treatment_type_gender_plot
 
 ```
 
@@ -2688,6 +2733,27 @@ treat_dat_gap_gender <- treat_dat %>%
 treat_dat_seek_gender <- pivot_wider(treat_dat_seek_gender, names_from = soughthelp_for_self, values_from = n) 
 treat_dat_gap_gender <- pivot_wider(treat_dat_gap_gender, names_from = AnyReceived, values_from = n) 
 
+#extract nbsd
+treat_dat_seek_nbsd <- tibble(sought = 1)
+treat_dat_gap_nbsd <- tibble(received = 1)
+
+treat_dat_seek_nbsd$sought <- sum(treat_dat_seek_gender$`1`[6:7])
+treat_dat_seek_nbsd$not_sought <- sum(treat_dat_seek_gender$`0`[6:7])
+
+treat_dat_gap_nbsd$received <- sum(treat_dat_gap_gender$`1`[6:7])
+treat_dat_gap_nbsd$not_received <- treat_dat_seek_nbsd$sought - treat_dat_gap_nbsd$received
+
+#as proportions
+treat_dat_seek_nbsd$prop_sought <- treat_dat_seek_nbsd$sought/(treat_dat_seek_nbsd$sought+treat_dat_seek_nbsd$not_sought)*100
+treat_dat_seek_nbsd$prop_not_sought <- treat_dat_seek_nbsd$not_sought/(treat_dat_seek_nbsd$sought+treat_dat_seek_nbsd$not_sought)*100
+print("Proportion of NB-SD gender seeking treatment: ")
+treat_dat_seek_nbsd
+
+treat_dat_gap_nbsd$prop_received <- treat_dat_gap_nbsd$received/(treat_dat_gap_nbsd$received+treat_dat_gap_nbsd$not_received)*100
+treat_dat_gap_nbsd$prop_not_received <- treat_dat_gap_nbsd$not_received/(treat_dat_gap_nbsd$received+treat_dat_gap_nbsd$not_received)*100
+print("Proportion of NB-SD gender receiving treatment: ")
+treat_dat_gap_nbsd
+
 #limit to just male and female
 treat_dat_seek_gender <- treat_dat_seek_gender[4:5,]
 treat_dat_gap_gender <- treat_dat_gap_gender[4:5,]
@@ -2703,7 +2769,7 @@ treat_dat_seek_gender <- treat_dat_seek_gender %>%
   as.data.frame()
 
 tx_seek_gender_chisq <- chisq.test(treat_dat_seek_gender[-1])
-tx_seek_gender_chisq$p.value
+print("Gender treatment seeking chisq: ")
 
 tx_seek_gender_chisq
 #as proportions
@@ -2729,8 +2795,8 @@ treat_dat_gap_gender <- treat_dat_gap_gender %>%
   as.data.frame()
 
 tx_gender_chisq <- chisq.test(treat_dat_gap_gender[-1])
-tx_gender_chisq$p.value
 
+print("Gender treatment receipt chisq: ")
 tx_gender_chisq
 #as proportions
 treat_dat_gap_gender$prop_received <- treat_dat_gap_gender$`n received`/(treat_dat_gap_gender$`n received`+treat_dat_gap_gender$`n not received`)
@@ -2740,6 +2806,78 @@ treat_dat_gap_gender
 
 #N for chisq test
 sum(treat_dat_gap_gender$`n received`) + sum(treat_dat_gap_gender$`n not received`)
+```
+###*Plot treatment seeking by gender*
+```{r plot treatment seeking by gender}
+
+treat_dat_seek_gender_for_plot <- treat_dat_seek_gender[c(1,4:5)]
+treat_dat_seek_gender_for_plot$prop_sought <- treat_dat_seek_gender_for_plot$prop_sought*100
+treat_dat_seek_gender_for_plot$prop_not_sought <- treat_dat_seek_gender_for_plot$prop_not_sought*100
+colnames(treat_dat_seek_gender_for_plot)[2] <- "Sought"
+colnames(treat_dat_seek_gender_for_plot)[3] <- "Not sought"
+
+treat_dat_seek_gender_for_plot <- treat_dat_seek_gender_for_plot %>%
+  pivot_longer(!Gender, names_to = "sought",values_to = "percent")
+
+treat_dat_seek_gender_for_plot$sought <- as.factor(treat_dat_seek_gender_for_plot$sought)
+
+treat_dat_seek_gender_for_plot$sought <- factor(treat_dat_seek_gender_for_plot$sought, levels=c("Not sought","Sought"), ordered=TRUE)
+
+treat_dat_seek_gender_plot <- treat_dat_seek_gender_for_plot %>%
+  ggplot(mapping = aes(Gender, percent, fill = sought)
+    ) +
+    geom_bar(aes(),
+      stat="identity",
+     position = "stack"
+    ) +
+  labs( x = "Gender",  y = "Proportion of sample (%)") +
+  theme_personal +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+  theme(legend.position = "top", legend.title = element_blank())  +
+    scale_fill_manual(
+    values = rev(COPINGpalette2)
+  ) + 
+  theme(legend.text = element_text(size = 8)) +
+  theme(legend.key.size = unit(.25, "cm")) +
+  guides(fill=guide_legend(nrow=3,byrow=TRUE))
+
+treat_dat_seek_gender_plot
+
+```
+###*Plot treatment gap by gender*
+```{r plot treatment gap by gender}
+
+treat_dat_gap_gender_plot <- treat_dat_gap_gender[c(1,4:5)]
+colnames(treat_dat_gap_gender_plot)[2] <- "Received"
+colnames(treat_dat_gap_gender_plot)[3] <- "Not received"
+treat_dat_gap_gender_plot <- treat_dat_gap_gender_plot %>%
+  pivot_longer(!Gender, names_to = "received",values_to = "percent")
+
+treat_dat_gap_gender_plot$percent <- treat_dat_gap_gender_plot$percent*100
+treat_dat_gap_gender_plot$received <- as.factor(treat_dat_gap_gender_plot$received)
+
+treat_dat_gap_gender_plot$received <- factor(treat_dat_gap_gender_plot$received, levels=c("Not received","Received"), ordered=TRUE)
+
+treat_dat_gap_gender_ggplot <- treat_dat_gap_gender_plot %>%
+  ggplot(mapping = aes(Gender, percent, fill = received)
+    ) +
+    geom_bar(aes(),
+      stat="identity",
+     position = "stack"
+    ) +
+  labs( x = "Gender",  y = "Proportion of sample (%)") +
+  theme_personal +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+  theme(legend.position = "top", legend.title = element_blank())  +
+    scale_fill_manual(
+    values = rev(COPINGpalette2)
+  ) + 
+  theme(legend.text = element_text(size = 8)) +
+  theme(legend.key.size = unit(.25, "cm")) +
+  guides(fill=guide_legend(nrow=3,byrow=TRUE))
+
+treat_dat_gap_gender_ggplot
+
 ```
 By sample
 
@@ -2857,6 +2995,53 @@ p_mf_supp <- pnorm(abs(ctable[, "t value"]), lower.tail = FALSE) * 2
 (ctable_mf_supp <- cbind(ctable_mf_supp, "p value" = p_mf_supp))
 (ci_mf_supp <- confint(m_mf_supp)) 
 
+```
+####**Effect of gender on helpfulness: plots**
+```{r Effect of gender on helpfulness: plots,eval=FALSE}
+
+#convert to percent
+
+MF_helpful_self_guide_prop <- MF_helpful_self_guide
+MF_helpful_supported_prop <- MF_helpful_supported
+  
+MF_helpful_self_guide_prop$Male <- MF_helpful_self_guide$Male/sum(MF_helpful_self_guide$Male)*100
+MF_helpful_self_guide_prop$Female <- MF_helpful_self_guide$Female/sum(MF_helpful_self_guide$Female)*100
+
+MF_helpful_supported_prop$Male <- MF_helpful_supported$Male/sum(MF_helpful_supported$Male)*100
+MF_helpful_supported_prop$Female <- MF_helpful_supported$Female/sum(MF_helpful_supported$Female)*100
+
+#pivot longer
+long_MF_helpful_self_guide <- MF_helpful_self_guide_prop %>%
+  pivot_longer(Male:Female, names_to = "Gender", values_to = "percent")
+
+long_MF_helpful_supported <- MF_helpful_supported_prop %>%
+  pivot_longer(Male:Female, names_to = "Gender", values_to = "percent")
+
+long_MF_helpful <- long_MF_helpful_self_guide
+colnames(long_MF_helpful)[3] <- "self_guided"
+long_MF_helpful$supported <- long_MF_helpful_supported$percent
+
+long_MF_helpful <- long_MF_helpful %>%
+  pivot_longer(self_guided:supported, names_to = "Type", values_to= "percent")
+
+MF_helpfulness_plot <- long_MF_helpful %>%
+  ggplot(mapping = aes(Gender, percent, fill = labels)
+    ) +
+    geom_bar(aes(),
+      stat="identity",
+     position = "stack"
+    ) +
+  theme(legend.position = "right", legend.title = element_blank())  +
+  facet_grid(. ~ Type) +
+  labs( x = "Type of treatment",  y = "Proportion of responses (%)") +
+  theme_personal +
+  theme(legend.title = element_blank()) +
+  theme(legend.text = element_text(size = 8)) +
+  theme(legend.key.size = unit(.25, "cm")) +
+  scale_fill_manual(
+    values = (RAMPlikertpalette)
+  ) 
+MF_helpfulness_plot
 ```
 
 ```{r treatment seeking freq by wave by sample gender,eval=FALSE}
@@ -3166,6 +3351,22 @@ multiplot <- ggarrange(p1,NULL,p2,NULL,p3,ncol=1,nrow=5,heights = c(1,.05,1,.05,
 multiplot
 
 ```
+## *Gender multi-panel plot*
+```{r Gender multi-panel plot, fig.height=10,fig.width=10}
+
+gp1 <- ggarrange(NULL,NULL,NULL,treat_dat_seek_gender_plot,percent_treatment_type_gender_plot+ rremove("ylab"),treat_dat_gap_gender_ggplot+ rremove("ylab"), 
+          labels = c("A: Treatment *seeking*","B: Type of treatment sought","C:Treatment receipt","","",""),hjust = 0,
+          ncol = 3, nrow =2,heights=c(.1,1))
+
+gp2 <- ggarrange(NULL,long_reasons_gender_treatment_plot,
+          labels = c("D: Reasons treatment not received",""),hjust = 0,
+          ncol = 1, nrow =2,heights=c(.1,1))
+
+gender_multiplot <- ggarrange(gp1,NULL,gp2,ncol=1,nrow=3,heights = c(1,.05,1))
+
+gender_multiplot
+
+```
 
 ## Geographic
 
@@ -3173,7 +3374,7 @@ Project postcode data onto map of the UK. Use downloaded long/lat data mapped to
 
 ### Create clean, labelled and flat outcode dataset
 
-```{r process downloaded geographic data}
+```{r process downloaded geographic data, eval=FALSE}
 setwd(wd)
 source("./scripts/Create_labelled_outcode_dataset.R")
 head(postcode_df_area)
@@ -3183,7 +3384,7 @@ head(postcode_df_area)
 
 #### read in map libraries
 
-```{r read in map libs}
+```{r read in map libs, eval=FALSE}
 if(!require(maps)){
   install.packages("maps")
   library(maps)
@@ -3201,7 +3402,7 @@ if(!require(mapproj)){
 ```
 
 
-```{r process and count treatment by area}
+```{r process and count treatment by area, eval=FALSE}
  setwd(wd)
  source("./scripts/RAMP_postcode_cleaning.R")
 
@@ -3210,7 +3411,7 @@ if(!require(mapproj)){
 
 ### Merge sample data to downloaded UK data
 
-```{r merge national and RAMP data}
+```{r merge national and RAMP data, eval=FALSE}
 # 
 postcode_full_seek <- left_join(postcode_seek,postcode_df_area,by="Outcode")
 postcode_full <- left_join(postcode_full_seek,postcode_receive,by="Outcode")
