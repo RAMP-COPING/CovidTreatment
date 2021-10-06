@@ -239,7 +239,6 @@ demCOPE.nbr <- readRDS(file = paste0(data_path, "/coping_nbr/dem_coping_nbr.RDS"
 #demCOPE.nbr.baseline <- fread(paste0(data_path, "/nbr/NBR_hlq_dem_data_hash.csv"))
 demCOPE.nbr.baseline <- fread(paste0(data_path, "/nbr_additional_info/coping_participants_export_20200730_hashed.csv"))
 
-
 GLADpostcode <- fread(paste0(postpath,"/GLAD_COPING_postcodes.csv"))
 EDGIpostcode <- fread(paste0(postpath,"/EDGI_COPING_postcodes.csv"))
 NBRpostcode <- fread(paste0(postpath,"/NBR_postcodes_hash.csv"))
@@ -462,30 +461,43 @@ Other
 ```{r recategorise NBR ethnicity}
 
 NBRdemvars <- NBRdemvars %>%
-  mutate(Ethnicity = case_when(Ethnicity == "A (White - British)" |
+  mutate(Ethnicity = case_when(Ethnicity ==  "A" |
+                               Ethnicity ==  "A (White - British)" |
+                                 Ethnicity ==  "B" |
                                  Ethnicity == "B (White - Irish)" |
+                                 Ethnicity ==  "C" |
                                  Ethnicity == "C (White - Other White)" ~ "White",
                                
                                Ethnicity == "D (Mixed - White and Black Caribbean)" |
+                                 Ethnicity ==  "D" |
                                  Ethnicity == "E (Mixed - White and Black African)" |
+                                 Ethnicity ==  "E" |
                                  Ethnicity == "F (Mixed - White and Asian)" |
+                                 Ethnicity ==  "F" |
                                  Ethnicity == "G (Mixed - Other Mixed)" ~ "Mixed or multiple ethnicities",
-                               
+                               Ethnicity ==  "G" |
                                Ethnicity == "H (Asian or Asian British - Indian)" |
+                                 Ethnicity ==  "H" |
                                  Ethnicity == "J (Asian or Asian British - Pakistani)" |
+                                 Ethnicity ==  "J" |
                                  Ethnicity == "K (Asian or Asian British - Bangladeshi)" |
+                                 Ethnicity ==  "K" |
                                  Ethnicity == "L (Asian or Asian British - Other Asian)" ~ "Asian or Asian British",
-                               
+                               Ethnicity ==  "L" |
                                Ethnicity == "M (Black or Black British - Caribbean)" |
+                                 Ethnicity ==  "M" |
                                  Ethnicity == "N (Black or Black British - African)" |
+                                 Ethnicity ==  "N" |
                                  Ethnicity == "P (Black or Black British - Other Black)" ~ "Black or Black British",
-                               
+                               Ethnicity ==  "P" |
                                Ethnicity == "R (Other Ethnic - Chinese)" |
-                                 Ethnicity == "S (Other Ethnic - Other Ethnic)" ~ "Other",
-                               
+                                 Ethnicity ==  "R" |
+                               Ethnicity ==  "S" |
+                                   Ethnicity == "S (Other Ethnic - Other Ethnic)" ~ "Other",
+                               Ethnicity ==  "Z" |
                                Ethnicity == "Z (Not Stated)" ~ "Seen but not answered"))
                                  
-         
+   
 
 ```
 
@@ -791,8 +803,51 @@ This includes the full range of MH questions we asked in RAMP
 
 names(MHD.RAMP) <- sub("mhq","mhd",names(MHD.RAMP))
 names(MHD.RAMP) <- sub(".1","",names(MHD.RAMP))
+
+
 names(MHD.COPE.glad) <- sub(".1","",names(MHD.COPE.glad))
-names(MHD.COPE.nbr) <- sub(".1","",names(MHD.COPE.nbr))
+names(MHD.COPE.glad) <- sub(".1","",names(MHD.COPE.glad))
+
+
+
+```
+Rename EDGI colums to make sure we can compare
+```{r rename edgi mental health diagnosis names}
+
+MHD.COPE.edgi <- demCOPE.edgi.baseline
+names(MHD.COPE.edgi) <- sub("demographics","mhd",names(MHD.COPE.edgi))
+names(MHD.COPE.edgi) <- sub(".1","",names(MHD.COPE.edgi))
+names(MHD.COPE.edgi) <- sub("externalDataReference","ID",names(MHD.COPE.edgi))
+
+
+```
+
+#CLEAN ALL REMAINING MISMATCHING VARIABLES
+```{r rename all other mismatching variables}
+
+names(MHD.RAMP) <- sub("mhd.posttraumatic_stress_disorder_ptsd","mhd.ptsd",names(MHD.RAMP))
+names(MHD.RAMP) <- sub("mhd.pregnancy_depression","mhd.depression_during_or_after_pregnancy",names(MHD.RAMP))
+names(MHD.RAMP) <- sub("mhd.premenstrual_dysphoric_disorder_pmdd","mhd.pmdd",names(MHD.RAMP))
+names(MHD.RAMP) <- sub("mhd.specific_phobia_e.g._phobia_of_flying","mhd.specific_phobia",names(MHD.RAMP))
+names(MHD.RAMP) <- sub("mhd.body_dysmorphic_disorder_bdd","mhd.bdd",names(MHD.RAMP))
+names(MHD.RAMP) <- sub("mhd.skin_picking_obsessive_compulsive","mhd.other_ocd",names(MHD.RAMP))
+names(MHD.RAMP) <- sub("mhd.obsessive_compulsive_related_disorder.txt","mhd.other_obsessivecompulsive_related_disorders",names(MHD.RAMP))
+names(MHD.RAMP) <- sub("mhd.autism_aspergers_or_autistic_spectrum_disorder","mhd.autism_spectrum_disorder_asd",names(MHD.RAMP))
+names(MHD.RAMP) <- sub("mhd.psychological_overeating_or_bingeeating_disorder","mhd.bingeeating_disorder",names(MHD.RAMP))
+names(MHD.COPE.edgi) <- sub("mhd.postnatalantenatal_depression","mhd.postnatal_depression",names(MHD.COPE.edgi))
+
+#add columns for questions not asked in order to retain in dataset
+MHD.COPE.glad <- MHD.COPE.glad %>%
+add_column(mhd.schizoaffective_disorder = NA) 
+MHD.COPE.nbr <- MHD.COPE.nbr %>%
+add_column(mhd.schizoaffective_disorder = NA) 
+MHD.COPE.edgi <- MHD.COPE.edgi %>%
+add_column(mhd.schizoaffective_disorder = NA) 
+
+MHD.RAMP <- MHD.RAMP %>%
+add_column(mhd.postnatal_depression = NA) 
+MHD.RAMP <- MHD.RAMP %>%
+add_column(mhd.obsessivecompulsive_disorder = NA) 
 
 ```
 
@@ -806,17 +861,7 @@ common_col_names <- common_col_names[common_col_names != "mhd.personality_disord
 
 ```
 
-Rename EDGI colums to make sure we can compare
 
-```{r rename edgi mental health diagnosis names}
-
-MHD.COPE.edgi <- demCOPE.edgi.baseline
-names(MHD.COPE.edgi) <- sub("demographics","mhd",names(MHD.COPE.edgi))
-names(MHD.COPE.edgi) <- sub(".1","",names(MHD.COPE.edgi))
-names(MHD.COPE.edgi) <- sub("externalDataReference","ID",names(MHD.COPE.edgi))
-
-
-```
 
 find intersect with edgi columns
 
@@ -860,10 +905,11 @@ MH <- merge(MH,MH.NBR,all = "TRUE")
 ```{r collapse all eating disorders together and drop the others}
 
 MH <- MH %>%
-  mutate(mhd.eating_disorder = case_when("mhd.anorexia_nervosa" == 1 |
-                                           "mhd.atypical_anorexia_nervosa" == 1|
-                                           "mhd.bulimia_nervosa" == 1 ~1)) %>%
-  select(-c(mhd.anorexia_nervosa,mhd.atypical_anorexia_nervosa,mhd.bulimia_nervosa))
+  mutate(mhd.eating_disorder = case_when(mhd.anorexia_nervosa == 1 |
+                                           mhd.atypical_anorexia_nervosa == 1|
+                                           mhd.bulimia_nervosa == 1|
+                                           mhd.bingeeating_disorder == 1 ~1)) %>%
+  select(-c(mhd.anorexia_nervosa,mhd.atypical_anorexia_nervosa,mhd.bulimia_nervosa,mhd.bingeeating_disorder))
 
 ```
 
@@ -881,6 +927,7 @@ adjust common col list for EDGI
 common_col_names <- common_col_names[common_col_names != "mhd.anorexia_nervosa"]
 common_col_names <- common_col_names[common_col_names != "mhd.atypical_anorexia_nervosa"]
 common_col_names <- common_col_names[common_col_names !="mhd.bulimia_nervosa"]
+common_col_names <- common_col_names[common_col_names !="mhd.bingeeating_disorder"]
 
 
 common_col_names <- append(common_col_names,"mhd.eating_disorder")
@@ -913,6 +960,39 @@ MH <- MH %>%
 
 ```
 
+```{r collapse other disorder categories}
+
+MH <- MH %>%
+  mutate(mhd.depressive_disorder = case_when(mhd.depression == 1|
+                                           mhd.depression_during_or_after_pregnancy == 1|
+                                           mhd.pmdd == 1|
+                                           mhd.postnatal_depression == 1 ~1)) %>%
+  select(-c(mhd.depression,mhd.depression_during_or_after_pregnancy,mhd.pmdd,mhd.postnatal_depression))
+
+MH <- MH %>%
+  mutate(mhd.anxiety_disorder = case_when(mhd.anxiety_nerves_or_generalised_anxiety_disorder == 1 |
+                                           mhd.social_anxiety_or_social_phobia == 1|
+                                           mhd.specific_phobia == 1|
+                                           mhd.agoraphobia == 1|
+                                           mhd.panic_disorder == 1|
+                                           mhd.panic_attacks == 1 ~1)) %>%
+  select(-c(mhd.anxiety_nerves_or_generalised_anxiety_disorder,mhd.social_anxiety_or_social_phobia,mhd.specific_phobia,mhd.agoraphobia,mhd.panic_disorder,mhd.panic_attacks))
+
+MH <- MH %>%
+  mutate(mhd.ocrd = case_when(mhd.obsessivecompulsive_disorder_ocd == 1 |
+                                mhd.obsessivecompulsive_disorder == 1|
+                                           mhd.bdd == 1|
+                                           mhd.other_ocd == 1|
+                                           mhd.other_obsessivecompulsive_related_disorders == 1 ~1)) %>%
+  select(-c(mhd.obsessivecompulsive_disorder_ocd,mhd.bdd,mhd.other_ocd,mhd.other_obsessivecompulsive_related_disorders,mhd.obsessivecompulsive_disorder))
+
+MH <- MH %>%
+  mutate(mhd.psychotic_disorder = case_when(mhd.schizophrenia == 1 |
+                                           mhd.schizoaffective_disorder == 1|
+                                           mhd.psychosis_type_psychotic_illness == 1 ~1)) %>%
+  select(-c(mhd.schizophrenia,mhd.psychosis_type_psychotic_illness,mhd.schizoaffective_disorder,mhd.dont_know,mhd.prefer_not_to_answer))
+
+```
 
 
 
@@ -1327,13 +1407,8 @@ List of diagnosis columns
 
 ```{r list diagnoses cols}
 
-dia_cols <- c("mhd.depression", "mhd.mania_hypomania_bipolar_or_manicdepression", 
-"mhd.anxiety_nerves_or_generalised_anxiety_disorder", "mhd.social_anxiety_or_social_phobia", 
-"mhd.agoraphobia", "mhd.panic_disorder", "mhd.panic_attacks", 
-"mhd.obsessivecompulsive_disorder_ocd", "mhd.dont_know", "mhd.prefer_not_to_answer", 
-"mhd.schizophrenia", "mhd.psychosis_type_psychotic_illness", 
-"mhd.personality_disorder", "mhd.attention_deficit_hyperactivity_disorder","mhd.eating_disorder")
-  
+dia_cols <- c("mhd.depressive_disorder","mhd.anxiety_disorder","mhd.ptsd","mhd.ocrd","mhd.eating_disorder","mhd.mania_hypomania_bipolar_or_manicdepression","mhd.psychotic_disorder","mhd.personality_disorder","mhd.autism_spectrum_disorder_asd","mhd.attention_deficit_hyperactivity_disorder")
+
 ```
 
 #### everyone
@@ -1350,7 +1425,7 @@ for (i in dia_cols){
 
 #### By sample
 frequencies for all diagnoses
-```{r freq tables for diagnoses by sample, echo=FALSE}
+```{r freq tables for diagnoses by sample}
 
 for (i in dia_cols){
   print(i)
