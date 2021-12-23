@@ -1,23 +1,24 @@
 ---
 title: "RAMP/COPING treatment paper core notebook"
-
 author: "K L Purves"
 date: '`r format(Sys.time(), "%d %B, %Y")`'
 output:
   html_document:
     df_print: paged
+    highlight: monochrome
+    number_sections: no
+    standalone: no
+    theme: cerulean
     toc: yes
     toc_depth: 3
     toc_float:
-      collapsed: false
-    number_sections: false
-    highlight: monochrome
-    theme: cerulean
-    standalone: no
-code_folding: show
-
+      collapsed: no
+  word_document:
+    toc: yes
+    toc_depth: '3'
 html_notebook:
   theme: cerulean
+code_folding: show
 toc: yes
 ---
 
@@ -300,6 +301,15 @@ Age cats:
 91-100
 100+
 
+RECODING TO BE EQUAL INTERVALS
+16-25
+26-35
+36-45
+46-55
+56-65
+66-75
+76+
+
 ```{r age categorical GLAD}
 
 GLADdemvars <- GLADdemvars %>%
@@ -327,6 +337,14 @@ GLADdemvars <- GLADdemvars %>%
                             Age.linear >=71 & Age.linear <= 75 ~ "71-75",
                             Age.linear >=76 & Age.linear <= 80 ~ "76-80",
                             Age.linear >=81  ~ "81+",
+                            Age.linear ==-77 ~ "Did not respond"),
+         AgeRecoded = case_when(Age.linear >=16 & Age.linear <= 25 ~ "16-25",
+                            Age.linear >=26 & Age.linear <= 35 ~ "26-35",
+                            Age.linear >=36 & Age.linear <= 45 ~ "36-45",
+                            Age.linear >=46 & Age.linear <= 55 ~ "46-55",
+                            Age.linear >=56 & Age.linear <= 65 ~ "56-65",
+                            Age.linear >=66 & Age.linear <= 75 ~ "66-75",
+                            Age.linear >=76 & Age.linear <= 80 ~ "76+",
                             Age.linear ==-77 ~ "Did not respond"))
 
 ```
@@ -391,6 +409,14 @@ EDGIdemvars <- EDGIdemvars %>%
                             Age.linear >=71 & Age.linear <= 75 ~ "71-75",
                             Age.linear >=76 & Age.linear <= 80 ~ "76-80",
                             Age.linear >=81  ~ "81+",
+                            Age.linear ==-77 ~ "Did not respond"),
+        AgeRecoded = case_when(Age.linear >=16 & Age.linear <= 25 ~ "16-25",
+                            Age.linear >=26 & Age.linear <= 35 ~ "26-35",
+                            Age.linear >=36 & Age.linear <= 45 ~ "36-45",
+                            Age.linear >=46 & Age.linear <= 55 ~ "46-55",
+                            Age.linear >=56 & Age.linear <= 65 ~ "56-65",
+                            Age.linear >=66 & Age.linear <= 75 ~ "66-75",
+                            Age.linear >=76 & Age.linear <= 80 ~ "76+",
                             Age.linear ==-77 ~ "Did not respond"))
 
 ```
@@ -529,6 +555,14 @@ NBRdemvars <- NBRdemvars %>%
                             Age.linear >=71 & Age.linear <= 75 ~ "71-75",
                             Age.linear >=76 & Age.linear <= 80 ~ "76-80",
                             Age.linear >=81  ~ "81+",
+                            Age.linear ==-77 ~ "Did not respond"),
+        AgeRecoded = case_when(Age.linear >=16 & Age.linear <= 25 ~ "16-25",
+                            Age.linear >=26 & Age.linear <= 35 ~ "26-35",
+                            Age.linear >=36 & Age.linear <= 45 ~ "36-45",
+                            Age.linear >=46 & Age.linear <= 55 ~ "46-55",
+                            Age.linear >=56 & Age.linear <= 65 ~ "56-65",
+                            Age.linear >=66 & Age.linear <= 75 ~ "66-75",
+                            Age.linear >=76 & Age.linear <= 80 ~ "76+",
                             Age.linear ==-77 ~ "Did not respond"))
 
 ```
@@ -773,6 +807,22 @@ dem.ramp <- dem.ramp %>%
                                 "81+"="12",
                                 "81+"="13",
                                 "Did not respond"="-77"
+                                ),  
+         AgeRecoded = fct_recode(Age, 
+                                "16-25"="1",
+                                "16-25"="2",
+                                "26-35"="3",
+                                "36-45"="4",
+                                "46-55"="5",
+                                "56-65"="6",
+                                "66-75"="7",
+                                "66-75"="8",
+                                "76+"="9",
+                                "76+"="10",
+                                "76+"="11",
+                                "76+"="12",
+                                "76+"="13",
+                                "Did not respond"="-77"
                                 ))
 
 ```
@@ -860,7 +910,7 @@ dem <- merge(dem,dem.cope.nbr,all=TRUE)
 #### get gender and age columns to add to treatment
 
 ```{r gender and age from demo}
-demgen <- subset(dem,select = c("ID","Gender","Age80up","Sample"))
+demgen <- subset(dem,select = c("ID","Gender","AgeRecoded","Sample"))
 ```
 
 
@@ -1112,14 +1162,14 @@ treat_dat <- rbind(treatRAMP.fin,treatCOPE.fin)
 ```{r reorder wave factor}
 
 treat_dat$wave <- factor(treat_dat$wave,
-                         levels = c("May 2020","June 2020", "July 2020","August 2020","September 2020","October 2020","November 2020","December 2020","January 2021"))
+                         levels = c("May 2020","June 2020", "July 2020","August 2020","September 2020","October 2020","November 2020","December 2020","January 2021","February 2021","March 2021","April 2021"))
 
 ```
 
 #### Drop June and January timepoints
 ```{r drop un-needed timepoints}
 
-treat_dat <- filter(treat_dat, wave == "July 2020" | wave == "August 2020" | wave == "September 2020" | wave == "October 2020" | wave == "November 2020" | wave == "December 2020")
+treat_dat <- filter(treat_dat, wave == "July 2020" | wave == "August 2020" | wave == "September 2020" | wave == "October 2020" | wave == "November 2020" | wave == "December 2020"| wave == "December 2020"| wave == "January 2021"| wave == "February 2021"| wave == "March 2021"| wave == "April 2020")
 ```
 
 #### Drop accidental duplicate IDs
@@ -1210,7 +1260,7 @@ treat_dat <- treat_dat %>%
                                  TRUE ~ 0))
 ```
 
-creat variable counting number of self guided or supported treatment types sought per wave per person
+create variable counting number of self guided or supported treatment types sought per wave per person
 
 ```{r type sought counts}
 
@@ -1536,7 +1586,7 @@ treat_dat_count
 ```
 ```{r plot response rates per wave}
 
-treat_dat_count_plot <- treat_dat_count[-c(9), ]  %>%
+treat_dat_count_plot <- treat_dat_count  %>%
   ggplot(mapping = aes(
     x=wave,
     y=n)
@@ -1617,7 +1667,7 @@ mean(treat_dat_seek_count$prop_responders)
 ```{r plot treatment seeking rates per wave}
 
 
-treat_dat_seek_count_plot <- treat_dat_seek_count[-c(1,9),]  %>%
+treat_dat_seek_count_plot <- treat_dat_seek_count  %>%
   ggplot(mapping = aes(wave, prop_responders,fill = "placeholder")
     ) +
     geom_bar(aes(),
@@ -1644,7 +1694,7 @@ treat_dat_gap_count <- treat_dat %>%
   count(AnyReceived)
   
 treat_dat_gap_count <- pivot_wider(treat_dat_gap_count, names_from = AnyReceived, values_from = n) 
-treat_dat_gap_count <- treat_dat_gap_count[1:6,]
+treat_dat_gap_count <- treat_dat_gap_count[1:9,]
 treat_dat_gap_count$total_sought <- treat_dat_seek_count$`1`
 
 treat_dat_gap_count$prop_received <- treat_dat_gap_count$`1` / treat_dat_gap_count$total_sought*100
@@ -1666,7 +1716,7 @@ long_n_receipt$received <- as.factor(long_n_receipt$received)
 
 long_n_receipt$received <- factor(long_n_receipt$received, levels=c("Not received","Received"), ordered=TRUE)
 
-long_n_receipt$wave <-factor(long_n_receipt$wave,levels=c("December 2020","November 2020","October 2020","September 2020","August 2020","July 2020"),ordered=TRUE)
+long_n_receipt$wave <-factor(long_n_receipt$wave,levels=c("April 2021","March 2021","February 2021","January 2021","December 2020","November 2020","October 2020","September 2020","August 2020","July 2020"),ordered=TRUE)
   
 treat_dat_received_plot <- long_n_receipt %>%
   ggplot(mapping = aes(wave, percent, fill = received)
@@ -1708,7 +1758,7 @@ long_prop_receipt$received <- as.factor(long_prop_receipt$received)
 
 long_prop_receipt$received <- factor(long_prop_receipt$received, levels=c("Treatment not sought","Treatment sought but not received","Treatment sought and received"), ordered=TRUE)
 
-long_prop_receipt$wave <-factor(long_prop_receipt$wave,levels=c("December 2020","November 2020","October 2020","September 2020","August 2020","July 2020"),ordered=TRUE)
+long_prop_receipt$wave <-factor(long_prop_receipt$wave,levels=c("April 2021","March 2021","February 2021","January 2021","December 2020","November 2020","October 2020","September 2020","August 2020","July 2020"),ordered=TRUE)
   
 treat_dat_received_plot <- long_prop_receipt %>%
   ggplot(mapping = aes(wave, percent, fill = received)
@@ -1798,7 +1848,7 @@ long_prop_reasons$ReasonSeek <- as.factor(long_prop_reasons$ReasonSeek)
 
 long_prop_reasons$ReasonSeek <- factor(long_prop_reasons$ReasonSeek, levels=c("Newly emerging symptoms","Mental health crisis","Seeking new treatment","Existing mental health concern"), ordered=TRUE)
 
-long_prop_reasons$wave <-factor(long_prop_reasons$wave,levels=c("December 2020","November 2020","October 2020","September 2020","August 2020","July 2020"),ordered=TRUE)
+long_prop_reasons$wave <-factor(long_prop_reasons$wave,levels=c("April 2021","March 2021","February 2021","January 2021","December 2020","November 2020","October 2020","September 2020","August 2020","July 2020"),ordered=TRUE)
   
 treat_dat_seek_count_plot <- long_prop_reasons %>%
   ggplot(mapping = aes(wave, n, fill = ReasonSeek)
@@ -2641,14 +2691,14 @@ sum(wide_tx_sought_mf$`0`) + sum(wide_tx_sought_mf$`1`)
 ```{r treatment seeking freq by age}
 
 treat_sought_age <- treat_dat %>%
-  group_by(Age80up) %>%
+  group_by(AgeRecoded) %>%
   count(soughthelp_for_self)
 
 #summarise to just full categories for chi-square
-tx_sought_age <- treat_sought_age[c(2:3,5:6,8:9,11:12,14:15,17:18,20:21,23:24,26:27,29:30),]
+tx_sought_age <- treat_sought_age[c(2:3,5:6,8:9,11:12,14:15,17:18,20:21),]
 
 wide_tx_sought_age <- tx_sought_age %>%
-  pivot_wider(id_cols = Age80up, names_from = soughthelp_for_self, values_from = n)
+  pivot_wider(id_cols = AgeRecoded, names_from = soughthelp_for_self, values_from = n)
 
 tx_sought_age_chisq <- chisq.test(wide_tx_sought_age[-1])
 tx_sought_age_chisq$p.value
@@ -2726,43 +2776,29 @@ reason_not_received_percent_nbsd
 ###*Summary reasons not received - BY AGE*
 ```{r reasons not received - by age}
 #this is not the best way to code this, but will do for now
-reason_not_received_16_18 <- tibble(reason = c("Systemic","Client","Other"), `Self guided` = 1:3, `Supported` = 1:3)
-reason_not_received_19_25 <- tibble(reason = c("Systemic","Client","Other"), `Self guided` = 1:3, `Supported` = 1:3)
+reason_not_received_16_25 <- tibble(reason = c("Systemic","Client","Other"), `Self guided` = 1:3, `Supported` = 1:3)
 reason_not_received_26_35 <- tibble(reason = c("Systemic","Client","Other"), `Self guided` = 1:3, `Supported` = 1:3)
 reason_not_received_36_45 <- tibble(reason = c("Systemic","Client","Other"), `Self guided` = 1:3, `Supported` = 1:3)
 reason_not_received_46_55 <- tibble(reason = c("Systemic","Client","Other"), `Self guided` = 1:3, `Supported` = 1:3)
 reason_not_received_56_65 <- tibble(reason = c("Systemic","Client","Other"), `Self guided` = 1:3, `Supported` = 1:3)
-reason_not_received_66_70 <- tibble(reason = c("Systemic","Client","Other"), `Self guided` = 1:3, `Supported` = 1:3)
-reason_not_received_71_75 <- tibble(reason = c("Systemic","Client","Other"), `Self guided` = 1:3, `Supported` = 1:3)
-reason_not_received_76_80 <- tibble(reason = c("Systemic","Client","Other"), `Self guided` = 1:3, `Supported` = 1:3)
-reason_not_received_81_plus <- tibble(reason = c("Systemic","Client","Other"), `Self guided` = 1:3, `Supported` = 1:3)
+reason_not_received_66_75 <- tibble(reason = c("Systemic","Client","Other"), `Self guided` = 1:3, `Supported` = 1:3)
+reason_not_received_76_plus <- tibble(reason = c("Systemic","Client","Other"), `Self guided` = 1:3, `Supported` = 1:3)
 
-age16_18_treat_dat <- filter(treat_dat, Age80up == "16-18")
-age19_25_treat_dat <- filter(treat_dat, Age80up == "19-25")
-age26_35_treat_dat <- filter(treat_dat, Age80up == "26-35")
-age36_45_treat_dat <- filter(treat_dat, Age80up == "36-45")
-age46_55_treat_dat <- filter(treat_dat, Age80up == "46-55")
-age56_65_treat_dat <- filter(treat_dat, Age80up == "56-65")
-age66_70_treat_dat <- filter(treat_dat, Age80up == "66-70")
-age71_75_treat_dat <- filter(treat_dat, Age80up == "71-75")
-age76_80_treat_dat <- filter(treat_dat, Age80up == "76-80")
-age81_plus_treat_dat <- filter(treat_dat, Age80up == "81+")
+age16_25_treat_dat <- filter(treat_dat, AgeRecoded == "16-25")
+age26_35_treat_dat <- filter(treat_dat, AgeRecoded == "26-35")
+age36_45_treat_dat <- filter(treat_dat, AgeRecoded == "36-45")
+age46_55_treat_dat <- filter(treat_dat, AgeRecoded == "46-55")
+age56_65_treat_dat <- filter(treat_dat, AgeRecoded == "56-65")
+age66_75_treat_dat <- filter(treat_dat, AgeRecoded == "66-75")
+age76_plus_treat_dat <- filter(treat_dat, AgeRecoded == "76+")
 
-#16-18
-reason_not_received_16_18[1,2] <- sum(age16_18_treat_dat$PreventHelp_SelfGuided.Systemic==1,na.rm=TRUE)
-reason_not_received_16_18[2,2] <- sum(age16_18_treat_dat$PreventHelp_SelfGuided.Client==1,na.rm=TRUE)
-reason_not_received_16_18[3,2] <- sum(age16_18_treat_dat$PreventHelp_SelfGuided.Other==1,na.rm=TRUE)
-reason_not_received_16_18[1,3] <- sum(age16_18_treat_dat$PreventHelp_Supported.Systemic==1,na.rm=TRUE)
-reason_not_received_16_18[2,3] <- sum(age16_18_treat_dat$PreventHelp_Supported.Client==1,na.rm=TRUE)
-reason_not_received_16_18[3,3] <- sum(age16_18_treat_dat$PreventHelp_Supported.Other==1,na.rm=TRUE)
-
-#19-25
-reason_not_received_19_25[1,2] <- sum(age19_25_treat_dat$PreventHelp_SelfGuided.Systemic==1,na.rm=TRUE)
-reason_not_received_19_25[2,2] <- sum(age19_25_treat_dat$PreventHelp_SelfGuided.Client==1,na.rm=TRUE)
-reason_not_received_19_25[3,2] <- sum(age19_25_treat_dat$PreventHelp_SelfGuided.Other==1,na.rm=TRUE)
-reason_not_received_19_25[1,3] <- sum(age19_25_treat_dat$PreventHelp_Supported.Systemic==1,na.rm=TRUE)
-reason_not_received_19_25[2,3] <- sum(age19_25_treat_dat$PreventHelp_Supported.Client==1,na.rm=TRUE)
-reason_not_received_19_25[3,3] <- sum(age19_25_treat_dat$PreventHelp_Supported.Other==1,na.rm=TRUE)
+#16-25
+reason_not_received_16_25[1,2] <- sum(age16_25_treat_dat$PreventHelp_SelfGuided.Systemic==1,na.rm=TRUE)
+reason_not_received_16_25[2,2] <- sum(age16_25_treat_dat$PreventHelp_SelfGuided.Client==1,na.rm=TRUE)
+reason_not_received_16_25[3,2] <- sum(age16_25_treat_dat$PreventHelp_SelfGuided.Other==1,na.rm=TRUE)
+reason_not_received_16_25[1,3] <- sum(age16_25_treat_dat$PreventHelp_Supported.Systemic==1,na.rm=TRUE)
+reason_not_received_16_25[2,3] <- sum(age16_25_treat_dat$PreventHelp_Supported.Client==1,na.rm=TRUE)
+reason_not_received_16_25[3,3] <- sum(age16_25_treat_dat$PreventHelp_Supported.Other==1,na.rm=TRUE)
 
 #26-35
 reason_not_received_26_35[1,2] <- sum(age26_35_treat_dat$PreventHelp_SelfGuided.Systemic==1,na.rm=TRUE)
@@ -2796,43 +2832,25 @@ reason_not_received_56_65[1,3] <- sum(age56_65_treat_dat$PreventHelp_Supported.S
 reason_not_received_56_65[2,3] <- sum(age56_65_treat_dat$PreventHelp_Supported.Client==1,na.rm=TRUE)
 reason_not_received_56_65[3,3] <- sum(age56_65_treat_dat$PreventHelp_Supported.Other==1,na.rm=TRUE)
 
-#66-70
-reason_not_received_66_70[1,2] <- sum(age66_70_treat_dat$PreventHelp_SelfGuided.Systemic==1,na.rm=TRUE)
-reason_not_received_66_70[2,2] <- sum(age66_70_treat_dat$PreventHelp_SelfGuided.Client==1,na.rm=TRUE)
-reason_not_received_66_70[3,2] <- sum(age66_70_treat_dat$PreventHelp_SelfGuided.Other==1,na.rm=TRUE)
-reason_not_received_66_70[1,3] <- sum(age66_70_treat_dat$PreventHelp_Supported.Systemic==1,na.rm=TRUE)
-reason_not_received_66_70[2,3] <- sum(age66_70_treat_dat$PreventHelp_Supported.Client==1,na.rm=TRUE)
-reason_not_received_66_70[3,3] <- sum(age66_70_treat_dat$PreventHelp_Supported.Other==1,na.rm=TRUE)
+#66-75
+reason_not_received_66_75[1,2] <- sum(age66_75_treat_dat$PreventHelp_SelfGuided.Systemic==1,na.rm=TRUE)
+reason_not_received_66_75[2,2] <- sum(age66_75_treat_dat$PreventHelp_SelfGuided.Client==1,na.rm=TRUE)
+reason_not_received_66_75[3,2] <- sum(age66_75_treat_dat$PreventHelp_SelfGuided.Other==1,na.rm=TRUE)
+reason_not_received_66_75[1,3] <- sum(age66_75_treat_dat$PreventHelp_Supported.Systemic==1,na.rm=TRUE)
+reason_not_received_66_75[2,3] <- sum(age66_75_treat_dat$PreventHelp_Supported.Client==1,na.rm=TRUE)
+reason_not_received_66_75[3,3] <- sum(age66_75_treat_dat$PreventHelp_Supported.Other==1,na.rm=TRUE)
 
-#71-75
-reason_not_received_71_75[1,2] <- sum(age71_75_treat_dat$PreventHelp_SelfGuided.Systemic==1,na.rm=TRUE)
-reason_not_received_71_75[2,2] <- sum(age71_75_treat_dat$PreventHelp_SelfGuided.Client==1,na.rm=TRUE)
-reason_not_received_71_75[3,2] <- sum(age71_75_treat_dat$PreventHelp_SelfGuided.Other==1,na.rm=TRUE)
-reason_not_received_71_75[1,3] <- sum(age71_75_treat_dat$PreventHelp_Supported.Systemic==1,na.rm=TRUE)
-reason_not_received_71_75[2,3] <- sum(age71_75_treat_dat$PreventHelp_Supported.Client==1,na.rm=TRUE)
-reason_not_received_71_75[3,3] <- sum(age71_75_treat_dat$PreventHelp_Supported.Other==1,na.rm=TRUE)
-
-#76-80
-reason_not_received_76_80[1,2] <- sum(age76_80_treat_dat$PreventHelp_SelfGuided.Systemic==1,na.rm=TRUE)
-reason_not_received_76_80[2,2] <- sum(age76_80_treat_dat$PreventHelp_SelfGuided.Client==1,na.rm=TRUE)
-reason_not_received_76_80[3,2] <- sum(age76_80_treat_dat$PreventHelp_SelfGuided.Other==1,na.rm=TRUE)
-reason_not_received_76_80[1,3] <- sum(age76_80_treat_dat$PreventHelp_Supported.Systemic==1,na.rm=TRUE)
-reason_not_received_76_80[2,3] <- sum(age76_80_treat_dat$PreventHelp_Supported.Client==1,na.rm=TRUE)
-reason_not_received_76_80[3,3] <- sum(age76_80_treat_dat$PreventHelp_Supported.Other==1,na.rm=TRUE)
-
-#81+
-reason_not_received_81_plus[1,2] <- sum(age81_plus_treat_dat$PreventHelp_SelfGuided.Systemic==1,na.rm=TRUE)
-reason_not_received_81_plus[2,2] <- sum(age81_plus_treat_dat$PreventHelp_SelfGuided.Client==1,na.rm=TRUE)
-reason_not_received_81_plus[3,2] <- sum(age81_plus_treat_dat$PreventHelp_SelfGuided.Other==1,na.rm=TRUE)
-reason_not_received_81_plus[1,3] <- sum(age81_plus_treat_dat$PreventHelp_Supported.Systemic==1,na.rm=TRUE)
-reason_not_received_81_plus[2,3] <- sum(age81_plus_treat_dat$PreventHelp_Supported.Client==1,na.rm=TRUE)
-reason_not_received_81_plus[3,3] <- sum(age81_plus_treat_dat$PreventHelp_Supported.Other==1,na.rm=TRUE)
+#76+
+reason_not_received_76_plus[1,2] <- sum(age76_plus_treat_dat$PreventHelp_SelfGuided.Systemic==1,na.rm=TRUE)
+reason_not_received_76_plus[2,2] <- sum(age76_plus_treat_dat$PreventHelp_SelfGuided.Client==1,na.rm=TRUE)
+reason_not_received_76_plus[3,2] <- sum(age76_plus_treat_dat$PreventHelp_SelfGuided.Other==1,na.rm=TRUE)
+reason_not_received_76_plus[1,3] <- sum(age76_plus_treat_dat$PreventHelp_Supported.Systemic==1,na.rm=TRUE)
+reason_not_received_76_plus[2,3] <- sum(age76_plus_treat_dat$PreventHelp_Supported.Client==1,na.rm=TRUE)
+reason_not_received_76_plus[3,3] <- sum(age76_plus_treat_dat$PreventHelp_Supported.Other==1,na.rm=TRUE)
 
 #TOTALS
-self_guided_total_16_18 <- sum(reason_not_received_16_18$`Self guided`)
-supported_total_16_18 <- sum(reason_not_received_16_18$`Supported`)
-self_guided_total_19_25 <- sum(reason_not_received_19_25$`Self guided`)
-supported_total_19_25 <- sum(reason_not_received_19_25$`Supported`)
+self_guided_total_16_25 <- sum(reason_not_received_16_25$`Self guided`)
+supported_total_16_25 <- sum(reason_not_received_16_25$`Supported`)
 self_guided_total_26_35 <- sum(reason_not_received_26_35$`Self guided`)
 supported_total_26_35 <- sum(reason_not_received_26_35$`Supported`)
 self_guided_total_36_45 <- sum(reason_not_received_36_45$`Self guided`)
@@ -2841,32 +2859,21 @@ self_guided_total_46_55 <- sum(reason_not_received_46_55$`Self guided`)
 supported_total_46_55 <- sum(reason_not_received_46_55$`Supported`)
 self_guided_total_56_65 <- sum(reason_not_received_56_65$`Self guided`)
 supported_total_56_65 <- sum(reason_not_received_56_65$`Supported`)
-self_guided_total_66_70 <- sum(reason_not_received_66_70$`Self guided`)
-supported_total_66_70 <- sum(reason_not_received_66_70$`Supported`)
-self_guided_total_71_75 <- sum(reason_not_received_71_75$`Self guided`)
-supported_total_71_75 <- sum(reason_not_received_71_75$`Supported`)
-self_guided_total_76_80 <- sum(reason_not_received_76_80$`Self guided`)
-supported_total_76_80 <- sum(reason_not_received_76_80$`Supported`)
-self_guided_total_81_plus <- sum(reason_not_received_81_plus$`Self guided`)
-supported_total_81_plus <- sum(reason_not_received_81_plus$`Supported`)
+self_guided_total_66_75 <- sum(reason_not_received_66_75$`Self guided`)
+supported_total_66_75 <- sum(reason_not_received_66_75$`Supported`)
+self_guided_total_76_plus <- sum(reason_not_received_76_plus$`Self guided`)
+supported_total_76_plus <- sum(reason_not_received_76_plus$`Supported`)
 
-reason_not_received_percent_16_18 <- reason_not_received_16_18[,1:3]
-reason_not_received_percent_19_25 <- reason_not_received_19_25[,1:3]
+reason_not_received_percent_16_25 <- reason_not_received_16_25[,1:3]
 reason_not_received_percent_26_35 <- reason_not_received_26_35[,1:3]
 reason_not_received_percent_36_45 <- reason_not_received_36_45[,1:3]
 reason_not_received_percent_46_55 <- reason_not_received_46_55[,1:3]
 reason_not_received_percent_56_65 <- reason_not_received_56_65[,1:3]
-reason_not_received_percent_66_70 <- reason_not_received_66_70[,1:3]
-reason_not_received_percent_71_75 <- reason_not_received_71_75[,1:3]
-reason_not_received_percent_76_80 <- reason_not_received_76_80[,1:3]
-reason_not_received_percent_81_plus <- reason_not_received_81_plus[,1:3]
+reason_not_received_percent_66_75 <- reason_not_received_66_75[,1:3]
+reason_not_received_percent_76_plus <- reason_not_received_76_plus[,1:3]
 
-
-reason_not_received_percent_16_18$`Self guided` <- reason_not_received_percent_16_18$`Self guided` / self_guided_total_16_18*100
-reason_not_received_percent_16_18$`Supported` <- reason_not_received_16_18$`Supported` / supported_total_16_18*100
-
-reason_not_received_percent_19_25$`Self guided` <- reason_not_received_percent_19_25$`Self guided` / self_guided_total_19_25*100
-reason_not_received_percent_19_25$`Supported` <- reason_not_received_19_25$`Supported` / supported_total_19_25*100
+reason_not_received_percent_16_25$`Self guided` <- reason_not_received_percent_16_25$`Self guided` / self_guided_total_16_25*100
+reason_not_received_percent_16_25$`Supported` <- reason_not_received_16_25$`Supported` / supported_total_16_25*100
 
 reason_not_received_percent_26_35$`Self guided` <- reason_not_received_percent_26_35$`Self guided` / self_guided_total_26_35*100
 reason_not_received_percent_26_35$`Supported` <- reason_not_received_26_35$`Supported` / supported_total_26_35*100
@@ -2880,29 +2887,19 @@ reason_not_received_percent_46_55$`Supported` <- reason_not_received_46_55$`Supp
 reason_not_received_percent_56_65$`Self guided` <- reason_not_received_percent_56_65$`Self guided` / self_guided_total_56_65*100
 reason_not_received_percent_56_65$`Supported` <- reason_not_received_56_65$`Supported` / supported_total_56_65*100
 
-reason_not_received_percent_66_70$`Self guided` <- reason_not_received_percent_66_70$`Self guided` / self_guided_total_66_70*100
-reason_not_received_percent_66_70$`Supported` <- reason_not_received_66_70$`Supported` / supported_total_66_70*100
+reason_not_received_percent_66_75$`Self guided` <- reason_not_received_percent_66_75$`Self guided` / self_guided_total_66_75*100
+reason_not_received_percent_66_75$`Supported` <- reason_not_received_66_75$`Supported` / supported_total_66_75*100
 
-reason_not_received_percent_71_75$`Self guided` <- reason_not_received_percent_71_75$`Self guided` / self_guided_total_71_75*100
-reason_not_received_percent_71_75$`Supported` <- reason_not_received_71_75$`Supported` / supported_total_71_75*100
+reason_not_received_percent_76_plus$`Self guided` <- reason_not_received_percent_76_plus$`Self guided` / self_guided_total_76_plus*100
+reason_not_received_percent_76_plus$`Supported` <- reason_not_received_76_plus$`Supported` / supported_total_76_plus*100
 
-reason_not_received_percent_76_80$`Self guided` <- reason_not_received_percent_76_80$`Self guided` / self_guided_total_76_80*100
-reason_not_received_percent_76_80$`Supported` <- reason_not_received_76_80$`Supported` / supported_total_76_80*100
-
-#set to zero for self guided as there are no instance here and otherwise creates NaN
-reason_not_received_percent_81_plus$`Self guided` <- 0*100
-reason_not_received_percent_81_plus$`Supported` <- reason_not_received_81_plus$`Supported` / supported_total_81_plus*100
-
-reason_not_received_percent_16_18
-reason_not_received_percent_19_25
+reason_not_received_percent_16_25
 reason_not_received_percent_26_35
 reason_not_received_percent_36_45
 reason_not_received_percent_46_55
 reason_not_received_percent_56_65
-reason_not_received_percent_66_70
-reason_not_received_percent_71_75
-reason_not_received_percent_76_80
-reason_not_received_percent_81_plus
+reason_not_received_percent_66_75
+reason_not_received_percent_76_plus
 ```
 
 ###**Chi square test Gender by reasons for not receiving treatment**
@@ -2957,73 +2954,61 @@ reasons_gender_sg$Female_prop <- reasons_gender_sg$Female/total_female_sg*100
 ###**Chi square test AGE by reasons for not receiving treatment**
 ```{r treatment received by age - supported and self-guided}
 #supported
-reason_not_received_supported_age <- tibble(reason = c("Systemic","Client","Other"), `16-18` = 1:3, `19-25` = 1:3, `26-35` = 1:3, `36-45` = 1:3, `46-55` = 1:3, `56-65` = 1:3, `66-70` = 1:3, `71-75` = 1:3, `76-80` = 1:3, `81_plus` = 1:3)
-reason_not_received_supported_age$`16-18` <- reason_not_received_16_18$Supported
-reason_not_received_supported_age$`19-25` <- reason_not_received_19_25$Supported
+reason_not_received_supported_age <- tibble(reason = c("Systemic","Client","Other"), `16-25` = 1:3, `26-35` = 1:3, `36-45` = 1:3, `46-55` = 1:3, `56-65` = 1:3, `66-75` = 1:3, `76_plus` = 1:3)
+reason_not_received_supported_age$`16-25` <- reason_not_received_16_25$Supported
 reason_not_received_supported_age$`26-35` <- reason_not_received_26_35$Supported
 reason_not_received_supported_age$`36-45` <- reason_not_received_36_45$Supported
 reason_not_received_supported_age$`46-55` <- reason_not_received_46_55$Supported
 reason_not_received_supported_age$`56-65` <- reason_not_received_56_65$Supported
-reason_not_received_supported_age$`66-70` <- reason_not_received_66_70$Supported
-reason_not_received_supported_age$`71-75` <- reason_not_received_71_75$Supported
-reason_not_received_supported_age$`76-80` <- reason_not_received_76_80$Supported
-reason_not_received_supported_age$`81_plus` <- reason_not_received_81_plus$Supported
+reason_not_received_supported_age$`66-75` <- reason_not_received_66_75$Supported
+reason_not_received_supported_age$`76_plus` <- reason_not_received_76_plus$Supported
 
 reasons_age_supported <- as.data.frame(reason_not_received_supported_age)
-#running without the 81+ category as such small sample
-reasons_age_supported_chisq <- chisq.test(reasons_age_supported[,2:10])
+
+reasons_age_supported_chisq <- chisq.test(reasons_age_supported[,c(-1)])
 reasons_age_supported_chisq$p.value
 reasons_age_supported_chisq
 
 #N for chisq test
-sum(reasons_age_supported$`16-18`) + sum(reasons_age_supported$`19-25`) + sum(reasons_age_supported$`26-35`) + sum(reasons_age_supported$`36-45`) + sum(reasons_age_supported$`46-55`) + sum(reasons_age_supported$`56-65`) + sum(reasons_age_supported$`66-70`) + sum(reasons_age_supported$`71-75`) + sum(reasons_age_supported$`76-80`) 
+sum(reasons_age_supported$`16-25`) + sum(reasons_age_supported$`26-35`) + sum(reasons_age_supported$`36-45`) + sum(reasons_age_supported$`46-55`) + sum(reasons_age_supported$`56-65`) + sum(reasons_age_supported$`66-75`) + sum(reasons_age_supported$`76_plus`) 
 
 #as percentages
-reasons_age_supported$`16-18_prop` <- reasons_age_supported$`16-18` /sum(reasons_age_supported$`16-18`)*100
-reasons_age_supported$`19-25_prop` <- reasons_age_supported$`19-25` /sum(reasons_age_supported$`19-25`)*100
+reasons_age_supported$`16-25_prop` <- reasons_age_supported$`16-25` /sum(reasons_age_supported$`16-25`)*100
 reasons_age_supported$`26-35_prop` <- reasons_age_supported$`26-35` /sum(reasons_age_supported$`26-35`)*100
 reasons_age_supported$`36-45_prop` <- reasons_age_supported$`36-45` /sum(reasons_age_supported$`36-45`)*100
 reasons_age_supported$`46-55_prop` <- reasons_age_supported$`46-55` /sum(reasons_age_supported$`46-55`)*100
 reasons_age_supported$`56-65_prop` <- reasons_age_supported$`56-65` /sum(reasons_age_supported$`56-65`)*100
-reasons_age_supported$`66-70_prop` <- reasons_age_supported$`66-70` /sum(reasons_age_supported$`66-70`)*100
-reasons_age_supported$`71-75_prop` <- reasons_age_supported$`71-75` /sum(reasons_age_supported$`71-75`)*100
-reasons_age_supported$`76-80_prop` <- reasons_age_supported$`76-80` /sum(reasons_age_supported$`76-80`)*100
-reasons_age_supported$`81_plus_prop` <- reasons_age_supported$`81_plus` /sum(reasons_age_supported$`81_plus`)*100
-
+reasons_age_supported$`66-75_prop` <- reasons_age_supported$`66-75` /sum(reasons_age_supported$`66-75`)*100
+reasons_age_supported$`76_plus_prop` <- reasons_age_supported$`76_plus` /sum(reasons_age_supported$`76_plus`)*100
 
 #selfguided
-reason_not_received_selfguided_age <- tibble(reason = c("Systemic","Client","Other"), `16-18` = 1:3, `19-25` = 1:3, `26-35` = 1:3, `36-45` = 1:3, `46-55` = 1:3, `56-65` = 1:3, `66-70` = 1:3, `71-75` = 1:3, `76-80` = 1:3, `81_plus` = 1:3)
-reason_not_received_selfguided_age$`16-18` <- reason_not_received_16_18$`Self guided`
-reason_not_received_selfguided_age$`19-25` <- reason_not_received_19_25$`Self guided`
+reason_not_received_selfguided_age <- tibble(reason = c("Systemic","Client","Other"), `16-25` = 1:3, `26-35` = 1:3, `36-45` = 1:3, `46-55` = 1:3, `56-65` = 1:3, `66-75` = 1:3, `76_plus` = 1:3)
+
+reason_not_received_selfguided_age$`16-25` <- reason_not_received_16_25$`Self guided`
 reason_not_received_selfguided_age$`26-35` <- reason_not_received_26_35$`Self guided`
 reason_not_received_selfguided_age$`36-45` <- reason_not_received_36_45$`Self guided`
 reason_not_received_selfguided_age$`46-55` <- reason_not_received_46_55$`Self guided`
 reason_not_received_selfguided_age$`56-65` <- reason_not_received_56_65$`Self guided`
-reason_not_received_selfguided_age$`66-70` <- reason_not_received_66_70$`Self guided`
-reason_not_received_selfguided_age$`71-75` <- reason_not_received_71_75$`Self guided`
-reason_not_received_selfguided_age$`76-80` <- reason_not_received_76_80$`Self guided`
-reason_not_received_selfguided_age$`81_plus` <- reason_not_received_81_plus$`Self guided`
+reason_not_received_selfguided_age$`66-75` <- reason_not_received_66_75$`Self guided`
+reason_not_received_selfguided_age$`76_plus` <- reason_not_received_76_plus$`Self guided`
 
 reasons_age_selfguided <- as.data.frame(reason_not_received_selfguided_age)
-#running without the 81+ category as such small sample
-reasons_age_selfguided_chisq <- chisq.test(reasons_age_selfguided[,2:10])
+
+reasons_age_selfguided_chisq <- chisq.test(reasons_age_selfguided[,c(-1)])
 reasons_age_selfguided_chisq$p.value
 reasons_age_selfguided_chisq
 
 #N for chisq test
-sum(reasons_age_selfguided$`16-18`) + sum(reasons_age_selfguided$`19-25`) + sum(reasons_age_selfguided$`26-35`) + sum(reasons_age_selfguided$`36-45`) + sum(reasons_age_selfguided$`46-55`) + sum(reasons_age_selfguided$`56-65`) + sum(reasons_age_selfguided$`66-70`) + sum(reasons_age_selfguided$`71-75`) + sum(reasons_age_selfguided$`76-80`) 
+sum(reasons_age_selfguided$`16-25`) + sum(reasons_age_selfguided$`26-35`) + sum(reasons_age_selfguided$`36-45`) + sum(reasons_age_selfguided$`46-55`) + sum(reasons_age_selfguided$`56-65`) + sum(reasons_age_selfguided$`66-75`) + sum(reasons_age_selfguided$`76_plus`)
 
 #as percentages
-reasons_age_selfguided$`16-18_prop` <- reasons_age_selfguided$`16-18` /sum(reasons_age_selfguided$`16-18`)*100
-reasons_age_selfguided$`19-25_prop` <- reasons_age_selfguided$`19-25` /sum(reasons_age_selfguided$`19-25`)*100
+reasons_age_selfguided$`16-25_prop` <- reasons_age_selfguided$`16-25` /sum(reasons_age_selfguided$`16-25`)*100
 reasons_age_selfguided$`26-35_prop` <- reasons_age_selfguided$`26-35` /sum(reasons_age_selfguided$`26-35`)*100
 reasons_age_selfguided$`36-45_prop` <- reasons_age_selfguided$`36-45` /sum(reasons_age_selfguided$`36-45`)*100
 reasons_age_selfguided$`46-55_prop` <- reasons_age_selfguided$`46-55` /sum(reasons_age_selfguided$`46-55`)*100
 reasons_age_selfguided$`56-65_prop` <- reasons_age_selfguided$`56-65` /sum(reasons_age_selfguided$`56-65`)*100
-reasons_age_selfguided$`66-70_prop` <- reasons_age_selfguided$`66-70` /sum(reasons_age_selfguided$`66-70`)*100
-reasons_age_selfguided$`71-75_prop` <- reasons_age_selfguided$`71-75` /sum(reasons_age_selfguided$`71-75`)*100
-reasons_age_selfguided$`76-80_prop` <- reasons_age_selfguided$`76-80` /sum(reasons_age_selfguided$`76-80`)*100
-reasons_age_selfguided$`81_plus_prop` <- reasons_age_selfguided$`81_plus` /sum(reasons_age_selfguided$`81_plus`)*100
+reasons_age_selfguided$`66-75_prop` <- reasons_age_selfguided$`66-75` /sum(reasons_age_selfguided$`66-75`)*100
+reasons_age_selfguided$`76_plus_prop` <- reasons_age_selfguided$`76_plus` /sum(reasons_age_selfguided$`76_plus`)*100
 
 ```
 ###**Plot Gender by reasons for not receiving treatment**
@@ -3071,12 +3056,10 @@ long_reasons_gender_treatment_plot
 
 ###**Plot Age by reasons for not receiving treatment**
 ```{r PLOT treatment received by age - supported and self-guided}
-reasons_age_treatment <- tibble(reason = c("Systemic","Client","Other","Systemic","Client","Other"),source=c("Supported","Supported","Supported","Self-guided","Self-guided","Self-guided"), `16-18` = 1:6, `19-25` = 1:6, `26-35` = 1:6, `36-45` = 1:6, `46-55` = 1:6, `56-65` = 1:6, `66-70` = 1:6, `71-75` = 1:6, `76-80` = 1:6)
+reasons_age_treatment <- tibble(reason = c("Systemic","Client","Other","Systemic","Client","Other"),source=c("Supported","Supported","Supported","Self-guided","Self-guided","Self-guided"), `16-25` = 1:6, `26-35` = 1:6, `36-45` = 1:6, `46-55` = 1:6, `56-65` = 1:6, `66-75` = 1:6, `76_plus` = 1:6)
 
-reasons_age_treatment$`16-18`[1:3] <- reasons_age_supported$`16-18_prop`
-reasons_age_treatment$`16-18`[4:6] <- reasons_age_selfguided$`16-18_prop`
-reasons_age_treatment$`19-25`[1:3] <- reasons_age_supported$`19-25_prop`
-reasons_age_treatment$`19-25`[4:6] <- reasons_age_selfguided$`19-25_prop`
+reasons_age_treatment$`16-25`[1:3] <- reasons_age_supported$`16-25_prop`
+reasons_age_treatment$`16-25`[4:6] <- reasons_age_selfguided$`16-25_prop`
 reasons_age_treatment$`26-35`[1:3] <- reasons_age_supported$`26-35_prop`
 reasons_age_treatment$`26-35`[4:6] <- reasons_age_selfguided$`26-35_prop`
 reasons_age_treatment$`36-45`[1:3] <- reasons_age_supported$`36-45_prop`
@@ -3085,16 +3068,13 @@ reasons_age_treatment$`46-55`[1:3] <- reasons_age_supported$`46-55_prop`
 reasons_age_treatment$`46-55`[4:6] <- reasons_age_selfguided$`46-55_prop`
 reasons_age_treatment$`56-65`[1:3] <- reasons_age_supported$`56-65_prop`
 reasons_age_treatment$`56-65`[4:6] <- reasons_age_selfguided$`56-65_prop`
-reasons_age_treatment$`66-70`[1:3] <- reasons_age_supported$`66-70_prop`
-reasons_age_treatment$`66-70`[4:6] <- reasons_age_selfguided$`66-70_prop`
-reasons_age_treatment$`71-75`[1:3] <- reasons_age_supported$`71-75_prop`
-reasons_age_treatment$`71-75`[4:6] <- reasons_age_selfguided$`71-75_prop`
-reasons_age_treatment$`76-80`[1:3] <- reasons_age_supported$`76-80_prop`
-reasons_age_treatment$`76-80`[4:6] <- reasons_age_selfguided$`76-80_prop`
-
+reasons_age_treatment$`66-75`[1:3] <- reasons_age_supported$`66-75_prop`
+reasons_age_treatment$`66-75`[4:6] <- reasons_age_selfguided$`66-75_prop`
+reasons_age_treatment$`76_plus`[1:3] <- reasons_age_supported$`76_plus_prop`
+reasons_age_treatment$`76_plus`[4:6] <- reasons_age_selfguided$`76_plus_prop`
 
 long_reasons_age_treatment <-  reasons_age_treatment %>%
-pivot_longer(cols = `16-18`:`76-80`, names_to = "Age", values_to = "prop")
+pivot_longer(cols = `16-25`:`76_plus`, names_to = "Age", values_to = "prop")
 
 long_reasons_age_treatment$reason <- as.factor(long_reasons_age_treatment$reason)
 
@@ -3102,7 +3082,7 @@ long_reasons_age_treatment$reason <- factor(long_reasons_age_treatment$reason, l
 
 long_reasons_age_treatment$source <- factor(long_reasons_age_treatment$source, levels = c("Supported","Self-guided"),ordered = TRUE)
 
-long_reasons_age_treatment$Age <- factor(long_reasons_age_treatment$Age, levels = c("16-18","19-25","26-35","36-45","46-55","56-65","66-70","71-75","76-80"),ordered = TRUE)
+long_reasons_age_treatment$Age <- factor(long_reasons_age_treatment$Age, levels = c("16-25","26-35","36-45","46-55","56-65","66-75","76_plus"),ordered = TRUE)
 
 long_reasons_age_treatment_plot <- long_reasons_age_treatment %>%
   ggplot(mapping = aes(Age, prop, fill = reason)
@@ -3112,7 +3092,7 @@ long_reasons_age_treatment_plot <- long_reasons_age_treatment %>%
      position = "stack"
     ) +
   theme(legend.position = "right", legend.title = element_blank())  +
-  labs(x = "Type of treatment",  y = "Proportion of responses (%)") +
+  labs(x = "Age",  y = "Proportion of responses (%)") +
   theme_personal +
   theme(legend.title = element_blank()) +
   theme(legend.text = element_text(size = 8)) +
@@ -3192,20 +3172,20 @@ sum(wide_tx_prop_mf$Supported) + sum(wide_tx_prop_mf$`Self guided`)
 ###**Chi square test Age by Type of treatment sought**
 ```{r treatment sought supported vs. self-guided - age}
 tx_supported_age <- treat_dat %>%
-  group_by(Age80up) %>%
+  group_by(AgeRecoded) %>%
   count(TypeSought.Supported.Any)
 
 tx_selfguided_age <- treat_dat %>%
-  group_by(Age80up) %>%
+  group_by(AgeRecoded) %>%
   count(TypeSought.SelfGuide.Any)
 
 #summarise to just ages of interest for chi-square
-tx_supported_age <- tx_supported_age[c(2:3,5:6,8:9,11:12,14:15,17:18,20:21,23:24,26:27,29:30),]
-tx_selfguided_age <- tx_selfguided_age[c(2:3,5:6,8:9,11:12,14:15,17:18,20:21,23:24,26:27,29:30),]
+tx_supported_age <- tx_supported_age[c(2:3,5:6,8:9,11:12,14:15,17:18,20:21),]
+tx_selfguided_age <- tx_selfguided_age[c(2:3,5:6,8:9,11:12,14:15,17:18,20:21),]
 
 tx_prop_age <- tx_supported_age[1]
-tx_prop_age[c(1,3,5,7,9,11,13,15,17,19),2] <- "Supported"
-tx_prop_age[c(2,4,6,8,10,12,14,16,18,20),2] <- "Self guided"
+tx_prop_age[c(1,3,5,7,9,11,13),2] <- "Supported"
+tx_prop_age[c(2,4,6,8,10,12,14),2] <- "Self guided"
 colnames(tx_prop_age)[2] <- "Type"
 
 tx_prop_age[1,3] <- tx_supported_age$n[2]
@@ -3222,22 +3202,16 @@ tx_prop_age[11,3] <- tx_supported_age$n[12]
 tx_prop_age[12,3] <- tx_selfguided_age$n[12]
 tx_prop_age[13,3] <- tx_supported_age$n[14]
 tx_prop_age[14,3] <- tx_selfguided_age$n[14]
-tx_prop_age[15,3] <- tx_supported_age$n[16]
-tx_prop_age[16,3] <- tx_selfguided_age$n[16]
-tx_prop_age[17,3] <- tx_supported_age$n[18]
-tx_prop_age[18,3] <- tx_selfguided_age$n[18]
-tx_prop_age[19,3] <- tx_supported_age$n[20]
-tx_prop_age[20,3] <- tx_selfguided_age$n[20]
 
 colnames(tx_prop_age)[3] <- "n"
 
 wide_tx_prop_age <- tx_prop_age %>%
-pivot_wider(id_cols = Age80up, names_from = Type, values_from = n)
+pivot_wider(id_cols = AgeRecoded, names_from = Type, values_from = n)
 
 wide_tx_prop_age <- wide_tx_prop_age %>%
   as.data.frame()
 
-tx_age_chisq <- chisq.test(wide_tx_prop_age[1:9,2:3])
+tx_age_chisq <- chisq.test(wide_tx_prop_age[1:7,2:3])
 tx_age_chisq
 
 #as proportions
@@ -3286,10 +3260,10 @@ percent_treatment_type_gender_plot
 percent_treatment_type_age <- wide_tx_prop_age[,c(1,4:5)]
 colnames(percent_treatment_type_age)[2] <- "Supported"
 colnames(percent_treatment_type_age)[3] <- "Self-guided"
-percent_treatment_type_age <- percent_treatment_type_age %>%  pivot_longer(!Age80up,names_to="type",values_to = "percent")
+percent_treatment_type_age <- percent_treatment_type_age %>%  pivot_longer(!AgeRecoded,names_to="type",values_to = "percent")
 
 percent_treatment_type_age_plot <- percent_treatment_type_age %>%
-  ggplot(mapping = aes(Age80up, percent, fill = type)
+  ggplot(mapping = aes(AgeRecoded, percent, fill = type)
     ) +
     geom_bar(aes(),
       stat="identity",
@@ -3404,11 +3378,11 @@ sum(treat_dat_gap_gender$`n received`) + sum(treat_dat_gap_gender$`n not receive
 ```{r Chi square test AGE by Treatment gap}
 
 treat_dat_seek_age <- treat_dat %>%
-  group_by(Age80up) %>%
+  group_by(AgeRecoded) %>%
   count(soughthelp_for_self)
   
 treat_dat_gap_age <- treat_dat %>%
-  group_by(Age80up) %>%
+  group_by(AgeRecoded) %>%
   count(AnyReceived)
 
 #pivot wider
@@ -3416,8 +3390,8 @@ treat_dat_seek_age <- pivot_wider(treat_dat_seek_age, names_from = soughthelp_fo
 treat_dat_gap_age <- pivot_wider(treat_dat_gap_age, names_from = AnyReceived, values_from = n) 
 
 #limit to real answers
-treat_dat_seek_age <- treat_dat_seek_age[2:11,]
-treat_dat_gap_age <- treat_dat_gap_age[2:11,]
+treat_dat_seek_age <- treat_dat_seek_age[2:8,]
+treat_dat_gap_age <- treat_dat_gap_age[2:8,]
 
 #drop NAs
 treat_dat_seek_age <- treat_dat_seek_age[,-c(2)]
@@ -3455,9 +3429,6 @@ colnames(treat_dat_gap_age)[2] <- "n received"
 treat_dat_gap_age$`n not received` <- treat_dat_gap_age$total_sought - treat_dat_gap_age$`n received`
 
 treat_dat_gap_age <- treat_dat_gap_age[,c(1,2,4)]
-
-#********somehow more received than sought for 16-18?? manually set to 0
-treat_dat_gap_age$`n not received`[1] <- 0
 
 treat_dat_gap_age <- treat_dat_gap_age %>%
   as.data.frame()
@@ -3520,14 +3491,14 @@ colnames(treat_dat_seek_age_for_plot)[2] <- "Sought"
 colnames(treat_dat_seek_age_for_plot)[3] <- "Not sought"
 
 treat_dat_seek_age_for_plot <- treat_dat_seek_age_for_plot %>%
-  pivot_longer(!Age80up, names_to = "sought",values_to = "percent")
+  pivot_longer(!AgeRecoded, names_to = "sought",values_to = "percent")
 
 treat_dat_seek_age_for_plot$sought <- as.factor(treat_dat_seek_age_for_plot$sought)
 
 treat_dat_seek_age_for_plot$sought <- factor(treat_dat_seek_age_for_plot$sought, levels=c("Not sought","Sought"), ordered=TRUE)
 
 treat_dat_seek_age_plot <- treat_dat_seek_age_for_plot %>%
-  ggplot(mapping = aes(Age80up, percent, fill = sought)
+  ggplot(mapping = aes(AgeRecoded, percent, fill = sought)
     ) +
     geom_bar(aes(),
       stat="identity",
@@ -3590,20 +3561,20 @@ treat_dat_gap_age_plot <- treat_dat_gap_age[c(1,4:5)]
 colnames(treat_dat_gap_age_plot)[2] <- "Received"
 colnames(treat_dat_gap_age_plot)[3] <- "Not received"
 treat_dat_gap_age_plot <- treat_dat_gap_age_plot %>%
-  pivot_longer(!Age80up, names_to = "received",values_to = "percent")
+  pivot_longer(!AgeRecoded, names_to = "received",values_to = "percent")
 
 treat_dat_gap_age_plot$received <- as.factor(treat_dat_gap_age_plot$received)
 
 treat_dat_gap_age_plot$received <- factor(treat_dat_gap_age_plot$received, levels=c("Not received","Received"), ordered=TRUE)
 
 treat_dat_gap_age_ggplot <- treat_dat_gap_age_plot %>%
-  ggplot(mapping = aes(Age80up, percent, fill = received)
+  ggplot(mapping = aes(AgeRecoded, percent, fill = received)
     ) +
     geom_bar(aes(),
       stat="identity",
      position = "stack"
     ) +
-  labs( x = "Gender",  y = "Proportion of sample (%)") +
+  labs( x = "Age",  y = "Proportion of sample (%)") +
   theme_personal +
   theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
   theme(legend.position = "top", legend.title = element_blank())  +
@@ -4089,6 +4060,7 @@ multiplot <- ggarrange(p1,NULL,p2,NULL,p3,ncol=1,nrow=5,heights = c(1,.05,1,.05,
 multiplot
 
 ```
+
 ## *Gender multi-panel plot*
 ```{r Gender multi-panel plot, fig.height=10,fig.width=10}
 
@@ -4110,7 +4082,7 @@ gender_multiplot
 ```{r Age multi-panel plot, fig.height=10,fig.width=10}
 
 gp1 <- ggarrange(NULL,NULL,NULL,treat_dat_seek_age_plot,percent_treatment_type_age_plot+ rremove("ylab"),treat_dat_gap_age_ggplot+ rremove("ylab"), 
-          labels = c("A: Treatment *seeking*","B: Type of treatment sought","C:Treatment receipt","","",""),hjust = 0,
+          labels = c("A: Treatment seeking","B: Type of treatment sought","C:Treatment receipt","","",""),hjust = 0,
           ncol = 3, nrow =2,heights=c(.1,1))
 
 gp2 <- ggarrange(NULL,long_reasons_age_treatment_plot,
