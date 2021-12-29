@@ -119,7 +119,7 @@ date = Sys.Date()
 
 ```{r call in function library functions}
 # source all functions in the function library folder
-files.sources = paste0("../FunctionLib/",list.files("../FunctionLib"))
+files.sources = paste0("./FunctionLib/",list.files("./FunctionLib"))
 sapply(files.sources, source)
 
 library("eeptools")
@@ -248,12 +248,16 @@ demCOPE.glad <- readRDS(file = paste0(data_path, "/coping_glad/dem_coping_glad.R
 demCOPE.glad.baseline <- readRDS(file = paste0(data_path, "/glad/dem_glad.RDS"))
 
 demCOPE.edgi <- readRDS(file = paste0(data_path, "/coping_edgi/dem_coping_edgi.RDS"))
+#¡¡¡¡¡¡¡¡¡#
 demCOPE.edgi.baseline <- readRDS(file = paste0(data_path, "/edgi/demographics_edgi.RDS"))
+#¡¡¡¡¡¡¡¡¡#
 
 demCOPE.nbr <- readRDS(file = paste0(data_path, "/coping_nbr/dem_coping_nbr.RDS"))
 demographicsCOPE.nbr <- readRDS(file = paste0(data_path, "/coping_nbr/demographics_coping_nbr.RDS"))
 #demCOPE.nbr.baseline <- fread(paste0(data_path, "/nbr/NBR_hlq_dem_data_hash.csv"))
+#¡¡¡¡¡¡¡¡¡#
 demCOPE.nbr.baseline <- fread(paste0(data_path, "/nbr_additional_info/coping_participants_export_20200730_hashed.csv"))
+#¡¡¡¡¡¡¡¡¡#
 
 GLADpostcode <- fread(paste0(postpath,"/GLAD_COPING_postcodes.csv"))
 EDGIpostcode <- fread(paste0(postpath,"/EDGI_COPING_postcodes.csv"))
@@ -262,8 +266,10 @@ NBRpostcode <- fread(paste0(postpath,"/NBR_postcodes_hash.csv"))
 MHD.COPE.glad <- readRDS(file = paste0(data_path, "/coping_glad/mhd_coping_glad.rds"))
 #MHD.COPE.edgi <- readRDS(file = paste0(cope_path, "/coping_edgi/mhd_coping_edgi.rds")) THIS IS IN THE DEMOGRAPHICS
 MHD.COPE.nbr <- readRDS(file = paste0(data_path, "/coping_nbr/mhd_coping_nbr.rds"))
-MHD.RAMP <- readRDS(file = paste0(data_path, "/ramp/mhd_ramp.rds"))
 
+#¡¡¡¡¡¡¡¡¡#
+MHD.RAMP <- readRDS(file = paste0(data_path, "/ramp/mhd_ramp.rds"))
+#¡¡¡¡¡¡¡¡¡#
 ```
 
 
