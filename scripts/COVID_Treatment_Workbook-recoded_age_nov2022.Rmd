@@ -1,0 +1,2658 @@
+---
+title: "RAMP/COPING treatment paper core notebook"
+author: "K L Purves"
+date: '`r format(Sys.time(), "%d %B, %Y")`'
+output:
+  html_document:
+    df_print: paged
+    highlight: monochrome
+    number_sections: no
+    standalone: no
+    theme: cerulean
+    toc: yes
+    toc_depth: 3
+    toc_float:
+      collapsed: no
+  word_document:
+    toc: yes
+    toc_depth: '3'
+html_notebook:
+  theme: cerulean
+code_folding: show
+toc: yes
+---
+
+This workbook runs code and shows results for the manuscript ***Access and uptake of mental health services during the COVID-19 pandemic: rates, barriers and usefulness***. 
+
+# Project description
+
+#### Research questions
+
+1. What are the rates for treatment seeking for MH concerns at each time point (wave)
+- rates over time
+
+2. 
+
+#### Details, discussion and questions
+
+How do we show change over time in treatment seeking and receipt over time?
+- are services overwhelmed?
+
+#### Predictors
+
+We select predictors that predict worse outcomes for common mental health problems in this sample [see GitHub for relevant paper here](https://github.com/klpurves/PANCHANGE_analysis/tree/forest_plots)
+
+
+#### submission
+
+Will submit to Psychological Medicine in first instance
+
+#### variables that need creating
+
+- did you seek treatment at any time
+
+#### Variable categorisation
+
+**treatment type:**
+supported (requires contact) or self guided ()
+
+Categorisation makes sense for resource allocation etc.
+
+**reasons for seeking**
+new or existing
+crisis as a third (number dependent)
+
+**barriers**
+Systemic and client level
+
+#### People who have helped along the way
+Henry 
+Laura
+Molly
+
+#### Figures
+
+1. COVID figures, lockdown dates, histogram/density 
+2. Bar plot 
+3. Map of the UK showing rates of treatment seeking and receipt per area (prop sought treatment == size, proportion received == colour) probably district or rgion level?
+4. Forest plots
+
+** prevention figure: bars for each barrier type, coloured by whether systemic or client led
+
+# set up 
+
+Clear global environment
+```{r Clear global environment}
+remove(list = ls())
+```
+
+#### Call in set up scripts
+
+```{r Setup, source files, echo=FALSE}
+#source data directory: data_path
+source("/Users/katherineyoung/Documents/RAMP-COPING_MH_treatment_paper/file_paths.R")
+setwd(wd)
+source("./scripts/palettes.R")
+source("./scripts/libraries.R")
+
+```
+
+
+```{r Setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE,
+                      comment=NA,
+                      prompt=FALSE,
+                      cache=FALSE,
+                      root.dir=wd)
+
+knitr::opts_chunk$set(fig.path="figures/")
+
+options(bitmapType = 'quartz') # to render fonts better
+```
+
+Retrieve the current date to use it for file endings to not overwrite files when one exports files
+```{r Recent date}
+date = Sys.Date()
+```
+
+#### R functions
+
+```{r call in function library functions}
+# source all functions in the function library folder
+files.sources = paste0("/Users/katherineyoung/Documents/RAMP-COPING_MH_treatment_paper/CovidTreatment/FunctionLib/",list.files("/Users/katherineyoung/Documents/RAMP-COPING_MH_treatment_paper/CovidTreatment/FunctionLib"))
+
+
+sapply(files.sources, source)
+
+library("eeptools")
+
+```
+
+#Add_numeric function
+Function used to convert character variables into numeric variables.
+```{r add_numeric function}
+add_numeric <- function(dat, exclude = NULL) {
+  dat_fct <- sjlabelled::as_label(dat)
+
+  dat <- dat[!colnames(dat) %in% exclude]
+  colnames(dat) <- paste(colnames(dat), "numeric", sep = "_")
+  return(bind_cols(dat_fct, dat))
+}
+```
+# Colour palettes
+Define colours for plotting this are the standard coping colours
+```{r Colour palettes: COPING}
+COPINGpalette2 <- c("#78D9C5",
+                    "#F5BE5E")
+
+COPINGpalette3 <- c("#78D9C5",
+                    "#F5BE5E",
+                    "#EEB6E9")
+
+COPINGpalette4 <- c("#78D9C5",
+                    "#F5BE5E",
+                    "#EEB6E9",
+                    "#DBDB73")
+
+COPINGpalette5 <- c("#78D9C5",
+                    "#F5BE5E",
+                    "#EEB6E9",
+                    "#DBDB73", 
+                    "#FFED98")
+
+COPINGpalette6 <- c("#78D9C5",
+                    "#F5BE5E",
+                    "#EEB6E9",
+                    "#DBDB73",
+                    "#FFED98",
+                    "#BFD2EB")
+
+COPINGpalette7 <- c("#78D9C5",
+                    "#F5BE5E",
+                    "#EEB6E9",
+                    "#DBDB73", 
+                    "#FFED98",
+                    "#BFD2EB", 
+                    "#808080")
+
+COPINGpaletteGRAD <- c("#F5BE5E",
+                       "#FFD284",
+                       "#FFEED1",
+                       "#B5B5B5",
+                       "#DEFFF8",
+                       "#94F6E1",
+                       "#78D9C5")
+
+COPINGNeuCenterpalette <- c("#78D9C5",
+                            "#808080",
+                            "#F5BE5E")
+
+RAMPworseGRADpalette <- c("#78D9C5",
+                          "#FFEED1",
+                          "#F5BE5E",
+                          "#FFB1B5")
+GLADpalette = c("#efc00b", 
+                "#b7dee8")  
+
+RAMPlikertpalette <- c("#78D9C5",
+                       "#8DD5B4",
+                       "#A2D0A3",
+                       "#B7CC92",
+                       "#CBC780",
+                       "#E0C36F",
+                    "#F5BE5E")
+```
+
+Choose in this chunk which palette to use
+04.07.2020 - Default to 2 colour COPING palette
+```{r Choose colour palette}
+palette = COPINGpalette2
+```
+
+# ggplot theme
+Set up ggplot theme for the plots
+```{r ggplot theme}
+library(ggpubr)
+
+theme_personal <-  theme(
+    text = element_text(color = "black"),
+    axis.title = element_text(color = "black"),
+    axis.text = element_text(color = "black"),
+    legend.background = element_blank(),
+    legend.box.background = element_blank(),
+    panel.background = element_blank(), 
+    panel.grid.minor.x = element_blank(),
+    panel.grid.major.x = element_line(
+      colour = "gray",
+      linetype = "dashed",
+      size = 0.2
+      ),
+    axis.ticks = element_blank()
+    )
+```
+# Data wrangling
+
+#### Data import
+RAMP
+```{r read in data ramp}
+treatRAMP <- readRDS(file = paste0(data_path, "/treatment_ramp_followupb.rds"))
+demRAMP <- readRDS(file = paste0(data_path, "/dem_ramp.RDS"))
+
+```
+
+COPING
+Note, external data reference is a hash-id for coping. So it is consistent across participants and matches, but is not linkable to GLAD ID
+```{r read in data coping}
+treatCOPE <- readRDS(file = paste0(data_path, "/treatment_coping_followupa_ongoing.rds"))
+
+demCOPE.glad <- readRDS(file = paste0(data_path, "/dem_coping_glad.rds"))
+demCOPE.glad.baseline <- readRDS(file = paste0(data_path, "/dem_glad.RDS"))
+
+demCOPE.edgi <- readRDS(file = paste0(data_path, "/dem_coping_edgi.RDS"))
+demCOPE.edgi.baseline <- readRDS(file = paste0(data_path_baseline, "/dem_edgi.RDS"))
+#demCOPE.edgi.baseline <- readRDS("/Users/katherineyoung/King's College London/MT-TNG BioResource EDIT - ilovedata - data_raw/2021-10-03/edgi/dem_edgi.rds")
+
+
+demCOPE.nbr <- readRDS(file = paste0(data_path_baseline, "/demographics_coping_nbr.RDS"))
+demographicsCOPE.nbr <- readRDS(file = paste0(data_path, "/demographics_coping_nbr.RDS"))
+#demCOPE.nbr.baseline <- fread(paste0(data_path, "/nbr/NBR_hlq_dem_data_hash.csv"))
+demCOPE.nbr.baseline <- fread(file = paste0(data_path_demCOPE,"/coping_participants_export_20200730_hashed.csv"))
+
+
+#GLADpostcode <- fread(paste0(postpath,"/GLAD_COPING_postcodes.csv"))
+#EDGIpostcode <- fread(paste0(postpath,"/EDGI_COPING_postcodes.csv"))
+#NBRpostcode <- fread(paste0(postpath,"/NBR_postcodes_hash.csv"))
+
+MHD.COPE.glad <- readRDS(file = paste0(data_path, "/mhd_coping_glad.rds"))
+#MHD.COPE.edgi <- readRDS(file = paste0(data_path, "/coping_edgi/mhd_coping_edgi.rds")) 
+MHD.COPE.nbr <- readRDS(file = paste0(data_path, "/mhd_coping_nbr.rds"))
+
+MHD.RAMP <- readRDS(file = paste0(data_path_baseline, "/mhd_ramp.rds"))
+
+```
+
+
+# Get age,gender & ethnicity for GLAD, EDGI & NBR
+
+## GLAD
+```{r age gender ethnicity GLAD}
+
+GLADdemvars <- demCOPE.glad.baseline %>%
+  dplyr::select("externalDataReference","dem.which_gender_do_you_identify_with","dem.questions_based_details_gather","dem.how_old_are_you_now.txt") %>%
+  rename(ID=externalDataReference,
+         Gender=dem.which_gender_do_you_identify_with,
+         Ethnicity=dem.questions_based_details_gather,
+         Age.linear = dem.how_old_are_you_now.txt)
+
+```
+
+
+### make age categorical
+
+Age cats:
+
+-77: Seen but not answered
+16-18
+19-25
+26-35
+36-45
+46-55
+56-65
+66-70
+71-75
+76-80
+81-85
+86-90
+91-100
+100+
+
+RECODING TO BE EQUAL INTERVALS
+16-25
+26-35
+36-45
+46-55
+56-65
+66-75
+76+
+
+```{r age categorical GLAD}
+
+GLADdemvars <- GLADdemvars %>%
+  mutate(AgeAll = case_when(Age.linear >=16 & Age.linear <= 18 ~ "16-18",
+                            Age.linear >=19 & Age.linear <= 25 ~ "19-25",
+                            Age.linear >=26 & Age.linear <= 35 ~ "26-35",
+                            Age.linear >=36 & Age.linear <= 45 ~ "36-45",
+                            Age.linear >=46 & Age.linear <= 55 ~ "46-55",
+                            Age.linear >=56 & Age.linear <= 65 ~ "56-65",
+                            Age.linear >=66 & Age.linear <= 70 ~ "66-70",
+                            Age.linear >=71 & Age.linear <= 75 ~ "71-75",
+                            Age.linear >=76 & Age.linear <= 80 ~ "76-80",
+                            Age.linear >=81 & Age.linear <= 85 ~ "81-85",
+                            Age.linear >=86 & Age.linear <= 90 ~ "86-90",
+                            Age.linear >=91 & Age.linear <= 100 ~ "91-100",
+                            Age.linear >=101 ~ "100+",
+                            Age.linear ==-77 ~ "Did not respond"),
+         Age80up = case_when(Age.linear >=16 & Age.linear <= 18 ~ "16-18",
+                            Age.linear >=19 & Age.linear <= 25 ~ "19-25",
+                            Age.linear >=26 & Age.linear <= 35 ~ "26-35",
+                            Age.linear >=36 & Age.linear <= 45 ~ "36-45",
+                            Age.linear >=46 & Age.linear <= 55 ~ "46-55",
+                            Age.linear >=56 & Age.linear <= 65 ~ "56-65",
+                            Age.linear >=66 & Age.linear <= 70 ~ "66-70",
+                            Age.linear >=71 & Age.linear <= 75 ~ "71-75",
+                            Age.linear >=76 & Age.linear <= 80 ~ "76-80",
+                            Age.linear >=81  ~ "81+",
+                            Age.linear ==-77 ~ "Did not respond"),
+         AgeRecoded = case_when(Age.linear >=16 & Age.linear <= 25 ~ "16-25",
+                            Age.linear >=26 & Age.linear <= 35 ~ "26-35",
+                            Age.linear >=36 & Age.linear <= 45 ~ "36-45",
+                            Age.linear >=46 & Age.linear <= 55 ~ "46-55",
+                            Age.linear >=56 & Age.linear <= 65 ~ "56-65",
+                            Age.linear >=66 & Age.linear <= 75 ~ "66-75",
+                            Age.linear >=76 & Age.linear <= 80 ~ "76+",
+                            Age.linear ==-77 ~ "Did not respond"))
+
+```
+
+
+## EDGI
+```{r age gender ethnicity EDGI}
+
+EDGIdemvars <- demCOPE.edgi.baseline %>%
+  select("externalDataReference","demographics.what_gender_do_you_identify_with","demographics.what_gender_do_you_identify_with","demographics.what_gender_do_you_identify_with") %>%
+  rename(ID=externalDataReference,
+         Gender=demographics.what_gender_do_you_identify_with,
+         Ethnicity=demographics.what_gender_do_you_identify_with,
+         Age.linear = demographics.what_gender_do_you_identify_with)
+
+```
+
+
+### make age categorical
+
+Age cats:
+
+-77: Seen but not answered
+16-18
+19-25
+26-35
+36-45
+46-55
+56-65
+66-70
+71-75
+76-80
+81-85
+86-90
+91-100
+100+
+
+```{r age categorical EDGI}
+
+EDGIdemvars <- EDGIdemvars %>%
+  mutate(AgeAll = case_when(Age.linear >=16 & Age.linear <= 18 ~ "16-18",
+                            Age.linear >=19 & Age.linear <= 25 ~ "19-25",
+                            Age.linear >=26 & Age.linear <= 35 ~ "26-35",
+                            Age.linear >=36 & Age.linear <= 45 ~ "36-45",
+                            Age.linear >=46 & Age.linear <= 55 ~ "46-55",
+                            Age.linear >=56 & Age.linear <= 65 ~ "56-65",
+                            Age.linear >=66 & Age.linear <= 70 ~ "66-70",
+                            Age.linear >=71 & Age.linear <= 75 ~ "71-75",
+                            Age.linear >=76 & Age.linear <= 80 ~ "76-80",
+                            Age.linear >=81 & Age.linear <= 85 ~ "81-85",
+                            Age.linear >=86 & Age.linear <= 90 ~ "86-90",
+                            Age.linear >=91 & Age.linear <= 100 ~ "91-100",
+                            Age.linear >=101 ~ "100+",
+                            Age.linear ==-77 ~ "Did not respond"),
+         Age80up = case_when(Age.linear >=16 & Age.linear <= 18 ~ "16-18",
+                            Age.linear >=19 & Age.linear <= 25 ~ "19-25",
+                            Age.linear >=26 & Age.linear <= 35 ~ "26-35",
+                            Age.linear >=36 & Age.linear <= 45 ~ "36-45",
+                            Age.linear >=46 & Age.linear <= 55 ~ "46-55",
+                            Age.linear >=56 & Age.linear <= 65 ~ "56-65",
+                            Age.linear >=66 & Age.linear <= 70 ~ "66-70",
+                            Age.linear >=71 & Age.linear <= 75 ~ "71-75",
+                            Age.linear >=76 & Age.linear <= 80 ~ "76-80",
+                            Age.linear >=81  ~ "81+",
+                            Age.linear ==-77 ~ "Did not respond"),
+        AgeRecoded = case_when(Age.linear >=16 & Age.linear <= 25 ~ "16-25",
+                            Age.linear >=26 & Age.linear <= 35 ~ "26-35",
+                            Age.linear >=36 & Age.linear <= 45 ~ "36-45",
+                            Age.linear >=46 & Age.linear <= 55 ~ "46-55",
+                            Age.linear >=56 & Age.linear <= 65 ~ "56-65",
+                            Age.linear >=66 & Age.linear <= 75 ~ "66-75",
+                            Age.linear >=76 & Age.linear <= 80 ~ "76+",
+                            Age.linear ==-77 ~ "Did not respond"))
+
+```
+
+
+## NBR
+### Select variables
+```{r age gender ethnicity NBR}
+
+NBRdemvars <- demCOPE.nbr.baseline %>%
+  select("NBR ID","gender","ethnicity","age") %>%
+  rename(ID=`NBR ID`,
+         Gender=gender,
+         Ethnicity=ethnicity,
+         Age.linear = age)
+
+```
+########################################################
+
+```{r nbr age cleaning}
+  exclude_cols_dem <- c("ID",
+                        "Sample",
+                        "Age_uncleaned",
+                        "EduYrs")
+
+nbr.dem.raw.id <- demographicsCOPE.nbr %>%
+    drop_na(subjectid) %>% # Drop NAs
+    distinct(subjectid, .keep_all = TRUE) %>% # Remove duplicates based on ID
+#    separate(subjectid, into = c("Sample", "ID.intm"), sep = 6) %>% # Split ID in Sample and Number
+#    separate(ID.intm, into = "ID", sep = 7) %>%
+    mutate(ID = subjectid) %>%
+    select(
+      ID, # ID
+      Birthyear_unc = dem.year, # Birthyear
+      Birthmonth = dem.month, #Birthmonth
+      Birthday = dem.day, #Birthday
+      Gender_unc = dem.which_gender_do_you_identify_with, # Gender
+      Sex = dem.select_questionnaire_items_medical #Sex
+    ) %>%
+    add_numeric(., exclude = exclude_cols_dem) %>%
+    mutate_if(is.numeric, ~na_if(., -88)) %>% # Recode missing values to NAs in numeric variables
+    mutate_if(is.numeric, ~na_if(., -99)) %>%
+    mutate_if(is.numeric, ~na_if(., -77)) %>%
+    mutate_if(is.factor, ~na_if(., "Seen but not answered")) %>% # Recode missing values to NAs in factor variables
+    mutate_if(is.factor, ~na_if(., "Don't know")) %>%
+    mutate_if(is.factor, ~na_if(., "Prefer not to say")) %>%
+    mutate_if(is.factor, ~na_if(., "Prefer not to answer")) %>%
+    mutate_if(is.factor, ~forcats::fct_drop(., only = "Seen but not answered")) %>% # Drop empty factor levels
+    mutate_if(is.factor, ~forcats::fct_drop(., only = "Don't know")) %>%
+    mutate_if(is.factor, ~forcats::fct_drop(., only = "Prefer not to answer")) %>%
+    mutate_if(is.factor, ~forcats::fct_drop(., only = "Prefer not to say"))
+
+  # Inspect dimensions
+  dim(nbr.dem.raw.id)
+  # Inspect colnames
+  colnames(nbr.dem.raw.id)
+```
+
+### NBR converting birth year to age
+```{r nbr dem calculating age from birthday}
+nbr.dem.raw.id$Birthyear_numeric <- nbr.dem.raw.id$Birthyear_unc_numeric + 1900
+
+#create dob as date format
+nbr.dem.raw.id$Birthdate <- as.Date(paste(nbr.dem.raw.id$Birthyear_numeric,
+                                  nbr.dem.raw.id$Birthmonth_numeric,
+                                  nbr.dem.raw.id$Birthday_numeric,
+                                  sep = "-"))
+
+head(nbr.dem.raw.id$Birthdate)
+
+#Calculate dem.age(remove NAs as it throws an error)
+#ages <- age_calc(na.omit(nbr.dem.raw.id$Birthdate), enddate = Sys.Date(), units = "years")
+#end of may set as arbitrary endpoint for baseline data for rough estimate of age
+ages <- age_calc(na.omit(nbr.dem.raw.id$Birthdate), enddate = as.Date("2020-05-30"), units = "years")
+
+#Create dem.agecolumn
+nbr.dem.raw.id$Age_uncleaned<- NA
+
+#Populate with values (excluding NAs)
+nbr.dem.raw.id$Age_uncleaned[!is.na(nbr.dem.raw.id$Birthdate)] <- ages
+
+#Round age down
+nbr.dem.raw.id$Age_uncleaned <- floor(nbr.dem.raw.id$Age_uncleaned)
+
+#Visualise
+head(nbr.dem.raw.id$Age_uncleaned)
+head(nbr.dem.raw.id$Birthdate)
+
+```
+
+### make age categorical
+
+Age cats:
+
+-77: Seen but not answered
+16-18
+19-25
+26-35
+36-45
+46-55
+56-65
+66-70
+71-75
+76-80
+81-85
+86-90
+91-100
+100+
+
+```{r age categorical NBR}
+all_NBR_dems <- left_join(NBRdemvars, nbr.dem.raw.id)
+
+NBRdemvars$Age.linear <- all_NBR_dems$Age_uncleaned
+NBRdemvars <- NBRdemvars %>%
+  mutate(AgeAll = case_when(Age.linear >=16 & Age.linear <= 18 ~ "16-18",
+                            Age.linear >=19 & Age.linear <= 25 ~ "19-25",
+                            Age.linear >=26 & Age.linear <= 35 ~ "26-35",
+                            Age.linear >=36 & Age.linear <= 45 ~ "36-45",
+                            Age.linear >=46 & Age.linear <= 55 ~ "46-55",
+                            Age.linear >=56 & Age.linear <= 65 ~ "56-65",
+                            Age.linear >=66 & Age.linear <= 70 ~ "66-70",
+                            Age.linear >=71 & Age.linear <= 75 ~ "71-75",
+                            Age.linear >=76 & Age.linear <= 80 ~ "76-80",
+                            Age.linear >=81 & Age.linear <= 85 ~ "81-85",
+                            Age.linear >=86 & Age.linear <= 90 ~ "86-90",
+                            Age.linear >=91 & Age.linear <= 100 ~ "91-100",
+                            Age.linear >=101 ~ "100+",
+                            Age.linear ==-77 ~ "Did not respond"),
+         Age80up = case_when(Age.linear >=16 & Age.linear <= 18 ~ "16-18",
+                            Age.linear >=19 & Age.linear <= 25 ~ "19-25",
+                            Age.linear >=26 & Age.linear <= 35 ~ "26-35",
+                            Age.linear >=36 & Age.linear <= 45 ~ "36-45",
+                            Age.linear >=46 & Age.linear <= 55 ~ "46-55",
+                            Age.linear >=56 & Age.linear <= 65 ~ "56-65",
+                            Age.linear >=66 & Age.linear <= 70 ~ "66-70",
+                            Age.linear >=71 & Age.linear <= 75 ~ "71-75",
+                            Age.linear >=76 & Age.linear <= 80 ~ "76-80",
+                            Age.linear >=81  ~ "81+",
+                            Age.linear ==-77 ~ "Did not respond"),
+        AgeRecoded = case_when(Age.linear >=16 & Age.linear <= 25 ~ "16-25",
+                            Age.linear >=26 & Age.linear <= 35 ~ "26-35",
+                            Age.linear >=36 & Age.linear <= 45 ~ "36-45",
+                            Age.linear >=46 & Age.linear <= 55 ~ "46-55",
+                            Age.linear >=56 & Age.linear <= 65 ~ "56-65",
+                            Age.linear >=66 & Age.linear <= 75 ~ "66-75",
+                            Age.linear >=76 & Age.linear <= 80 ~ "76+",
+                            Age.linear ==-77 ~ "Did not respond"))
+
+```
+
+
+### Map ethnicity categories
+
+-99: prefer not to say
+-88: Dont know
+-77: Seen but not answered
+
+White
+Mixed or multiple ethnicities
+Asian or Asian british
+Black or Black british
+Arab
+Other
+
+```{r recategorise NBR ethnicity}
+
+NBRdemvars <- NBRdemvars %>%
+  mutate(Ethnicity = case_when(Ethnicity ==  "A" |
+                               Ethnicity ==  "A (White - British)" |
+                                 Ethnicity ==  "B" |
+                                 Ethnicity == "B (White - Irish)" |
+                                 Ethnicity ==  "C" |
+                                 Ethnicity == "C (White - Other White)" ~ "White",
+                               
+                               Ethnicity == "D (Mixed - White and Black Caribbean)" |
+                                 Ethnicity ==  "D" |
+                                 Ethnicity == "E (Mixed - White and Black African)" |
+                                 Ethnicity ==  "E" |
+                                 Ethnicity == "F (Mixed - White and Asian)" |
+                                 Ethnicity ==  "F" |
+                                 Ethnicity == "G (Mixed - Other Mixed)" ~ "Mixed or multiple ethnicities",
+                               Ethnicity ==  "G" |
+                               Ethnicity == "H (Asian or Asian British - Indian)" |
+                                 Ethnicity ==  "H" |
+                                 Ethnicity == "J (Asian or Asian British - Pakistani)" |
+                                 Ethnicity ==  "J" |
+                                 Ethnicity == "K (Asian or Asian British - Bangladeshi)" |
+                                 Ethnicity ==  "K" |
+                                 Ethnicity == "L (Asian or Asian British - Other Asian)" ~ "Asian or Asian British",
+                               Ethnicity ==  "L" |
+                               Ethnicity == "M (Black or Black British - Caribbean)" |
+                                 Ethnicity ==  "M" |
+                                 Ethnicity == "N (Black or Black British - African)" |
+                                 Ethnicity ==  "N" |
+                                 Ethnicity == "P (Black or Black British - Other Black)" ~ "Black or Black British",
+                               Ethnicity ==  "P" |
+                               Ethnicity == "R (Other Ethnic - Chinese)" |
+                                 Ethnicity ==  "R" |
+                               Ethnicity ==  "S" |
+                                   Ethnicity == "S (Other Ethnic - Other Ethnic)" ~ "Other",
+                               Ethnicity ==  "Z" |
+                               Ethnicity == "Z (Not Stated)" ~ "Seen but not answered"))
+                                 
+   
+
+```
+
+### clean gender other column from blank to labelled
+
+```{r NBR clean gender}
+NBRdemvars <- NBRdemvars %>%
+  mutate(Gender = case_when(Gender == "Male" ~ "Male",
+                            Gender == "Female" ~ "Female",
+                            Gender == "" ~ "Did not respond"))
+```
+
+
+#### Create a wave columns in treatment data
+Base this on dates of the follow ups drawn from qualtrics.
+
+RAMP
+5 waves
+
+1 - May 2020
+2 - June 2020
+3 - July 2020 (start date actually the last day of June)
+4 - September 2020
+5 - November 2020
+
+```{r identify wave dates ramp}
+setwd(wd)
+source("./scripts/RAMPwaves.R")
+```
+
+COPING
+```{r identify wave dates coping}
+setwd(wd)
+source("./scripts/COPINGwaves.R")
+```
+#### drop data before data collection started
+
+Drop Any data collected earleir than June (our first instance of the questionnaire)
+
+```{r drop May dat}
+
+treatRAMP <- treatRAMP %>%
+  filter(startDate > as.POSIXct("2020-06-01"))
+
+```
+
+
+#### select only relevant demographics
+
+```{r demographic select list}
+keepcols.cope <- c("externalDataReference","dem.which_gender_do_you_identify_with")
+cols.cope <- c("ID","Gender")
+keepcols.nbr <- c("subjectid")
+cols.nbr <- c("ID")
+keepcols.ramp <- c("Login ID","dem2.how_old_are_you","dem2.which_gender_do_you_identify_with","dem2.where_in_the_uk_do_you_live.txt","dem2.what_is_your_ethnic_origin")
+cols.ramp <- c("ID","Age","Gender","Postcode","Ethnicity")
+
+names.postcode <- c("ID","Postcode")
+
+```
+
+
+```{r demographic select}
+dem.cope.glad <- demCOPE.glad[names(demCOPE.glad) %in% keepcols.cope]
+dem.cope.edgi <- demCOPE.edgi[names(demCOPE.edgi) %in% keepcols.cope]
+dem.cope.nbr <- demCOPE.nbr[names(demCOPE.nbr) %in% keepcols.nbr]
+dem.ramp <- demRAMP[names(demRAMP) %in% keepcols.ramp]
+
+names(dem.cope.glad) <- cols.cope
+names(dem.cope.edgi) <- cols.cope
+names(dem.cope.nbr) <- cols.nbr
+names(dem.ramp) <- cols.ramp
+
+
+#names(GLADpostcode) <- names.postcode
+#names(EDGIpostcode) <- names.postcode
+#names(NBRpostcode) <- names.postcode
+
+
+```
+Clean postcode to keep only outcode for COPING
+
+```{r clean COPING postcodes}
+
+#setwd(wd)
+#source("./scripts/clean_COPING_postcode_data.R")
+
+```
+
+Add postcode to COPING
+
+```{r add postcode to coping}
+
+#dem.cope.glad <- left_join(dem.cope.glad,GLADpostcode)
+#dem.cope.edgi <- left_join(dem.cope.edgi,EDGIpostcode)
+#dem.cope.nbr <- left_join(dem.cope.nbr,NBRpostcode)
+
+```
+
+#### Add extra demographic variables
+
+```{r merge glad/edgi/nbr baseline demographics to their other demographics}
+
+dem.cope.glad <- left_join(dem.cope.glad, GLADdemvars)
+dem.cope.edgi <- left_join(dem.cope.edgi, EDGIdemvars)
+dem.cope.nbr <- left_join(dem.cope.nbr, NBRdemvars)
+
+```
+
+
+#### add sample columns 
+
+```{r add sample col}
+
+dem.cope.glad$Sample <-  "COPING"
+dem.cope.glad$SampleCOPE <-  "GLAD"
+dem.cope.edgi$Sample <- "COPING"
+dem.cope.edgi$SampleCOPE <- "EDGI"
+dem.cope.nbr$Sample <- "COPING"
+dem.cope.nbr$SampleCOPE <- "NBR"
+dem.ramp$Sample <- "RAMP"
+
+treatRAMP$Sample <- "RAMP"
+treatCOPE$Sample <- "COPING"
+
+```
+
+
+
+# Demographics cleaning
+
+## clean age (RAMP)
+
+Age cats:
+
+-77: Seen but not answered
+1: 16-18
+2: 19-25
+3: 26-35
+4: 36-45
+5: 46-55
+6: 56-65
+7: 66-70
+8: 71-75
+9: 76-80
+10: 81-85
+11: 86-90
+12: 91-100
+13: 100+
+
+```{r make and label age factors}
+
+dem.ramp <- dem.ramp %>%
+  mutate_at(vars(Age),
+            list(factor))  %>%
+  mutate(AgeAll = fct_recode(Age, 
+                                "16-18"="1",
+                                "19-25"="2",
+                                "26-35"="3",
+                                "36-45"="4",
+                                "46-55"="5",
+                                "56-65"="6",
+                                "66-70"="7",
+                                "71-75"="8",
+                                "76-80"="9",
+                                "81-85"="10",
+                                "86-90"="11",
+                                "91-100"="12",
+                                "100+"="13",
+                                "Did not respond"="-77"
+                                ),
+         Age80up = fct_recode(Age, 
+                                "16-18"="1",
+                                "19-25"="2",
+                                "26-35"="3",
+                                "36-45"="4",
+                                "46-55"="5",
+                                "56-65"="6",
+                                "66-70"="7",
+                                "71-75"="8",
+                                "76-80"="9",
+                                "81+"="10",
+                                "81+"="11",
+                                "81+"="12",
+                                "81+"="13",
+                                "Did not respond"="-77"
+                                ),  
+         AgeRecoded = fct_recode(Age, 
+                                "16-25"="1",
+                                "16-25"="2",
+                                "26-35"="3",
+                                "36-45"="4",
+                                "46-55"="5",
+                                "56-65"="6",
+                                "66-75"="7",
+                                "66-75"="8",
+                                "76+"="9",
+                                "76+"="10",
+                                "76+"="11",
+                                "76+"="12",
+                                "76+"="13",
+                                "Did not respond"="-77"
+                                ))
+
+```
+
+## Join RAMP, GLAD and EDGI
+
+```{r join ramp, edgi and glad dems}
+
+dem <- merge(dem.ramp,dem.cope.glad, all=TRUE)
+dem <- merge(dem,dem.cope.edgi, all=TRUE)
+
+```
+
+## clean ethnicity
+Ethnicity:
+
+-99: prefer not to say
+-88: Dont know
+-77: Seen but not answered
+1: White
+2: Mixed or multiple ethnicities
+3: Asian or Asian british
+4: Black or Black british
+5: Arab
+6 :Other
+
+```{r make and label ethnicity factors}
+
+dem <- dem %>%
+  mutate_at(vars(Ethnicity),
+            list(factor))  %>%
+  mutate(Ethnicity = fct_recode(Ethnicity, 
+                                "White"="1",
+                                "Mixed or multiple ethnicities"="2",
+                                "Asian or Asian British"="3",
+                                "Black or Black British"="4",
+                                "Arab"="5",
+                                "Other"="6",
+                                "Prefer not to say"="-99",
+                                "Don't know"="-88",
+                                "Did not respond"="-77"
+                                ))
+
+```
+
+
+
+## clean gender
+Gender cats:
+
+-99: prefer not to say
+-88: Dont know
+-77: Seen but not answered
+0: Male
+1: female
+3: Non-binary
+4: prefer to self define
+
+```{r make and label gender factors}
+
+dem <- dem %>%
+  mutate_at(vars(Gender),
+            list(factor))  %>%
+  mutate(Gender = fct_recode(Gender, 
+                                "Male"="0",
+                                "Female"="1",
+                                "Non-binary"="2",
+                                "Prefer to self define"="3",
+                                "Prefer not to say"="-99",
+                                "Don't know"="-88",
+                                "Did not respond"="-77"
+                                ))
+
+```
+
+#### merge demographics with NBR 
+
+```{r demographics merge}
+
+dem <- merge(dem,dem.cope.nbr,all=TRUE)
+
+```
+
+
+#### get gender and age columns to add to treatment
+
+```{r gender and age from demo}
+demgen <- subset(dem,select = c("ID","Gender","AgeRecoded","Sample"))
+
+dem_reporting <- subset(dem,select = c("ID","Gender","AgeRecoded","Sample","Ethnicity"))
+```
+
+
+# mental health diagnosis cleaning
+
+
+rename id columns so they all match
+
+```{r rename mhd id vars}
+
+MHD.RAMP <- MHD.RAMP %>%
+  rename(ID="Login ID")
+
+MHD.COPE.nbr <- MHD.COPE.nbr %>%
+  rename(ID="subjectid")
+
+MHD.COPE.glad <- MHD.COPE.glad %>%
+  rename(ID="externalDataReference")
+
+
+
+```
+
+## Identify subset of diagnoses we have for all datasets.
+
+This includes the full range of MH questions we asked in RAMP
+
+```{r rename ramp var names to match COPING}
+
+names(MHD.RAMP) <- sub("mhq","mhd",names(MHD.RAMP))
+names(MHD.RAMP) <- sub(".1","",names(MHD.RAMP))
+
+
+names(MHD.COPE.glad) <- sub(".1","",names(MHD.COPE.glad))
+names(MHD.COPE.glad) <- sub(".1","",names(MHD.COPE.glad))
+
+
+
+```
+Rename EDGI colums to make sure we can compare
+```{r rename edgi mental health diagnosis names}
+
+MHD.COPE.edgi <- demCOPE.edgi.baseline
+names(MHD.COPE.edgi) <- sub("demographics","mhd",names(MHD.COPE.edgi))
+names(MHD.COPE.edgi) <- sub(".1","",names(MHD.COPE.edgi))
+names(MHD.COPE.edgi) <- sub("externalDataReference","ID",names(MHD.COPE.edgi))
+
+
+```
+
+#CLEAN ALL REMAINING MISMATCHING VARIABLES
+```{r rename all other mismatching variables}
+
+names(MHD.RAMP) <- sub("mhd.posttraumatic_stress_disorder_ptsd","mhd.ptsd",names(MHD.RAMP))
+names(MHD.RAMP) <- sub("mhd.pregnancy_depression","mhd.depression_during_or_after_pregnancy",names(MHD.RAMP))
+names(MHD.RAMP) <- sub("mhd.premenstrual_dysphoric_disorder_pmdd","mhd.pmdd",names(MHD.RAMP))
+names(MHD.RAMP) <- sub("mhd.specific_phobia_e.g._phobia_of_flying","mhd.specific_phobia",names(MHD.RAMP))
+names(MHD.RAMP) <- sub("mhd.body_dysmorphic_disorder_bdd","mhd.bdd",names(MHD.RAMP))
+names(MHD.RAMP) <- sub("mhd.skin_picking_obsessive_compulsive","mhd.other_ocd",names(MHD.RAMP))
+names(MHD.RAMP) <- sub("mhd.obsessive_compulsive_related_disorder.txt","mhd.other_obsessivecompulsive_related_disorders",names(MHD.RAMP))
+names(MHD.RAMP) <- sub("mhd.autism_aspergers_or_autistic_spectrum_disorder","mhd.autism_spectrum_disorder",names(MHD.RAMP))
+names(MHD.RAMP) <- sub("mhd.psychological_overeating_or_bingeeating_disorder","mhd.bingeeating_disorder",names(MHD.RAMP))
+names(MHD.COPE.edgi) <- sub("mhd.postnatalantenatal_depression","mhd.postnatal_depression",names(MHD.COPE.edgi))
+
+#add columns for questions not asked in order to retain in dataset
+MHD.COPE.glad <- MHD.COPE.glad %>%
+add_column(mhd.schizoaffective_disorder = NA) 
+MHD.COPE.nbr <- MHD.COPE.nbr %>%
+add_column(mhd.schizoaffective_disorder = NA) 
+MHD.COPE.edgi <- MHD.COPE.edgi %>%
+add_column(mhd.schizoaffective_disorder = NA) 
+
+MHD.RAMP <- MHD.RAMP %>%
+add_column(mhd.postnatal_depression = NA) 
+MHD.RAMP <- MHD.RAMP %>%
+add_column(mhd.obsessivecompulsive_disorder = NA) 
+
+```
+
+```{r find column columns}
+
+common_col_names <- intersect(names(MHD.RAMP),names(MHD.COPE.glad))
+common_col_names <- intersect(common_col_names,names(MHD.COPE.nbr))
+
+# remove the second personality option which says what specific personality disorder is diagnosed.
+common_col_names <- common_col_names[common_col_names != "mhd.personality_disorder_diagnosed"]
+
+```
+
+
+
+find intersect with edgi columns
+
+```{r intersect mhd with edgi}
+common_col_names_edg <- intersect(common_col_names,names(MHD.COPE.edgi))
+
+```
+this shows that the only ones not common are eating disorder categories. makes sense as EDGI is ascertained on the basis of having one. So if we collapse across eating disorders we can assume that all edgi fall into this. Will add EDGI last to achieve this. 
+
+
+### select the appropriate columns and merge samples
+
+
+```{r select columns}
+
+MH.RAMP <- MHD.RAMP %>%
+  select(all_of(common_col_names)) %>%
+  mutate(Sample = "RAMP")
+
+MH.GLAD <- MHD.COPE.glad %>%
+  select(all_of(common_col_names)) %>%
+  mutate(Sample = "COPING",
+         SampleCOPE = "GLAD")
+
+MH.NBR <- MHD.COPE.nbr %>%
+  select(all_of(common_col_names)) %>%
+  mutate(Sample = "COPING",
+         SampleCOPE = "NBR")
+
+```
+
+
+```{r merge the three datasets}
+
+MH <- merge(MH.RAMP,MH.GLAD,all = "TRUE")
+MH <- merge(MH,MH.NBR,all = "TRUE")
+
+```
+
+
+```{r collapse all eating disorders together and drop the others}
+
+MH <- MH %>%
+  mutate(mhd.eating_disorder = case_when(mhd.anorexia_nervosa == 1 |
+                                           mhd.atypical_anorexia_nervosa == 1|
+                                           mhd.bulimia_nervosa == 1|
+                                           mhd.bingeeating_disorder == 1 ~1)) %>%
+  select(-c(mhd.anorexia_nervosa,mhd.atypical_anorexia_nervosa,mhd.bulimia_nervosa,mhd.bingeeating_disorder))
+
+```
+
+EDGI all have eating disorders (ascertained for this)
+```{r creat eating disorder category for EDGI}
+
+MHD.COPE.edgi$mhd.eating_disorder <- 1
+
+```
+
+adjust common col list for EDGI
+
+```{r adjust common cols for edgi}
+
+common_col_names <- common_col_names[common_col_names != "mhd.anorexia_nervosa"]
+common_col_names <- common_col_names[common_col_names != "mhd.atypical_anorexia_nervosa"]
+common_col_names <- common_col_names[common_col_names !="mhd.bulimia_nervosa"]
+common_col_names <- common_col_names[common_col_names !="mhd.bingeeating_disorder"]
+
+
+common_col_names <- append(common_col_names,"mhd.eating_disorder")
+
+```
+
+```{r select columns for EDGI}
+
+MH.EDGI <- MHD.COPE.edgi %>%
+  select(all_of(common_col_names_edg)) %>%
+  mutate(Sample = "COPING",
+         SampleCOPE = "EDGI")
+
+```
+
+Merge EDGI onto rest
+
+```{r merge edgi MH to others}
+
+MH <- MH <- merge(MH,MH.EDGI,all = "TRUE")
+
+```
+
+drop start and end date (don't need it as we just need a single point per person)
+
+```{r drop start and end date}
+
+MH <- MH %>%
+  select(-c(startDate,endDate)) 
+
+```
+
+```{r collapse other disorder categories}
+
+MH <- MH %>%
+  mutate(mhd.depressive_disorder = case_when(mhd.depression == 1|
+                                           mhd.depression_during_or_after_pregnancy == 1|
+                                           mhd.pmdd == 1|
+                                           mhd.postnatal_depression == 1 ~1,
+                                          TRUE ~ 0)) %>%
+  select(-c(mhd.depression,mhd.depression_during_or_after_pregnancy,mhd.pmdd,mhd.postnatal_depression))
+
+MH <- MH %>%
+  mutate(mhd.anxiety_disorder = case_when(mhd.anxiety_nerves_or_generalised_anxiety_disorder == 1 |
+                                           mhd.social_anxiety_or_social_phobia == 1|
+                                           mhd.specific_phobia == 1|
+                                           mhd.agoraphobia == 1|
+                                           mhd.panic_disorder == 1|
+                                           mhd.panic_attacks == 1 ~1,
+                                          TRUE ~ 0)) %>%
+  select(-c(mhd.anxiety_nerves_or_generalised_anxiety_disorder,mhd.social_anxiety_or_social_phobia,mhd.specific_phobia,mhd.agoraphobia,mhd.panic_disorder,mhd.panic_attacks))
+
+#mhd.obsessivecompulsive_disorder_ocd == 1 |
+  
+MH <- MH %>%
+  mutate(mhd.ocrd = case_when(mhd.obsessivecompulsive_disorder == 1|
+                                           mhd.bdd == 1|
+                                           mhd.other_ocd == 1|
+                                           mhd.other_obsessivecompulsive_related_disorders == 1 ~1,
+                                          TRUE ~ 0)) %>%
+  select(-c(mhd.bdd,mhd.other_ocd,mhd.other_obsessivecompulsive_related_disorders,mhd.obsessivecompulsive_disorder))
+
+MH <- MH %>%
+  mutate(mhd.psychotic_disorder = case_when(mhd.schizophrenia == 1 |
+                                           mhd.schizoaffective_disorder == 1|
+                                           mhd.psychosis_type_psychotic_illness == 1 ~1,
+                                          TRUE ~ 0)) %>%
+  select(-c(mhd.schizophrenia,mhd.psychosis_type_psychotic_illness,mhd.schizoaffective_disorder,mhd.dont_know,mhd.prefer_not_to_answer))
+
+```
+
+
+
+# Rename the treatment variables and drop irrelevant ones
+
+used the [data dictionary](https://docs.google.com/spreadsheets/d/1Vp028XLxbcXeOdjeuI-3y-kVenKWDR4hW9iJ1tHpttI/edit#gid=1527211037) to identify the relevant items and rename them
+
+```{r rename COPE & RAMP datasets and select variables}
+setwd(wd)
+source("./scripts/renameRAMPtreatment.R")
+
+treatRAMP.fin <- treatRAMP.renamed[names(treatRAMP.renamed) %in% treatnames]
+treatCOPE.fin <- treatCOPE.renamed[names(treatCOPE.renamed) %in% treatnames]
+
+```
+#### merge RAMP and COPING treatment data
+
+Use rbind to add COPING to RAMP
+
+```{r merge coping and ramp treatment data}
+
+treat_dat <- rbind(treatRAMP.fin,treatCOPE.fin)
+  
+```
+
+#### order wave variable
+
+```{r reorder wave factor}
+
+treat_dat$wave <- factor(treat_dat$wave,
+                         levels = c("May 2020","June 2020", "July 2020","August 2020","September 2020","October 2020","November 2020","December 2020","January 2021","February 2021","March 2021","April 2021", "May 2021", "June 2021"))
+
+```
+
+#### Drop June and January timepoints
+```{r drop un-needed timepoints}
+
+treat_dat <- filter(treat_dat,  wave == "July 2020" | wave == "August 2020" | wave == "September 2020" | wave == "October 2020" | wave == "November 2020" | wave == "December 2020"| wave == "December 2020"| wave == "January 2021"| wave == "February 2021"| wave == "March 2021"| wave == "April 2021"| wave == "May 2021" | wave == "June 2021")
+```
+
+#### Drop accidental duplicate IDs
+
+these are IDS that were allocated twice by qualtrics. Technical errors. Will drop all instances (we lose 80 IDs doing this)
+```{r id  duplicates}
+
+DupIDdat <- treat_dat %>%
+  pivot_wider(id_cols = ID,
+              names_from = wave,
+              values_from = soughthelp_for_self,
+              values_fn = length)
+
+dupids <- DupIDdat$ID[( DupIDdat$`July 2020` > 1 |
+                        DupIDdat$`August 2020` > 1 | 
+                        DupIDdat$`September 2020` > 1 |
+                        DupIDdat$`October 2020` > 1 | 
+                        DupIDdat$`November 2020` > 1 |
+                        DupIDdat$`December 2020` > 1 | 
+                        DupIDdat$`January 2021` > 1 |
+                        DupIDdat$`February 2021` > 1 |
+                        DupIDdat$`March 2021` > 1 |
+                        DupIDdat$`April 2021` > 1 |
+                        DupIDdat$`May 2021` > 1 |
+                        DupIDdat$`June 2021` > 1
+                        )]
+
+dupids <- unique(dupids)
+
+```
+
+Now drop from our treatment data
+
+```{r drop dups from treatment}
+treat_dat <- treat_dat[(treat_dat$ID %!in% dupids),]
+```
+
+#### make seen but not responded NA 
+
+```{r make -77 in treatment seeking NA}
+
+treat_dat$soughthelp_for_self <- ifelse(treat_dat$soughthelp_for_self == -77,NA,treat_dat$soughthelp_for_self)
+
+```
+
+#### Create summary variables for treatment
+Grouping variables to make sensible categories for comparing different aspects of treatment seeking
+
+
+##### Sought help for new or pre-existing MH disorder 
+
+Categorise reasons for help seeking into whether it was for a pre-existing, newly emerging MH disorder or a crisis
+
+```{r dummy reason for help seek variable}
+
+#convert -77 to NA
+treat_dat$reasonhelp_new_mh <- ifelse(treat_dat$reasonhelp_new_mh == -77,NA,treat_dat$reasonhelp_new_mh)
+treat_dat$reasonhelp_cont_mh <- ifelse(treat_dat$reasonhelp_cont_mh == -77,NA,treat_dat$reasonhelp_cont_mh)
+treat_dat$reasonhelp_worsen_mh <- ifelse(treat_dat$reasonhelp_worsen_mh == -77,NA,treat_dat$reasonhelp_worsen_mh)
+treat_dat$reasonhelp_repeat_prescription <- ifelse(treat_dat$reasonhelp_repeat_prescription == -77,NA,treat_dat$reasonhelp_repeat_prescription)
+treat_dat$reasonhelp_change_med <- ifelse(treat_dat$reasonhelp_change_med == -77,NA,treat_dat$reasonhelp_change_med)
+treat_dat$reasonhelp_alt_support <- ifelse(treat_dat$reasonhelp_alt_support == -77,NA,treat_dat$reasonhelp_alt_support)
+treat_dat$reasonhelp_mh_crisis <- ifelse(treat_dat$reasonhelp_mh_crisis == -77,NA,treat_dat$reasonhelp_mh_crisis)
+treat_dat$reasonhelp_new_med <- ifelse(treat_dat$reasonhelp_new_med == -77,NA,treat_dat$reasonhelp_new_med)
+treat_dat$reasonhelp_other <- ifelse(treat_dat$reasonhelp_other == -77,NA,treat_dat$reasonhelp_other)
+
+#combine reasons
+treat_dat <- treat_dat %>%
+  mutate(ReasonSeek = case_when(
+    reasonhelp_new_mh == 1 ~ "Newly emerging symptoms",
+    reasonhelp_cont_mh == 1 | reasonhelp_worsen_mh == 1 | reasonhelp_repeat_prescription == 1 | reasonhelp_change_med == 1 | reasonhelp_alt_support == 1 ~ "Existing mental health",
+  reasonhelp_mh_crisis == 1 ~ "Mental health crisis",
+  reasonhelp_new_med == 1 ~ "Seeking new treatment",
+  reasonhelp_other == 1 ~ "Other"))
+
+treat_dat <- treat_dat %>%
+  mutate(
+  Reason_Existing_Mh = rowSums(cbind(reasonhelp_cont_mh, reasonhelp_worsen_mh,  reasonhelp_repeat_prescription, reasonhelp_change_med, reasonhelp_alt_support), na.rm = T))
+
+reasonscols = c("reasonhelp_new_mh", "reasonhelp_cont_mh", "reasonhelp_worsen_mh", "reasonhelp_mh_crisis", "reasonhelp_repeat_prescription", "reasonhelp_change_med", "reasonhelp_new_med", "reasonhelp_alt_support", "reasonhelp_other"  )
+
+treat_dat <- treat_dat %>%
+  mutate(total_n_reasons = rowSums(treat_dat[names(treat_dat) %in% reasonscols], na.rm = T))
+
+sum(treat_dat$total_n_reasons)
+
+```
+
+
+##### Type of treatment (supported / self guided)
+
+Categorise places where treatment was sought into supported or self-guided
+
+
+make Prefer not to say (-77) NA
+
+```{r na for PNS treatment type sought}
+treat_dat[grep("wherehelp",names(treat_dat))] <-apply(treat_dat[grep("wherehelp",names(treat_dat))],2,function(x) ifelse(x == -77,NA, x))
+
+treat_dat[grep("reasonhelp",names(treat_dat))] <-apply(treat_dat[grep("reasonhelp",names(treat_dat))],2,function(x) ifelse(x == -77,NA, x))
+
+treat_dat[grep("reasonNo",names(treat_dat))] <-apply(treat_dat[grep("reasonNo",names(treat_dat))],2,function(x) ifelse(x == -77,NA, x))
+
+```
+
+
+
+create variable counting number of self guided or supported treatment types sought per wave per person
+
+```{r type sought counts}
+
+supportcols <- c("wherehelp_sought_emergency_mh","wherehelp_sought_online_talk_therapy",
+                 "wherehelp_sought_gp","wherehelp_sought_existing_mh_team",
+                " wherehelp_received_nonnhs_phone","wherehelp_sought_nhs_111")
+
+selfcols <- c("wherehelp_sought_gov_website","wherehelp_received_selfguide_online",
+                 "wherehelp_sought_nongov_website","wherehelp_sought_struc_therapy")
+
+
+treat_dat$TypeSought.Supported.total <- rowSums(treat_dat[names(treat_dat) %in% supportcols],na.rm = T)
+treat_dat$TypeSought.SelfGuided.total <- rowSums(treat_dat[names(treat_dat) %in% selfcols],na.rm = T)
+
+#calculate total sources sought
+  treat_dat$TypeSought.All.total <- rowSums(cbind(treat_dat$TypeSought.SelfGuided.total, treat_dat$TypeSought.Supported.total), na.rm = T)
+
+```
+
+
+
+```{r dummy treatment not received if sought}
+
+#treat_dat  <- treat_dat %>%
+#  mutate(AnyNoReceipt = case_when(AnyReceived == 0 ~1,
+ #                                 TRUE ~ 0))
+
+```
+
+##### number of agencies from which treatment was received, if sought
+
+```{r type received counts}
+
+supportcols <- c("wherehelp_received_emergency_mh","wherehelp_received_online_talk_therapy","wherehelp_received_gp","wherehelp_received_existing_mh_team","wherehelp_received_nonnhs_phone","wherehelp_received_nhs_111")
+
+selfcols <- c("wherehelp_received_gov_website","wherehelp_received_selfguide_online","wherehelp_received_nongov_website","wherehelp_received_struc_therapy")
+
+othercols <- c("wherehelp_received_other")
+
+
+soughtcols <- c("wherehelp_sought_emergency_mh", "wherehelp_sought_existing_mh_team", "wherehelp_sought_online_talk_therapy", "wherehelp_sought_gp",  "wherehelp_sought_nhs_111", "wherehelp_sought_nonnhs_phone", "wherehelp_sought_gov_website", "wherehelp_sought_nongov_website",  "wherehelp_sought_selfguide_online", "wherehelp_sought_struc_therapy", 
+ "wherehelp_sought_other" )
+
+receivecols <- c("wherehelp_received_emergency_mh","wherehelp_received_online_talk_therapy","wherehelp_received_gp","wherehelp_received_existing_mh_team","wherehelp_received_nonnhs_phone","wherehelp_received_nhs_111","wherehelp_received_gov_website","wherehelp_received_selfguide_online","wherehelp_received_nongov_website","wherehelp_received_struc_therapy","wherehelp_received_other")
+
+reasoncols <- c("preventhelp_emergency_mh", "preventhelp_existing_mh_team", "preventhelp_online_talk_therapy", "preventhelp_gp", "preventhelp_nhs_111", "preventhelp_nonnhs_phone", "preventhelp_gov_website", "preventhelp_nongov_website", "preventhelp_online_self_therapy", "preventhelp_struc_therapy", "preventhelp_other")
+
+helpfulnesscols <- c("treatmenthelpful_emergency_mh", "treatmenthelpful_existing_mh_team", "treatmenthelpful_online_talk_therapy", "treatmenthelpful_gp", "treatmenthelpful_nhs_111", "treatmenthelpful_nonnhs_phone", "treatmenthelpful_gov_website", "treatmenthelpful_nongov_website", "treatmenthelpful_online_self_therapy", "treatmenthelpful_struc_therapy", "treatmenthelpful_other")
+
+treat_dat$TypeReceived.Supported.total <- rowSums(treat_dat[names(treat_dat) %in% supportcols],na.rm = T)
+treat_dat$TypeReceived.SelfGuided.total <- rowSums(treat_dat[names(treat_dat) %in% selfcols],na.rm = T)
+
+#calculate total sources received
+  treat_dat$TypeReceived.All.total <- rowSums(cbind(treat_dat$TypeReceived.SelfGuided.total, treat_dat$TypeReceived.Supported.total), na.rm = T)
+  
+#calculate total reasons not received
+
+total_reasons <- treat_dat %>%
+  mutate(total_reasons_non_na = sum(!is.na(treat_dat[names(treat_dat) %in% reasoncols])))
+
+#calculate total sought but not received
+    treat_dat$SoughtNotReceived.All.total <- (treat_dat$TypeSought.All.total - treat_dat$TypeReceived.All.total)
+    
+    
+
+```
+
+##### Sought treatment at any time (How many times, how many total responses)
+
+Create a dataset and column that identifies how many times someone sought help, how many times they responded, and if they ever sought help
+
+Making a new dataset where the count by ID is tracked
+```{r treatment seek in any wave count}
+
+treat_dat_byID <- treat_dat %>%
+  group_by(ID) %>%
+  tally(soughthelp_for_self)
+
+treat_dat_byIDSamp <- treat_dat %>%
+  group_by(ID,Sample) %>%
+  tally(soughthelp_for_self)
+
+```
+##### Reason not sought
+```{r reason not sought}
+
+reason_not_sought <- tibble(reason = c("Feel fine","Feel better","Not bad enough","Don't think help available","Bad past experience","Didn't know where to find","Too busy","Want to but haven't","Other"),category = c("Mild or no current symptoms","Mild or no current symptoms","Mild or no current symptoms","Systemic","Systemic","Systemic","Client","Client","Other"), n = 1:9)
+
+reason_not_sought[1,3] <- sum(treat_dat$reasonNohelp_feel_fine==1,na.rm=TRUE)
+reason_not_sought[2,3] <- sum(treat_dat$reasonNohelp_I_feel_better==1,na.rm=TRUE)
+reason_not_sought[3,3] <- sum(treat_dat$reasonNohelp_I_dont_think_I_feel_bad_enough==1,na.rm=TRUE)
+reason_not_sought[4,3] <- sum(treat_dat$reasonNohelp_I_want_help_dont_think_its_available==1,na.rm=TRUE)
+reason_not_sought[5,3] <- sum(treat_dat$reasonNohelp_Bad_experiences_in_past==1,na.rm=TRUE)
+reason_not_sought[6,3] <- sum(treat_dat$reasonNohelp_I_didnt_know_where_to_find==1,na.rm=TRUE)
+reason_not_sought[7,3] <- sum(treat_dat$reasonNohelp_Too_busy==1,na.rm=TRUE)
+reason_not_sought[8,3] <- sum(treat_dat$reasonNohelp_I_want_to_but_havent==1,na.rm=TRUE)
+reason_not_sought[9,3] <- sum(treat_dat$reasonNohelp_other==1,na.rm=TRUE)
+
+```
+
+```{r treatment seek in any wave}
+
+treat_dat_byID$AnySeek <- ifelse(treat_dat_byID$n > 0,"Sought help at least once", "Never sought help")
+treat_dat_byIDSamp$AnySeek <- ifelse(treat_dat_byIDSamp$n > 0,"Sought help at least once", "Never sought help")
+
+```
+
+##### Client level vs systemic barriers
+identify if treatment was received when sought according to category
+
+```{r run script to relabel and clean treatment help and barrier factors}
+setwd(wd)
+## factorise and label barrier and helpfulness 
+source("./scripts/relabel_barriers_help_factors.R")
+```
+
+
+Identify whether barriers are systemic or client-level
+```{r dummy type of barriers, eval = FALSE}
+## systemic
+treat_dat[grep("prevent",names(treat_dat))] <- apply(treat_dat[grep("prevent",names(treat_dat))], 2, function(x) 
+  ifelse(x == "Could not get an appointment","Systemic",x))
+
+treat_dat[grep("prevent",names(treat_dat))] <- apply(treat_dat[grep("prevent",names(treat_dat))], 2, function(x) 
+  ifelse(x == "Waiting list was too long","Systemic",x))
+
+treat_dat[grep("prevent",names(treat_dat))] <- apply(treat_dat[grep("prevent",names(treat_dat))], 2, function(x) 
+  ifelse(x == "Was assessed and was unable to be offered support","Systemic",x))
+
+treat_dat[grep("prevent",names(treat_dat))] <- apply(treat_dat[grep("prevent",names(treat_dat))], 2, function(x) 
+  ifelse(x == "Support option was unavailable when tried to access it","Systemic",x))
+
+## client level
+treat_dat[grep("prevent",names(treat_dat))] <- apply(treat_dat[grep("prevent",names(treat_dat))], 2, function(x) 
+  ifelse(x == "None of the support options were relevant","Client-level",x))
+
+treat_dat[grep("prevent",names(treat_dat))] <- apply(treat_dat[grep("prevent",names(treat_dat))], 2, function(x) 
+  ifelse(x == "Didn't feel well enough to engage","Client-level",x))
+
+treat_dat[grep("prevent",names(treat_dat))] <- apply(treat_dat[grep("prevent",names(treat_dat))], 2, function(x) 
+  ifelse(x == "Was too busy to engage","Client-level",x))
+
+treat_dat[grep("prevent",names(treat_dat))] <- apply(treat_dat[grep("prevent",names(treat_dat))], 2, function(x) 
+  ifelse(x == "Felt better","Client-level",x))
+
+```
+
+#### group agencies for help prevention into client-led or supported
+creates PreventHelp_Supported and PreventHelp_SelfGuided columns
+
+```{r group barrier agencies into client led or supported}
+setwd(wd)
+source("./scripts/Barriers_column_creation.R")
+```
+
+### helpfulness
+
+#### Relabel factors
+
+```{r relabel helpfullness factors}
+
+setwd(wd)
+source("./scripts/Relabel_helpful_factors.R")
+
+```
+#### group agencies for helpfulness into client led or supported.
+Assess helpfulness for both type seperately depending on helpfulness by agency sought
+
+```{r group helpfullness agencies into client led or supported}
+setwd(wd)
+source("./scripts/Helpfulness_column_creation.R")
+```
+
+# Analyses
+
+## Descriptives
+
+
+### Demographics
+
+Age, ethnicity and gender for those who have responded to at least 1 wave of the treatment survey, dropping duplicates as per treat_dt step
+
+
+```{r drop all IDS that are not included in our treatment data from the demographics data}
+
+dem <- dem %>%
+  filter(dem$ID %in% treat_dat_byID$ID) %>%
+  distinct(.)
+
+```
+
+
+**At the moment this is only keeping 15656 people, when we have 27926 distinct IDs in the treatment data. It is possible this is due to not having demographic info for the NBR sample, but need to check these numbers once NBR is added and look into it if these are still out**
+
+
+#### check numbers
+
+##### Ethnicity
+
+```{r ethnicity table, eval = FALSE}
+
+dem %>%
+  freq(Ethnicity)
+
+```
+By sample
+```{r ethnicity by Sample table, eval = FALSE}
+
+dem %>%
+  group_by(Sample) %>%
+  freq(Ethnicity)
+
+
+```
+##### Gender
+
+```{r Gender table, eval = FALSE}
+
+dem %>%
+  freq(Gender)
+
+```
+By sample
+```{r Gender by Sample table, eval = FALSE}
+
+
+dem %>%
+  group_by(Sample) %>%
+  freq(Gender)
+```
+
+##### Age (all brackets)
+
+
+```{r Age table, eval = FALSE}
+dem %>%
+  freq(AgeAll)
+
+```
+
+By sample
+```{r Age by Sample table, eval = FALSE}
+
+dem %>%
+  group_by(Sample) %>%
+  freq(AgeAll)
+
+```
+
+
+##### Age (81+ collapses)
+
+
+```{r Age 81+ table, eval = FALSE}
+
+dem %>%
+  freq(Age80up)
+
+```
+
+By sample
+```{r Age 81+  by Sample table, eval = FALSE}
+
+dem %>%
+  group_by(Sample) %>%
+  freq(Age80up)
+
+```
+
+### Mental health diagnoses
+
+Clean so we match treatment data and dont have duplicates
+```{r drop all IDS that are not included in our treatment data from the MHD data}
+
+MH <- MH %>%
+  filter(MH$ID %in% treat_dat_byID
+         
+         $ID) %>%
+  distinct(.)
+
+```
+
+List of diagnosis columns
+
+```{r list diagnoses cols}
+
+dia_cols <- c("mhd.depressive_disorder","mhd.anxiety_disorder","mhd.ptsd","mhd.ocrd","mhd.eating_disorder","mhd.mania_hypomania_bipolar_or_manicdepression","mhd.psychotic_disorder","mhd.personality_disorder","mhd.autism_spectrum_disorder","mhd.attention_deficit_hyperactivity_disorder")
+
+```
+
+#### everyone
+
+frequencies for all diagnoses
+```{r freq tables for diagnoses,eval=FALSE, echo=FALSE}
+
+for (i in dia_cols){
+  print(freq(MH[i]))
+}
+
+```
+
+
+#### By sample
+frequencies for all diagnoses
+```{r freq tables for diagnoses by sample, eval=FALSE}
+
+for (i in dia_cols){
+  print(i)
+    print(ctable(MH[,i],MH$Sample))
+}
+
+```
+
+## Add gender and age 
+
+Add gender and age to treatment data 
+
+```{r add gender to treat datgender}
+treat_dat <- left_join(treat_dat,demgen)
+```
+
+# remove duplicates
+```{r remove duplicate IDs }
+
+nrow(treat_dat)
+
+treat_dat <- treat_dat %>%
+    distinct(ID, wave, .keep_all = TRUE)
+
+nrow(treat_dat)
+
+```
+
+## Unique individuals in dataset
+```{r unique individuals}
+
+unique_all <- n_distinct(treat_dat$ID)
+unique_all
+
+unique_dem <- dem %>%
+  distinct(ID, .keep_all = TRUE)
+nrow(unique_dem)
+
+unique_mh <- MH %>%
+  distinct(ID, .keep_all = TRUE)
+nrow(unique_mh)
+  
+#create ID list for unique sample
+dem_table <- NULL
+dem_table$ID <- unique(treat_dat$ID)
+
+dem_table <- as.data.frame(dem_table)
+nrow(dem_table)
+n_distinct(dem$ID)
+
+#join ID and demographics table
+dem_table <- left_join(dem_table, unique_dem, by = "ID", keep = FALSE)
+nrow(dem_table)
+
+#join demographics table with MH table
+dem_table <- left_join(dem_table, unique_mh, by = "ID", keep = FALSE)
+nrow(dem_table)
+
+```
+
+```{r demographics table}
+
+  age_table <-  table(dem_table$AgeRecoded, useNA = "ifany") %>%
+  kable(caption = "Frequency table for age in combined cohort (maximum n)",
+        booktabs = T,
+        digits = 2)
+
+age_table 
+
+gender_table <-  table(dem_table$Gender, useNA = "ifany") %>%
+  kable(caption = "Frequency table for gender in combined cohort (maximum n)",
+        booktabs = T,
+        digits = 2) 
+
+gender_table 
+
+ethnicity_table <-  table(dem_table$Ethnicity, useNA = "ifany") %>%
+  kable(caption = "Frequency table for ethnicity in combined cohort (maximum n)",
+        booktabs = T,
+        digits = 2) 
+
+ethnicity_table 
+
+##EMPLOYMENT??
+
+
+
+if(!require(expss)){
+  install.packages("expss")
+  library(expss)
+}
+
+
+all_table <- dem_table  %>% tab_cells("Age" = AgeRecoded, "Gender" = Gender,"Ethnicity" = Ethnicity, "Depressive disorder diagnosis" = mhd.depressive_disorder, "Anxiety disorder diagnosis" = mhd.anxiety_disorder, "OCD diagnosis" = mhd.ocrd, "Psychotic disorder diagnosis" = mhd.psychotic_disorder, "Bipolar disorder diagnosis" = mhd.mania_hypomania_bipolar_or_manicdepression,"Eating disorder diagnosis" = mhd.eating_disorder, "Personality disorder diagnosis" = mhd.personality_disorder, "PTSD diagnosis" = mhd.ptsd, "ASD diagnosis" = mhd.autism_spectrum_disorder, "ADHD diagnosis" = mhd.attention_deficit_hyperactivity_disorder) %>% 
+    tab_cols(total(label = "N")) %>% 
+    tab_stat_cases(total_row_position = "none") %>% 
+    tab_pivot() %>% 
+    kable()
+
+all_table
+
+coping_table <- dem_table %>% filter(Sample.x == "COPING") %>% tab_cells("Age" = AgeRecoded, "Gender" = Gender,"Ethnicity" = Ethnicity, "Depressive disorder diagnosis" = mhd.depressive_disorder, "Anxiety disorder diagnosis" = mhd.anxiety_disorder, "OCD diagnosis" = mhd.ocrd, "Psychotic disorder diagnosis" = mhd.psychotic_disorder, "Bipolar disorder diagnosis" = mhd.mania_hypomania_bipolar_or_manicdepression,"Eating disorder diagnosis" = mhd.eating_disorder, "Personality disorder diagnosis" = mhd.personality_disorder, "PTSD diagnosis" = mhd.ptsd, "ASD diagnosis" = mhd.autism_spectrum_disorder, "ADHD diagnosis" = mhd.attention_deficit_hyperactivity_disorder) %>% 
+    tab_cols(total(label = "N")) %>% 
+    tab_stat_cases(total_row_position = "none") %>% 
+    tab_pivot() %>% 
+    kable()
+
+coping_table
+
+ramp_table <- dem_table %>% filter(Sample.x == "RAMP") %>% tab_cells("Age" = AgeRecoded, "Gender" = Gender,"Ethnicity" = Ethnicity, "Depressive disorder diagnosis" = mhd.depressive_disorder, "Anxiety disorder diagnosis" = mhd.anxiety_disorder, "OCD diagnosis" = mhd.ocrd, "Psychotic disorder diagnosis" = mhd.psychotic_disorder, "Bipolar disorder diagnosis" = mhd.mania_hypomania_bipolar_or_manicdepression,"Eating disorder diagnosis" = mhd.eating_disorder, "Personality disorder diagnosis" = mhd.personality_disorder, "PTSD diagnosis" = mhd.ptsd, "ASD diagnosis" = mhd.autism_spectrum_disorder, "ADHD diagnosis" = mhd.attention_deficit_hyperactivity_disorder) %>% 
+    tab_cols(total(label = "N")) %>% 
+    tab_stat_cases(total_row_position = "none") %>% 
+    tab_pivot() %>% 
+    kable()
+
+ramp_table
+
+table(dem_table$Sample.x )
+
+
+
+```
+
+
+## Unique individuals seeking help
+
+```{r confirm unique seeking help}
+unique_help_self <- treat_dat %>%
+  filter(soughthelp_for_self == 1)
+
+n_unique_help_self <- n_distinct(unique_help_self$ID)
+n_unique_whole_sample <- n_distinct(treat_dat$ID)
+
+n_unique_help_self
+
+n_unique_whole_sample
+
+prop_help_self  <- (n_unique_help_self/n_unique_whole_sample)*100
+prop_help_self
+
+
+```
+Collapsing across time points, 26.33% of participants (n = 7,262) reported seeking treatment on at least one occasion between July 2020 and June 2021.
+
+
+
+
+
+### Response rates per wave
+
+```{r response rates per wave}
+
+table(treat_dat$soughthelp_for_self)
+
+treat_dat_count <- treat_dat %>%
+  group_by(wave, soughthelp_for_self) %>%
+  count()
+
+treat_dat_count
+
+treat_dat_count <- treat_dat_count %>%
+  filter(soughthelp_for_self != "NA")
+
+treat_dat_count <-  pivot_wider(treat_dat_count, id_cols = wave, names_from = soughthelp_for_self, values_from = n)
+
+treat_dat_count$total <- treat_dat_count$`0` + treat_dat_count$`1`
+
+treat_dat_count$prop_sought <- treat_dat_count$`1` / treat_dat_count$total *100
+treat_dat_count
+View(treat_dat_count)
+```
+
+The proportion of individuals seeking treatment was reasonably consistent across the assessed time points, with 12-17% of each sample assessed reporting treatment seeking.
+
+### +Count N waves treatment sought
+
+```{r count n waves treatment sought}
+
+
+unique_help_self$wave <- factor(unique_help_self$wave,levels=c("June 2021","May 2021","April 2021","March 2021","February 2021","January 2021","December 2020","November 2020","October 2020","September 2020","August 2020","July 2020"),ordered=TRUE)
+
+
+N_waves <- unique_help_self %>%
+  pivot_wider(id_cols = ID, names_from = wave, values_from = soughthelp_for_self)
+
+N_waves <- N_waves %>%
+    mutate(Total = select(., `July 2020`:`June 2021`) %>% rowSums(na.rm = TRUE))
+
+N_waves_seeking <- N_waves %>%
+  filter(Total > 0)
+
+N_waves_table <- table(N_waves_seeking$Total)
+View(N_waves_table)
+
+View(prop.table(N_waves_table)*100)
+```
+Looking at the distribution of treatment seeking over time, of those seeking treatment, 47.40% (3,442) reported seeking treatment during one of the assessed intervals, 23.08% (n = 1,676) during two intervals, 12.81% (n = 930) during three intervals and 16.72% (n = 1,214) during four or more intervals. 
+
+##### Response rates by gender
+```{r response rates per wave by gender}
+View(table(unique_help_self$Gender))
+
+treat_dat_count_gender_all <- treat_dat %>%
+  filter(!is.na(soughthelp_for_self)) %>%
+  group_by(soughthelp_for_self, Gender) %>%
+  count()
+
+treat_dat_count_gender <- treat_dat %>%
+  filter(Gender == "Male" | Gender == "Female") %>%
+  filter(!is.na(soughthelp_for_self)) %>%
+  group_by(soughthelp_for_self, Gender) %>%
+  count()
+
+sum(treat_dat_count_gender$n)
+
+View(treat_dat_count_gender)
+
+treat_dat_count_gender <- treat_dat_count_gender %>%
+  pivot_wider(id_cols = Gender, names_from = soughthelp_for_self, values_from = n)
+
+treat_dat_count_gender$total <- rowSums(treat_dat_count_gender[,2:3])
+
+treat_dat_count_gender <- treat_dat_count_gender %>%
+  mutate(p_sought = `1`/(`0` + `1`)*100,
+         p_not_sought = `0`/(`0` + `1`)*100)
+
+treat_dat_count_gender
+View(treat_dat_count_gender)
+
+```
+
+Across all timepoints, frequencies of treatment-seeking were significantly higher among women (16.12%) than men (7.16%,),
+
+```{r chisq response gender}
+
+tx_seeking_gender_chisq <- chisq.test(treat_dat_count_gender[c(2:3)])
+tx_seeking_gender_chisq
+tx_seeking_gender_chisq$p.value
+
+```
+
+X2 (1, N = 112,445) = 1663.9, p = < .001)
+
+##### Response rates by age
+```{r response rates per wave by age}
+
+
+treat_dat_count_age <- treat_dat %>%
+  filter(!is.na(soughthelp_for_self)) %>%
+  #filter(!is.na(AgeRecoded)) %>%
+  group_by(soughthelp_for_self, AgeRecoded) %>%
+  count()
+treat_dat_count_age
+View(treat_dat_count_age)
+
+sum(treat_dat_count_age$n)
+
+treat_dat_count_age <- treat_dat_count_age %>%
+  pivot_wider(id_cols = AgeRecoded, names_from = soughthelp_for_self, values_from = n)
+
+treat_dat_count_age$total <- rowSums(treat_dat_count_age[,2:3])
+
+treat_dat_count_age <- treat_dat_count_age %>%
+  mutate(p_sought = `1`/(`0` + `1`)*100,
+         p_not_sought = `0`/(`0` + `1`)*100)
+treat_dat_count_age
+```
+
+There was a striking effect of age on treatment seeking, with higher proportions of younger people reporting treatment seeking than older people 
+n = 110996
+
+```{r chisq response agge}
+
+tx_seeking_age_chisq <- chisq.test(treat_dat_count_age[c(2:3)])
+tx_seeking_age_chisq
+tx_seeking_age_chisq$p.value
+
+```
+(X2 (6, N = 110996) = 6716.3, p = < .001
+
+```{r plot response rates per wave, eval = FALSE}
+
+treat_dat_count_plot <- treat_dat_count  %>%
+  ggplot(mapping = aes(
+    x=wave,
+    y=n)
+    ) +
+    geom_bar(aes(),
+      stat="identity",
+     position = position_dodge2(preserve = "single")
+    ) +
+  labs(
+    x = "Time point",
+    y = "Number of participants") +
+  theme_personal +
+  scale_fill_manual(
+    values = COPINGpalette4
+  ) +
+  coord_flip()
+treat_dat_count_plot
+
+
+```
+
+By sample
+```{r response rates per wave by sample}
+
+treat_dat_count_by_sample <- treat_dat %>%
+  group_by(wave,Sample) %>%
+  count()
+```
+
+###*Plot sample size*
+```{r plot response rates per wave per sample}
+
+treat_dat_count_by_sample_plot <- treat_dat_count_by_sample  %>%
+  ggplot(mapping = aes(
+    x=wave,
+    y=n)
+    ) +
+    geom_bar(aes(fill = Sample),
+      stat="identity",
+     position = position_dodge2(preserve = "single")
+    ) +
+  labs(
+    x = "Time point",
+    y = "Number of participants") +
+  theme_personal +
+  scale_fill_manual(
+    values = COPINGpalette4
+  ) +
+  coord_flip()
+treat_dat_count_by_sample_plot
+
+
+```
+# *order factors*
+
+```{r order factors}
+
+treat_dat$wave <- factor(treat_dat$wave,levels=c("June 2021","May 2021","April 2021","March 2021","February 2021","January 2021","December 2020","November 2020","October 2020","September 2020","August 2020","July 2020"),ordered=TRUE)
+  
+```
+
+# CREATE LONG DATASET
+
+"wherehelp_sought_emergency_mh"                    
+"wherehelp_sought_existing_mh_team"               
+"wherehelp_sought_online_talk_therapy" 
+"wherehelp_sought_gp"      
+"wherehelp_sought_nhs_111" 
+"wherehelp_sought_nonnhs_phone" 
+"wherehelp_sought_gov_website"  
+"wherehelp_sought_nongov_website"
+"wherehelp_sought_selfguide_online"                
+"wherehelp_sought_struc_therapy" 
+"wherehelp_sought_other"   
+
+"wherehelp_received_emergency_mh"                  
+"wherehelp_received_existing_mh_team"                           
+"wherehelp_received_online_talk_therapy"                                
+"wherehelp_received_gp"                                                 
+"wherehelp_received_nhs_111"                                           
+"wherehelp_received_nonnhs_phone"                                      "wherehelp_received_gov_website"                                      
+"wherehelp_received_nongov_website"                 
+"wherehelp_received_selfguide_online"                                 "wherehelp_received_struc_therapy"                                    
+"wherehelp_received_other"                          
+
+"treatmenthelpful_emergency_mh"                     
+"treatmenthelpful_existing_mh_team"                
+"treatmenthelpful_online_talk_therapy"              
+"treatmenthelpful_gp"                              
+"treatmenthelpful_nhs_111"                          
+"treatmenthelpful_nonnhs_phone"                    
+"treatmenthelpful_gov_website"                      
+"treatmenthelpful_nongov_website"                  
+"treatmenthelpful_online_self_therapy"              
+"treatmenthelpful_struc_therapy"                   
+"treatmenthelpful_other"        
+
+### Tx seeking
+
+```{r create long datasets}
+
+seek_long <- treat_dat %>% 
+  filter(soughthelp_for_self == 1) %>%
+pivot_longer(c(wherehelp_sought_emergency_mh,                    
+wherehelp_sought_existing_mh_team,               
+wherehelp_sought_online_talk_therapy, 
+wherehelp_sought_gp,      
+wherehelp_sought_nhs_111, 
+wherehelp_sought_nonnhs_phone, 
+wherehelp_sought_gov_website,  
+wherehelp_sought_nongov_website,
+wherehelp_sought_selfguide_online,                
+wherehelp_sought_struc_therapy, 
+wherehelp_sought_other), names_to = "Type", values_to= "sought")
+
+sum(seek_long$sought, na.rm=T)
+```
+
+A total of 27,125 instances of treatment seeking were reported
+
+## Unique instances of treatment seeking (wave)
+```{r unique waves of treatment seeking}
+
+#overall count of responses (non-NA) 
+ treat_dat2 <- treat_dat %>%
+  filter(soughthelp_for_self == 1)
+
+treat_dat2 <- treat_dat2 %>%
+  mutate(responses_total_sought = rowSums(!is.na(treat_dat2[names(treat_dat2) %in% soughtcols])))
+sum(treat_dat2$responses_total_sought)
+
+#overall count of instances sought (==1)
+treat_dat2 <- treat_dat2 %>%
+  mutate(total_instances_sought = rowSums((treat_dat2[names(treat_dat2) %in% soughtcols]), na.rm = T))
+sum(treat_dat2$total_instances_sought)
+
+instances_by_individual <- treat_dat2 %>%
+  group_by(ID) %>%
+  summarise(sum_per_user = sum(total_instances_sought, na.rm = TRUE))
+
+mean(instances_by_individual$sum_per_user, na.rm = T)
+sd(instances_by_individual$sum_per_user)
+
+```
+
+with a mean of 3.53 instances per participant (SD = 4.20)
+
+
+
+### Tx receiving
+
+```{r tx receipt}
+
+receive_long <- treat_dat %>% 
+  filter(soughthelp_for_self ==1) %>%
+pivot_longer(c(wherehelp_received_emergency_mh,                    
+wherehelp_received_existing_mh_team,               
+wherehelp_received_online_talk_therapy, 
+wherehelp_received_gp,      
+wherehelp_received_nhs_111, 
+wherehelp_received_nonnhs_phone, 
+wherehelp_received_gov_website,  
+wherehelp_received_nongov_website,
+wherehelp_received_selfguide_online,                
+wherehelp_received_struc_therapy, 
+wherehelp_received_other), names_to = "Type", values_to= "received")
+
+receive_long %>%
+  count(received, na.rm=T)
+
+treat_long <- cbind(seek_long,receive_long[,80])
+
+treat_long <- treat_long %>%
+  mutate(sought_and_received = 
+           case_when(
+             sought == 1 & received == 1 ~ 1,
+             TRUE ~ 0
+           )) %>%
+         mutate(sought_not_received = 
+                  case_when(
+                    sought == 1 & received == 0 ~1,
+                    TRUE ~0
+                  ))
+
+print("sought and received")
+table(treat_long$sought_and_received)
+
+print("sought and received (%)")
+sum(treat_long$sought_and_received)/(sum(treat_long$sought_and_received)+sum(treat_long$sought_not_received))*100
+
+print("sought not received")
+table(treat_long$sought_not_received)
+
+treat_long %>%
+  group_by(wave) %>%
+  summarise(n_sought = sum(sought, na.rm = T), n_sought_and_received = sum(sought_and_received, na.rm = T), n_sought_not_received = sum(sought_not_received, na.rm = T), prop_received = n_sought_and_received/n_sought*100, prop_not_received = n_sought_not_received/n_sought*100)
+
+treat_long %>%
+  group_by(Type) %>%
+  summarise(n_sought = sum(sought, na.rm = T), n_sought_and_received = sum(sought_and_received, na.rm = T), n_sought_not_received = sum(sought_not_received, na.rm = T), prop_received = n_sought_and_received/n_sought*100, prop_not_received = n_sought_not_received/n_sought*100)
+
+```
+
+and 14,693 instances in which a specific treatment was sought and received (57.47%)
+
+We explored treatment receipt across the 12 months of the study, across all treatment sources. We compared the frequency with which individuals sought one or more types of treatment, and where none was received. The lowest treatment receipt was reported at the time of the third national lockdown in the UK, January 2021 (52.58%) and the highest was recorded in May 2021 (65.56%).
+
+Treatment receipt differed widely according to the source of treatment sought. Of concern, for the two emergency sources, only 37.72% of respondents who sought help from an emergency mental health reported receiving it and only 39.93% of respondents who sought help from the NHS emergency helpline (111) reported receiving it. The highest rates of treatment receipt were were for online talking therapies (64.82%), existing mental health teams (62.74%) and structured therapeutic activities (69.56%). Comparing website-based help, participants reported receiving treatment moreso from non-government sources (48.32%) than from government sources (39.47%).
+
+
+### Tx helpfulness
+
+```{r add helpfulness}
+
+helpfulness_long <- treat_dat %>% 
+  filter(soughthelp_for_self ==1) %>%
+pivot_longer(c(treatmenthelpful_emergency_mh,                    
+treatmenthelpful_existing_mh_team,               
+treatmenthelpful_online_talk_therapy, 
+treatmenthelpful_gp,      
+treatmenthelpful_nhs_111, 
+treatmenthelpful_nonnhs_phone, 
+treatmenthelpful_gov_website,  
+treatmenthelpful_nongov_website,
+treatmenthelpful_online_self_therapy,                
+treatmenthelpful_struc_therapy, 
+treatmenthelpful_other), names_to = "Type", values_to= "helpful")
+                
+helpfulness_long %>%
+  count(helpful, na.rm=T)
+
+treat_long <- cbind(treat_long,helpfulness_long[,80])
+
+summary_helpful <- treat_long %>%
+  filter(sought_and_received == 1) %>%
+  filter(!is.na(helpful)) %>%
+  group_by(helpful) %>%
+  count(helpful)
+
+total_helpful <- sum(summary_helpful$n)
+
+summary_helpful <- summary_helpful %>%
+  mutate(prop_helpful = n / total_helpful*100)
+summary_helpful
+
+help_long <- treat_long %>%
+  filter(!is.na(helpful)) %>%
+  filter(sought_and_received == 1) %>%
+  group_by(Type, helpful) %>%
+  summarise(n = n())
+
+help_wide <- help_long %>%
+  pivot_wider(.,id_cols = Type, names_from = helpful, values_from = n)
+
+help_wide$total <- rowSums(help_wide[2:8])
+
+help_wide_prop <- help_wide %>%
+  mutate(`Extremely unhelpful` =  `Extremely unhelpful`/total*100,
+         `Very unhelpful` = `Very unhelpful`/total*100,
+         `Somewhat unhelpful` = `Somewhat unhelpful`/total*100,
+         `Neither helpful nor unhelpful` = `Neither helpful nor unhelpful`/total*100,
+         `Somewhat helpful` = `Somewhat helpful`/total*100,
+         `Very helpful` = `Very helpful`/total*100,
+         `Extremely helpful` = `Extremely helpful`/total*100)
+help_wide_prop
+
+```
+
+
+When sought and received, treatment was rated as at least ‘somewhat’ helpful in the majority of instances (81.75%). The most frequent rating was ‘somewhat helpful’ (36.57%), with 27.00% of ratings being ‘very helpful’ and 18.18% of ratings as ‘extremely helpful’.  
+
+Online talking therapies received the highest proportion of “extremely helpful” ratings, and were more positively rated compared with self-guided therapies, which had a higher proportion of “somewhat helpful” ratings”. For websites, helpfulness ratings were overall more positive for non-government websites compared to government websites.  
+
+#### Gender
+```{r tx seeking gender}
+
+total_seeking_attempts <- sum(treat_long$sought, na.rm = T) 
+
+gender_seek <- treat_long %>%
+  filter(Gender == "Male" | Gender == "Female") %>%
+  group_by(Gender) %>%
+  summarise(n_sought = sum(sought, na.rm = T), propsought = n_sought/total_seeking_attempts*100)
+  gender_seek
+  
+sum(treat_long$sought, na.rm = T)
+
+
+```
+
+#### TABLE: tx seeking
+
+##### - A) proportion type
+```{r}
+
+tx_seek_type <- treat_long %>%
+  group_by(Type) %>%
+  summarise(n_sought = sum(sought, na.rm = T))
+tx_seek_type
+
+tx_seek_type$prop_total <- tx_seek_type$n_sought/total_seeking_attempts*100
+
+tx_seek_type
+View(tx_seek_type)
+
+
+tx_seek_type_n <- tx_seek_type %>%
+  pivot_wider(., id_cols = Type, names_from = Type, values_from = n_sought )
+```
+
+tx_seek_gender_type_prop <- tx_seek_gender_type_n %>%
+  mutate(
+    wherehelp_sought_emergency_mh =  wherehelp_sought_emergency_mh/total*100,
+    wherehelp_sought_existing_mh_team =  wherehelp_sought_existing_mh_team/total*100,
+    wherehelp_sought_gov_website =  wherehelp_sought_gov_website/total*100,
+    wherehelp_sought_gp =  wherehelp_sought_gp/total*100,
+    wherehelp_sought_nhs_111 =  wherehelp_sought_nhs_111/total*100,
+    wherehelp_sought_nongov_website =  wherehelp_sought_nongov_website/total*100,
+    wherehelp_sought_nonnhs_phone =  wherehelp_sought_nonnhs_phone/total*100,
+    wherehelp_sought_online_talk_therapy =  wherehelp_sought_online_talk_therapy/total*100,
+    wherehelp_sought_other =  wherehelp_sought_other/total*100,
+    wherehelp_sought_selfguide_online =  wherehelp_sought_selfguide_online/total*100,
+    wherehelp_sought_struc_therapy =  wherehelp_sought_struc_therapy/total*100
+         )
+tx_seek_gender_type_prop
+
+View(tx_seek_gender_type_prop)
+
+GPs were the most commonly reported source of help sought by respondents (19.94%). The next most sources were either from an existing mental health team (15.90%) or online talk therapy (15.30%). Self-guided online therapies were much less commonly sought compared to online talking therapies, at just 4.96%. Participants also commonly sought help from websites, with government and non-government websites combined comprising 14.18% of help seeking instances. Phonelines were less common sources than websites, with the NHS emergency phoneline being the least reported of the eleven options, at 2.17%. 
+
+##### - B) proportion gender*type
+```{r}
+
+tx_seek_gender_type <- treat_long %>%
+  filter(Gender == "Male" | Gender == "Female") %>%
+  group_by(Gender, Type) %>%
+  summarise(n_sought = sum(sought, na.rm = T))
+tx_seek_gender_type
+
+sum(tx_seek_gender_type$n_sought)
+
+tx_seek_gender_type_n <- tx_seek_gender_type %>%
+  pivot_wider(., id_cols = Gender, names_from = Type, values_from = n_sought )
+
+tx_seek_gender_type_n$total <- rowSums(tx_seek_gender_type_n[2:12])
+
+tx_seek_chisq <- chisq.test(tx_seek_gender_type_n[,2:12])
+tx_seek_chisq$expected
+
+chisq.test(tx_seek_gender_type_n[,2:12])
+
+tx_seek_gender_type_prop <- tx_seek_gender_type_n %>%
+  mutate(
+    wherehelp_sought_emergency_mh =  wherehelp_sought_emergency_mh/total*100,
+    wherehelp_sought_existing_mh_team =  wherehelp_sought_existing_mh_team/total*100,
+    wherehelp_sought_gov_website =  wherehelp_sought_gov_website/total*100,
+    wherehelp_sought_gp =  wherehelp_sought_gp/total*100,
+    wherehelp_sought_nhs_111 =  wherehelp_sought_nhs_111/total*100,
+    wherehelp_sought_nongov_website =  wherehelp_sought_nongov_website/total*100,
+    wherehelp_sought_nonnhs_phone =  wherehelp_sought_nonnhs_phone/total*100,
+    wherehelp_sought_online_talk_therapy =  wherehelp_sought_online_talk_therapy/total*100,
+    wherehelp_sought_other =  wherehelp_sought_other/total*100,
+    wherehelp_sought_selfguide_online =  wherehelp_sought_selfguide_online/total*100,
+    wherehelp_sought_struc_therapy =  wherehelp_sought_struc_therapy/total*100
+         )
+tx_seek_gender_type_prop
+
+View(tx_seek_gender_type_prop)
+```
+
+There were significant differences between men and women in terms of the treatment type sought (X2 (10, N = 24,622) = 87.42, p < .001). Women reported more frequent seeking of online talking therapy compared to men, while men reported higher rates of help seeking from their Emergency Health care team compared to women. 
+
+##### - C) proportion age*type
+```{r}
+
+tx_seek_age_type <- treat_long %>%
+  filter(!is.na(AgeRecoded)) %>%
+  group_by(AgeRecoded, Type) %>%
+  summarise(n_sought = sum(sought, na.rm = T))
+tx_seek_age_type
+
+tx_seek_age_type_n <- tx_seek_age_type %>%
+  pivot_wider(., id_cols = AgeRecoded, names_from = Type, values_from = n_sought )
+
+tx_seek_age_type_n$total <- rowSums(tx_seek_age_type_n[2:12])
+
+tx_seek_chisq <- chisq.test(tx_seek_age_type_n[,2:12])
+tx_seek_chisq
+tx_seek_chisq$expected
+
+tx_seek_age_type_prop <- tx_seek_age_type_n %>%
+  mutate(
+    wherehelp_sought_emergency_mh =  wherehelp_sought_emergency_mh/total*100,
+    wherehelp_sought_existing_mh_team =  wherehelp_sought_existing_mh_team/total*100,
+    wherehelp_sought_gov_website =  wherehelp_sought_gov_website/total*100,
+    wherehelp_sought_gp =  wherehelp_sought_gp/total*100,
+    wherehelp_sought_nhs_111 =  wherehelp_sought_nhs_111/total*100,
+    wherehelp_sought_nongov_website =  wherehelp_sought_nongov_website/total*100,
+    wherehelp_sought_nonnhs_phone =  wherehelp_sought_nonnhs_phone/total*100,
+    wherehelp_sought_online_talk_therapy =  wherehelp_sought_online_talk_therapy/total*100,
+    wherehelp_sought_other =  wherehelp_sought_other/total*100,
+    wherehelp_sought_selfguide_online =  wherehelp_sought_selfguide_online/total*100,
+    wherehelp_sought_struc_therapy =  wherehelp_sought_struc_therapy/total*100
+         )
+tx_seek_age_type_prop
+
+
+```
+For types of treatment, a higher proportion of older adults reported seeking help from their GP compared to younger adults. A higher proportion of younger adults reported treatment seeking from non-government websites, compared to older adults. 
+
+
+#### TABLE: tx gap
+
+##### - A) Treatment gap all types*gender
+
+```{r }
+
+tx_gap_gender_main <- treat_long %>%
+ filter(Gender == "Male" | Gender == "Female") %>%
+  group_by(Gender) %>%
+  summarise(n_sought = sum(sought, na.rm = T), n_sought_and_received = sum(sought_and_received, na.rm = T), n_sought_not_received = sum(sought_not_received, na.rm = T), prop_not_received = n_sought_not_received/n_sought*100, prop_received = n_sought_and_received/n_sought*100)
+tx_gap_gender_main
+
+sum(tx_gap_gender_main$n_sought)
+
+print("Tx gap chi square test - men/women sought/received")
+chisq.test(tx_gap_gender_main[,3:4])
+
+tx_gap_gender <- treat_long %>%
+ filter(Gender == "Male" | Gender == "Female") %>%
+  group_by(Type, Gender) %>%
+  summarise(n_sought = sum(sought, na.rm = T), n_sought_and_received = sum(sought_and_received, na.rm = T), n_sought_not_received = sum(sought_not_received, na.rm = T), prop_not_received = n_sought_not_received/n_sought*100, prop_received = n_sought_and_received/n_sought*100)
+tx_gap_gender
+
+tx_gap_gender_wide_n <- tx_gap_gender %>%
+  pivot_wider(id_cols = Gender, names_from = Type, values_from = n_sought_not_received)
+tx_gap_gender_wide_n
+
+chisq.test(tx_gap_gender_wide_n[-1])
+
+tx_gap_gender_wide_prop <- tx_gap_gender %>%
+  pivot_wider(id_cols = Gender, names_from = Type, values_from = prop_received)
+tx_gap_gender_wide_prop
+
+chisq.test(tx_gap_gender_wide_prop[-1])
+
+
+
+```
+Among treatment seekers, women were more likely to report receiving treatment than men (58.19%, versus 52.05%  X2 (1, N = 24622) = 58.43, p = < .001). 
+
+There were particularly pronounced gender differences related to phonelines, where women reported much higher receipt of help from both the NHS and non-NHS phonelines (43.75% and 55.68%, respectively), compared to men (28.07% and 40.20%, respectively).
+
+##### - B) Treatment gap all types*age
+
+
+
+```{r }
+
+tx_gap_age_main <- treat_long %>%
+ filter(!is.na(AgeRecoded)) %>%
+  group_by(AgeRecoded) %>%
+  summarise(n_sought = sum(sought, na.rm = T), n_sought_and_received = sum(sought_and_received, na.rm = T), n_sought_not_received = sum(sought_not_received, na.rm = T), prop_not_received = n_sought_not_received/n_sought*100, )
+tx_gap_age_main
+
+sum(tx_gap_age_main$n_sought)
+
+chisq.test(tx_gap_age_main[,3:4])
+
+tx_gap_age <- treat_long %>%
+ filter(!is.na(AgeRecoded)) %>%
+  group_by(AgeRecoded, Type) %>%
+  summarise(n_sought = sum(sought, na.rm = T), n_sought_and_received = sum(sought_and_received, na.rm = T), n_sought_not_received = sum(sought_not_received, na.rm = T), prop_not_received = n_sought_not_received/n_sought*100, prop_received = n_sought_and_received/n_sought*100)
+tx_gap_age
+
+tx_gap_age_wide_n <- tx_gap_age %>%
+  pivot_wider(id_cols = AgeRecoded, names_from = Type, values_from = n_sought_and_received)
+tx_gap_age_wide_n
+
+chisq.test(tx_gap_age_wide_n[-1])
+
+tx_gap_age_wide_prop <- tx_gap_age %>%
+  pivot_wider(id_cols = AgeRecoded, names_from = Type, values_from = prop_received)
+tx_gap_age_wide_prop
+
+chisq.test(tx_gap_age_wide_prop[-1])
+
+
+
+```
+
+Younger people more likely to report receiving treatment than older people (63.93% among 16-25 year olds, 42.71% among 76+ year olds; X2 (6, N = 23,783) = 233.55, p = < .001; Figure).
+
+# CREATE REASONS DATASET
+
+"reasonhelp_new_mh"                                
+"reasonhelp_cont_mh"                                
+"reasonhelp_worsen_mh"                             
+"reasonhelp_mh_crisis"                              
+"reasonhelp_repeat_prescription"                   
+"reasonhelp_change_med"                             
+"reasonhelp_new_med"                               
+"reasonhelp_alt_support"                            
+"reasonhelp_other"                                 
+
+
+```{r create long datasets2}
+
+reasons_long <- treat_long %>% 
+  filter(sought == 1) %>%
+  pivot_longer(c(reasonhelp_new_mh:reasonhelp_other), names_to = "Reason", values_to= "reason_given")
+
+total_reasons <- sum(reasons_long$reason_given, na.rm=T)
+total_reasons
+
+table(reasons_long$reason_given)
+
+```
+
+## summary all reasons sought
+
+```{r total reasons}
+summary_reasons <- reasons_long %>%
+  group_by(Reason) %>%
+  summarise(n = sum(reason_given, na.rm = T), prop = n/total_reasons*100)
+summary_reasons
+```
+Most treatment seeking was related to either a continuation (26.29%) or a worsening of an existing mental health problem (22.65%). 
+
+```{r total reasons by wave}
+summary_reasons_wave <- reasons_long %>%
+  group_by(Reason, wave) %>%
+  summarise(n = sum(reason_given, na.rm = T)) 
+
+summary_reasons_wave %>%
+  group_by(wave) %>%
+  mutate(per = prop.table(n)*100)
+  
+
+
+```
+
+
+## summary recategorise reasons
+
+```{r recategorise reasons}
+reasons_long <- reasons_long %>%
+  mutate(Reason_cat = case_when(
+    Reason == "reasonhelp_new_mh" ~ "Newly emerging symptoms", 
+    Reason == "reasonhelp_cont_mh" ~ "Existing mental health", 
+    Reason == "reasonhelp_worsen_mh" ~ "Existing mental health", 
+    Reason == "reasonhelp_mh_crisis" ~ "Mental health crisis", 
+    Reason == "reasonhelp_repeat_prescription" ~ "Existing mental health", 
+    Reason == "reasonhelp_change_med" ~ "Existing mental health", 
+    Reason == "reasonhelp_new_med" ~ "Seeking new treatment", 
+    Reason == "reasonhelp_alt_support" ~ "Existing mental health", 
+    Reason == "reasonhelp_other" ~ "Other"))
+
+summary_reasons_cat <- reasons_long %>%
+  group_by(Reason_cat) %>%
+  summarise(n = sum(reason_given, na.rm = T), prop = n/total_reasons*100)
+summary_reasons_cat
+
+summary_reasons_cat_wave <- reasons_long %>%
+  group_by(Reason_cat, wave) %>%
+  summarise(n = sum(reason_given, na.rm = T))
+summary_reasons_cat_wave
+
+summary_reasons_cat_wave_wide <- summary_reasons_cat_wave %>%
+  pivot_wider(.,id_cols = wave, names_from = Reason_cat, values_from = n)
+
+summary_reasons_cat_wave_wide$total <- rowSums(summary_reasons_cat_wave_wide[2:6])
+
+summary_reasons_cat_wave_wide_prop <- summary_reasons_cat_wave_wide %>%
+  mutate(`Existing mental health` =  `Existing mental health`/total*100,
+         `Mental health crisis` = `Mental health crisis`/total*100,
+         `Newly emerging symptoms` = `Newly emerging symptoms`/total*100,
+         `Other` = `Other`/total*100,
+         `Seeking new treatment` = `Seeking new treatment`/total*100,)
+summary_reasons_cat_wave_wide_prop
+
+
+```
+There was minimal variety in the reasons for treatment-seeking over time across the 12 month study period.
+
+
+# CREATE REASONS NOT RECEIVED DATASET
+
+"preventhelp_emergency_mh"                         
+"preventhelp_existing_mh_team"                      
+"preventhelp_online_talk_therapy"                  
+"preventhelp_gp"                                    
+"preventhelp_nhs_111"                              
+"preventhelp_nonnhs_phone"                          
+"preventhelp_gov_website"                          
+"preventhelp_nongov_website"                        
+"preventhelp_online_self_therapy"                  
+"preventhelp_struc_therapy"                         
+"preventhelp_other"   
+
+```{r create long reasons not received dataset}
+
+reasons_not_received_long <- treat_dat %>% 
+  filter(soughthelp_for_self == 1) %>%
+  pivot_longer(c(preventhelp_emergency_mh:preventhelp_other), names_to = "Type", values_to= "reason_given")
+
+table(reasons_not_received_long$reason_given)
+
+```
+
+## summary reasons not received
+
+```{r reasons not received - all}
+summary_not_received <- reasons_not_received_long %>%
+  filter(!is.na(reason_given)) %>%
+  group_by(reason_given) %>%
+  count(reason_given)
+
+total_not_received <- sum(summary_not_received$n)
+
+summary_not_received <- summary_not_received %>%
+  mutate(prop_not_received = n / total_not_received*100)
+summary_not_received
+
+summary_not_received_type <- reasons_not_received_long %>%
+  filter(!is.na(reason_given)) %>%
+  group_by(Type, reason_given) %>%
+  count(reason_given)
+
+not_received_wide <- summary_not_received_type %>%
+  pivot_wider(.,id_cols = Type, names_from = reason_given, values_from = n)
+
+not_received_wide$total <- rowSums(not_received_wide[2:10])
+
+not_received_wide_prop <- not_received_wide %>%
+  mutate(`Could not get an appointment` =  `Could not get an appointment`/total*100,
+         `Waiting list was too long` =  `Waiting list was too long`/total*100,
+         `Was assessed and was unable to be offered support` =  `Was assessed and was unable to be offered support`/total*100,
+         `None of the support options were relevant` =  `None of the support options were relevant`/total*100,
+         `Support option was unavailable when tried to access it` =  `Support option was unavailable when tried to access it`/total*100,
+         `Didn't feel well enough to engage` =  `Didn't feel well enough to engage`/total*100,
+         `Was too busy to engage` =  `Was too busy to engage`/total*100,
+         `Felt better` =  `Felt better`/total*100,
+         `Other` =  `Other`/total*100
+         )
+not_received_wide_prop
+```
+
+For GPs, the most commonly-sought treatment source, the most frequently endorsed reason for no-receipt was appointment unavailability (27.24%). For website-based support, both government and non-government, the most commonly endorsed reason for non-receipt was that the support was not relevant (28.34% and 23.27% respectively). For NHS 111 phone lines, where the largest gap in treatment receipt was reported, “being assessed but being unable to be offered support” was the most common reason (20.52%). 
+
+
+#### TABLE: reasons not received
+
+##### - A) reasons not received*gender
+```{r}
+
+reasons_not_gender <- reasons_not_received_long %>%
+  filter(Gender == "Male" | Gender == "Female") %>%
+  filter(!is.na(reason_given)) %>%
+  group_by(Gender, reason_given) %>%
+  summarise(n = n())
+reasons_not_gender  
+
+sum(reasons_not_gender$n)
+
+reasons_not_gender_wide <- reasons_not_gender %>%
+  pivot_wider(id_cols = Gender, names_from = reason_given, values_from = n)
+reasons_not_gender_wide
+
+reasons_not_gender_wide$total <- rowSums(reasons_not_gender_wide[-1])
+
+reasons_not_gender_chisq <- chisq.test(reasons_not_gender_wide[2:10])
+reasons_not_gender_chisq
+reasons_not_gender_chisq$residuals
+
+reasons_not_gender_wide_prop <- reasons_not_gender_wide %>%
+  mutate(
+    `Could not get an appointment` = `Could not get an appointment`/total*100,
+    `Waiting list was too long` = `Waiting list was too long`/total*100,
+    `Was assessed and was unable to be offered support` = `Was assessed and was unable to be offered support`/total*100,
+    `None of the support options were relevant` = `None of the support options were relevant`/total*100,
+    `Support option was unavailable when tried to access it` = `Support option was unavailable when tried to access it`/total*100,
+    `Didn't feel well enough to engage` = `Didn't feel well enough to engage`/total*100,
+    `Was too busy to engage` = `Was too busy to engage`/total*100,
+    `Felt better` = `Felt better`/total*100,
+    `Other` = `Other`/total*100
+  )
+
+reasons_not_gender_wide_prop
+```
+
+There were also significant gender differences in the reasons provided for non-receipt (X2 (8, N = 10,409) = 53.84, p < .001).
+
+##### - B) reasons not received*age
+```{r}
+
+reasons_not_age <- reasons_not_received_long %>%
+  filter(!is.na(AgeRecoded)) %>%
+  filter(!is.na(reason_given)) %>%
+  group_by(AgeRecoded, reason_given) %>%
+  summarise(n = n())
+reasons_not_age  
+
+reasons_not_age_wide <- reasons_not_age %>%
+  pivot_wider(id_cols = AgeRecoded, names_from = reason_given, values_from = n)
+reasons_not_age_wide
+
+reasons_not_age_wide[7,8] <- 0
+
+reasons_not_age_wide$total <- rowSums(reasons_not_age_wide[-1])
+
+reasons_not_age_chisq <- chisq.test(reasons_not_age_wide[2:10])
+reasons_not_age_chisq
+reasons_not_gender_chisq$residuals
+
+reasons_not_age_wide_prop <- reasons_not_age_wide %>%
+  mutate(
+    `Could not get an appointment` = `Could not get an appointment`/total*100,
+    `Waiting list was too long` = `Waiting list was too long`/total*100,
+    `Was assessed and was unable to be offered support` = `Was assessed and was unable to be offered support`/total*100,
+    `None of the support options were relevant` = `None of the support options were relevant`/total*100,
+    `Support option was unavailable when tried to access it` = `Support option was unavailable when tried to access it`/total*100,
+    `Didn't feel well enough to engage` = `Didn't feel well enough to engage`/total*100,
+    `Was too busy to engage` = `Was too busy to engage`/total*100,
+    `Felt better` = `Felt better`/total*100,
+    `Other` = `Other`/total*100
+  )
+
+reasons_not_age_wide_prop
+
+
+```
+
+
+
+# CREATE REASONS NOT SOUGHT DATASET
+
+"reasonNohelp_feel_fine"                            
+"reasonNohelp_I_feel_better"                       
+"reasonNohelp_I_dont_think_I_feel_bad_enough"       "reasonNohelp_I_want_help_dont_think_its_available"
+"reasonNohelp_Bad_experiences_in_past"              
+"reasonNohelp_I_want_to_but_havent"                
+"reasonNohelp_Too_busy"                             
+"reasonNohelp_I_didnt_know_where_to_find"          
+"reasonNohelp_other"        
+
+```{r create long reasons not sought datasets}
+
+reasons_not_sought_long <- treat_dat %>% 
+  filter(soughthelp_for_self != 1) %>%
+  pivot_longer(c(reasonNohelp_feel_fine:reasonNohelp_other), names_to = "ReasonNot", values_to= "reason_given")
+
+total_reasons_not <- sum(reasons_not_sought_long$reason_given, na.rm=T)
+total_reasons_not
+
+table(reasons_not_sought_long$reason_given)
+
+```
+
+## summary all reasons NOT sought
+
+```{r total reasons not sought}
+summary_reasons_not <- reasons_not_sought_long %>%
+  group_by(ReasonNot) %>%
+  summarise(n = sum(reason_given, na.rm = T), prop = n/total_reasons_not*100)
+summary_reasons_not
+```
+
+Most participants reported that they did not seek treatment because they had no, or only mild symptoms (53.20% selected ‘feel fine’, 3.78% ‘feel better’, 22.45% ‘not bad enough to need help’). 10.03% of answers indicated system-oriented reasons (4.55% ‘don’t think help is available’, 3.78% ‘bad past experience’, 1.70% ‘didn’t know where to find help’). 5.48% of answers indicated reasons related to their own personal feelings or situations (2.67% ‘I want to but haven’t’, 2.81% ‘I’m too busy’).
+
+          
+                               16101                                16101                                16101 
+                 wherehelp_sought_gp             wherehelp_sought_nhs_111      wherehelp_sought_nongov_website 
+                               16101                                16101                                16101 
+       wherehelp_sought_nonnhs_phone wherehelp_sought_online_talk_therapy               wherehelp_sought_other 
+                               16101                                16101                                16101 
+   wherehelp_sought_selfguide_online       wherehelp_sought_struc_therapy 
+                               16101                                16101 
+

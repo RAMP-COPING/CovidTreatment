@@ -48,8 +48,8 @@ start12 <- as.POSIXct("2021-04-01")
 end12 <-   as.POSIXct("2021-05-01") 
 
 #May
-start13 <- as.POSIXct("2021-06-01")
-end13 <-   as.POSIXct("2021-07-01") 
+start13 <- as.POSIXct("2021-05-01")
+end13 <-   as.POSIXct("2021-06-01") 
 
 #June
 start14 <- as.POSIXct("2021-06-01")

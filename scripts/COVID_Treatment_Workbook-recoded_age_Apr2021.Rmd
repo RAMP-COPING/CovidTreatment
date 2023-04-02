@@ -119,7 +119,9 @@ date = Sys.Date()
 
 ```{r call in function library functions}
 # source all functions in the function library folder
-files.sources = paste0("./FunctionLib/",list.files("./FunctionLib"))
+files.sources = paste0("/Users/katherineyoung/OneDrive - King's College London/MQ_project/papers/RAMP-COPING_MH_treatment_paper/CovidTreatment/FunctionLib/",list.files("/Users/katherineyoung/OneDrive - King's College London/MQ_project/papers/RAMP-COPING_MH_treatment_paper/CovidTreatment/FunctionLib"))
+
+
 sapply(files.sources, source)
 
 library("eeptools")
@@ -241,35 +243,32 @@ demRAMP <- readRDS(file = paste0(data_path, "/ramp/dem_ramp.RDS"))
 COPING
 Note, external data reference is a hash-id for coping. So it is consistent across participants and matches, but is not linkable to GLAD ID
 ```{r read in data coping}
-
 treatCOPE <- readRDS(file = paste0(data_path, "/coping_followupa_ongoing/treatment_coping_followupa_ongoing.rds"))
 
 demCOPE.glad <- readRDS(file = paste0(data_path, "/coping_glad/dem_coping_glad.RDS"))
 demCOPE.glad.baseline <- readRDS(file = paste0(data_path, "/glad/dem_glad.RDS"))
 
 demCOPE.edgi <- readRDS(file = paste0(data_path, "/coping_edgi/dem_coping_edgi.RDS"))
-#¡¡¡¡¡¡¡¡¡#
-demCOPE.edgi.baseline <- readRDS(file = paste0(data_path, "/edgi/demographics_edgi.RDS"))
-#¡¡¡¡¡¡¡¡¡#
+demCOPE.edgi.baseline <- readRDS(file = paste0(data_path_baseline, "/edgi/dem_edgi.RDS"))
+#demCOPE.edgi.baseline <- readRDS("/Users/katherineyoung/King's College London/MT-TNG BioResource EDIT - ilovedata - data_raw/2021-10-03/edgi/dem_edgi.rds")
 
-demCOPE.nbr <- readRDS(file = paste0(data_path, "/coping_nbr/dem_coping_nbr.RDS"))
+
+demCOPE.nbr <- readRDS(file = paste0(data_path_baseline, "/coping_nbr/demographics_coping_nbr.RDS"))
 demographicsCOPE.nbr <- readRDS(file = paste0(data_path, "/coping_nbr/demographics_coping_nbr.RDS"))
 #demCOPE.nbr.baseline <- fread(paste0(data_path, "/nbr/NBR_hlq_dem_data_hash.csv"))
-#¡¡¡¡¡¡¡¡¡#
-demCOPE.nbr.baseline <- fread(paste0(data_path, "/nbr_additional_info/coping_participants_export_20200730_hashed.csv"))
-#¡¡¡¡¡¡¡¡¡#
+demCOPE.nbr.baseline <- fread(file = paste0(data_path_demCOPE,"coping_participants_export_20200730_hashed.csv"))
 
-GLADpostcode <- fread(paste0(postpath,"/GLAD_COPING_postcodes.csv"))
-EDGIpostcode <- fread(paste0(postpath,"/EDGI_COPING_postcodes.csv"))
-NBRpostcode <- fread(paste0(postpath,"/NBR_postcodes_hash.csv"))
+
+#GLADpostcode <- fread(paste0(postpath,"/GLAD_COPING_postcodes.csv"))
+#EDGIpostcode <- fread(paste0(postpath,"/EDGI_COPING_postcodes.csv"))
+#NBRpostcode <- fread(paste0(postpath,"/NBR_postcodes_hash.csv"))
 
 MHD.COPE.glad <- readRDS(file = paste0(data_path, "/coping_glad/mhd_coping_glad.rds"))
-#MHD.COPE.edgi <- readRDS(file = paste0(cope_path, "/coping_edgi/mhd_coping_edgi.rds")) THIS IS IN THE DEMOGRAPHICS
+#MHD.COPE.edgi <- readRDS(file = paste0(data_path, "/coping_edgi/mhd_coping_edgi.rds")) 
 MHD.COPE.nbr <- readRDS(file = paste0(data_path, "/coping_nbr/mhd_coping_nbr.rds"))
 
-#¡¡¡¡¡¡¡¡¡#
-MHD.RAMP <- readRDS(file = paste0(data_path, "/ramp/mhd_ramp.rds"))
-#¡¡¡¡¡¡¡¡¡#
+MHD.RAMP <- readRDS(file = paste0(data_path_baseline, "/ramp/mhd_ramp.rds"))
+
 ```
 
 
@@ -279,10 +278,10 @@ MHD.RAMP <- readRDS(file = paste0(data_path, "/ramp/mhd_ramp.rds"))
 ```{r age gender ethnicity GLAD}
 
 GLADdemvars <- demCOPE.glad.baseline %>%
-  select("externalDataReference","dem.which_gender_do_you_identify_with","dem.questions_based_ethnic_origin","dem.how_old_are_you_now.txt") %>%
+  select("externalDataReference","dem.which_gender_do_you_identify_with","dem.questions_based_details_gather","dem.how_old_are_you_now.txt") %>%
   rename(ID=externalDataReference,
          Gender=dem.which_gender_do_you_identify_with,
-         Ethnicity=dem.questions_based_ethnic_origin,
+         Ethnicity=dem.questions_based_details_gather,
          Age.linear = dem.how_old_are_you_now.txt)
 
 ```
@@ -360,11 +359,11 @@ GLADdemvars <- GLADdemvars %>%
 ```{r age gender ethnicity EDGI}
 
 EDGIdemvars <- demCOPE.edgi.baseline %>%
-  select("externalDataReference","demographics.what_gender_do_you_identify_with","demographics.what_is_your_ethnic_origin","dem.how_old_are_you_now.txt") %>%
+  select("externalDataReference","demographics.what_gender_do_you_identify_with","demographics.what_gender_do_you_identify_with","demographics.what_gender_do_you_identify_with") %>%
   rename(ID=externalDataReference,
          Gender=demographics.what_gender_do_you_identify_with,
-         Ethnicity=demographics.what_is_your_ethnic_origin,
-         Age.linear = dem.how_old_are_you_now.txt)
+         Ethnicity=demographics.what_gender_do_you_identify_with,
+         Age.linear = demographics.what_gender_do_you_identify_with)
 
 ```
 
@@ -456,11 +455,11 @@ nbr.dem.raw.id <- demographicsCOPE.nbr %>%
     mutate(ID = subjectid) %>%
     select(
       ID, # ID
-      Birthyear_unc = demographics.year, # Birthyear
-      Birthmonth = demographics.month, #Birthmonth
-      Birthday = demographics.day, #Birthday
-      Gender_unc = demographics.which_gender_do_you_identify_with, # Gender
-      Sex = demographics.select_questionnaire_items_medical #Sex
+      Birthyear_unc = dem.year, # Birthyear
+      Birthmonth = dem.month, #Birthmonth
+      Birthday = dem.day, #Birthday
+      Gender_unc = dem.which_gender_do_you_identify_with, # Gender
+      Sex = dem.select_questionnaire_items_medical #Sex
     ) %>%
     add_numeric(., exclude = exclude_cols_dem) %>%
     mutate_if(is.numeric, ~na_if(., -88)) %>% # Recode missing values to NAs in numeric variables
@@ -701,9 +700,9 @@ names(dem.cope.nbr) <- cols.nbr
 names(dem.ramp) <- cols.ramp
 
 
-names(GLADpostcode) <- names.postcode
-names(EDGIpostcode) <- names.postcode
-names(NBRpostcode) <- names.postcode
+#names(GLADpostcode) <- names.postcode
+#names(EDGIpostcode) <- names.postcode
+#names(NBRpostcode) <- names.postcode
 
 
 ```
@@ -711,8 +710,8 @@ Clean postcode to keep only outcode for COPING
 
 ```{r clean COPING postcodes}
 
-setwd(wd)
-source("./scripts/clean_COPING_postcode_data.R")
+#setwd(wd)
+#source("./scripts/clean_COPING_postcode_data.R")
 
 ```
 
@@ -720,9 +719,9 @@ Add postcode to COPING
 
 ```{r add postcode to coping}
 
-dem.cope.glad <- left_join(dem.cope.glad,GLADpostcode)
-dem.cope.edgi <- left_join(dem.cope.edgi,EDGIpostcode)
-dem.cope.nbr <- left_join(dem.cope.nbr,NBRpostcode)
+#dem.cope.glad <- left_join(dem.cope.glad,GLADpostcode)
+#dem.cope.edgi <- left_join(dem.cope.edgi,EDGIpostcode)
+#dem.cope.nbr <- left_join(dem.cope.nbr,NBRpostcode)
 
 ```
 
@@ -1082,7 +1081,7 @@ common_col_names <- append(common_col_names,"mhd.eating_disorder")
 ```{r select columns for EDGI}
 
 MH.EDGI <- MHD.COPE.edgi %>%
-  select(all_of(common_col_names)) %>%
+  select(all_of(common_col_names_edg)) %>%
   mutate(Sample = "COPING",
          SampleCOPE = "EDGI")
 
@@ -1123,13 +1122,14 @@ MH <- MH %>%
                                            mhd.panic_attacks == 1 ~1)) %>%
   select(-c(mhd.anxiety_nerves_or_generalised_anxiety_disorder,mhd.social_anxiety_or_social_phobia,mhd.specific_phobia,mhd.agoraphobia,mhd.panic_disorder,mhd.panic_attacks))
 
+#mhd.obsessivecompulsive_disorder_ocd == 1 |
+  
 MH <- MH %>%
-  mutate(mhd.ocrd = case_when(mhd.obsessivecompulsive_disorder_ocd == 1 |
-                                mhd.obsessivecompulsive_disorder == 1|
+  mutate(mhd.ocrd = case_when(mhd.obsessivecompulsive_disorder == 1|
                                            mhd.bdd == 1|
                                            mhd.other_ocd == 1|
                                            mhd.other_obsessivecompulsive_related_disorders == 1 ~1)) %>%
-  select(-c(mhd.obsessivecompulsive_disorder_ocd,mhd.bdd,mhd.other_ocd,mhd.other_obsessivecompulsive_related_disorders,mhd.obsessivecompulsive_disorder))
+  select(-c(mhd.bdd,mhd.other_ocd,mhd.other_obsessivecompulsive_related_disorders,mhd.obsessivecompulsive_disorder))
 
 MH <- MH %>%
   mutate(mhd.psychotic_disorder = case_when(mhd.schizophrenia == 1 |
@@ -1168,14 +1168,14 @@ treat_dat <- rbind(treatRAMP.fin,treatCOPE.fin)
 ```{r reorder wave factor}
 
 treat_dat$wave <- factor(treat_dat$wave,
-                         levels = c("May 2020","June 2020", "July 2020","August 2020","September 2020","October 2020","November 2020","December 2020","January 2021","February 2021","March 2021","April 2021"))
+                         levels = c("May 2020","June 2020", "July 2020","August 2020","September 2020","October 2020","November 2020","December 2020","January 2021","February 2021","March 2021","April 2021", "May 2021", "June 2021"))
 
 ```
 
 #### Drop June and January timepoints
 ```{r drop un-needed timepoints}
 
-treat_dat <- filter(treat_dat, wave == "July 2020" | wave == "August 2020" | wave == "September 2020" | wave == "October 2020" | wave == "November 2020" | wave == "December 2020"| wave == "December 2020"| wave == "January 2021"| wave == "February 2021"| wave == "March 2021"| wave == "April 2020")
+treat_dat <- filter(treat_dat,  wave == "July 2020" | wave == "August 2020" | wave == "September 2020" | wave == "October 2020" | wave == "November 2020" | wave == "December 2020"| wave == "December 2020"| wave == "January 2021"| wave == "February 2021"| wave == "March 2021"| wave == "April 2021"| wave == "May 2021" | wave == "June 2021")
 ```
 
 #### Drop accidental duplicate IDs
@@ -1189,10 +1189,19 @@ DupIDdat <- treat_dat %>%
               values_from = soughthelp_for_self,
               values_fn = length)
 
-dupids <- DupIDdat$ID[(DupIDdat$`June 2020` > 1 | DupIDdat$`July 2020` > 1 |
-                         DupIDdat$`August 2020` > 1 | DupIDdat$`September 2020` > 1 |
-                         DupIDdat$`October 2020` > 1 | DupIDdat$`November 2020` > 1 |
-                         DupIDdat$`December 2020` > 1 | DupIDdat$`January 2021` > 1)]
+dupids <- DupIDdat$ID[( DupIDdat$`July 2020` > 1 |
+                        DupIDdat$`August 2020` > 1 | 
+                        DupIDdat$`September 2020` > 1 |
+                        DupIDdat$`October 2020` > 1 | 
+                        DupIDdat$`November 2020` > 1 |
+                        DupIDdat$`December 2020` > 1 | 
+                        DupIDdat$`January 2021` > 1 |
+                        DupIDdat$`February 2021` > 1 |
+                        DupIDdat$`March 2021` > 1 |
+                        DupIDdat$`April 2021` > 1 |
+                        DupIDdat$`May 2021` > 1 |
+                        DupIDdat$`June 2021` > 1
+                        )]
 
 dupids <- unique(dupids)
 
@@ -1223,11 +1232,25 @@ Categorise reasons for help seeking into whether it was for a pre-existing, newl
 ```{r dummy reason for help seek variable}
 
 treat_dat <- treat_dat %>%
-  mutate(ReasonSeek = case_when(reasonhelp_new_mh == 1 ~ "Newly emerging symptoms",
-                                reasonhelp_cont_mh == 1 | reasonhelp_worsen_mh == 1 | reasonhelp_repeat_prescription == 1 |
-                                 reasonhelp_change_med == 1 | reasonhelp_alt_support == 1 ~ "Existing mental health",
-                                reasonhelp_mh_crisis == 1 ~ "Mental health crisis",
-                               reasonhelp_new_med == 1 ~ "Seeking new treatment"))
+  mutate(ReasonSeek = case_when(
+    reasonhelp_new_mh == 1 ~ "Newly emerging symptoms",
+    reasonhelp_cont_mh == 1 | reasonhelp_worsen_mh == 1 | reasonhelp_repeat_prescription == 1 | reasonhelp_change_med == 1 | reasonhelp_alt_support == 1 ~ "Existing mental health",
+  reasonhelp_mh_crisis == 1 ~ "Mental health crisis",
+  reasonhelp_new_med == 1 ~ "Seeking new treatment",
+  reasonhelp_other == 1 ~ "Other"))
+
+treat_dat <- treat_dat %>%
+  mutate(
+  Reason_Existing_Mh = rowSums(cbind(reasonhelp_cont_mh, reasonhelp_worsen_mh,  reasonhelp_repeat_prescription, reasonhelp_change_med, reasonhelp_alt_support), na.rm = T))
+
+reasonscols = c("reasonhelp_new_mh", "reasonhelp_cont_mh", "reasonhelp_worsen_mh", "reasonhelp_mh_crisis", "reasonhelp_repeat_prescription", "reasonhelp_change_med", "reasonhelp_new_med", "reasonhelp_alt_support", "reasonhelp_other"  )
+
+treat_dat <- treat_dat %>%
+  mutate(total_n_reasons = rowSums(treat_dat[names(treat_dat) %in% reasonscols], na.rm = T))
+
+sum(treat_dat$total_n_reasons)
+sum(treat_dat$Reason_New_Tx)
+sum(treat_dat$Reason_other)
 
 ```
 
@@ -1241,30 +1264,14 @@ make Prefer not to say (-77) NA
 
 ```{r na for PNS treatment type sought}
 treat_dat[grep("wherehelp",names(treat_dat))] <-apply(treat_dat[grep("wherehelp",names(treat_dat))],2,function(x) ifelse(x == -77,NA, x))
+
+treat_dat[grep("reasonhelp",names(treat_dat))] <-apply(treat_dat[grep("reasonhelp",names(treat_dat))],2,function(x) ifelse(x == -77,NA, x))
+
+treat_dat[grep("reasonNo",names(treat_dat))] <-apply(treat_dat[grep("reasonNo",names(treat_dat))],2,function(x) ifelse(x == -77,NA, x))
+
 ```
 
-create a variable that will say if they sought supported or self guided for each support instance
-```{r dummy type of treatment sought}
 
-treat_dat <- treat_dat %>%
-  mutate(TypeSought.Supported.Any  = case_when(wherehelp_sought_emergency_mh == 1 ~ "Sought Supported",
-                               wherehelp_sought_existing_mh_team == 1 ~ "Sought Supported",
-                                wherehelp_sought_online_talk_therapy == 1 ~ "Sought Supported",
-                                wherehelp_sought_gp == 1 ~ "Sought Supported",
-                                wherehelp_sought_nonnhs_phone == 1 ~ "Sought Supported",
-                                wherehelp_sought_nhs_111 == 1 ~ "Sought Supported", 
-                               TRUE ~ "Did not seek supported treatment"),
-         TypeSought.SelfGuide.Any = case_when(
-                                wherehelp_sought_gov_website == 1 ~ "Sought Self-guided",
-                                wherehelp_sought_selfguide_online == 1 ~ "Sought Self-guided",
-                                wherehelp_sought_nongov_website == 1 ~ "Sought Self-guided",
-                                wherehelp_sought_struc_therapy == 1 ~ "Sought Self-guided",
-                                TRUE ~ "Did not seek self-guided treatment")) %>%
-  
-  mutate(AnySought = case_when(TypeSought.Supported.Any  == "Sought Supported" ~ 1,
-                                  TypeSought.SelfGuide.Any  == "Sought Self-guided" ~ 1,
-                                 TRUE ~ 0))
-```
 
 create variable counting number of self guided or supported treatment types sought per wave per person
 
@@ -1281,32 +1288,12 @@ selfcols <- c("wherehelp_sought_gov_website","wherehelp_received_selfguide_onlin
 treat_dat$TypeSought.Supported.total <- rowSums(treat_dat[names(treat_dat) %in% supportcols],na.rm = T)
 treat_dat$TypeSought.SelfGuided.total <- rowSums(treat_dat[names(treat_dat) %in% selfcols],na.rm = T)
 
+#calculate total sources sought
+  treat_dat$TypeSought.All.total <- rowSums(cbind(treat_dat$TypeSought.SelfGuided.total, treat_dat$TypeSought.Supported.total), na.rm = T)
+
 ```
 
-##### received treatment if sought 
 
-identify if treatment was received when sought according to category
-```{r dummy type of treatment received}
-
-treat_dat <- treat_dat %>%
-  mutate(TypeReceived.Supported.Any  = case_when(wherehelp_received_emergency_mh == 1 ~ "Received Supported",
-                               wherehelp_received_existing_mh_team == 1 ~ "Received Supported",
-                                wherehelp_received_online_talk_therapy == 1 ~ "Received Supported",
-                                wherehelp_received_gp == 1 ~ "Received Supported",
-                                wherehelp_received_nonnhs_phone == 1 ~ "Received Supported",
-                                wherehelp_received_nhs_111 == 1 ~ "Received Supported", 
-                               TRUE ~ "Did not receive supported treatment"),
-         TypeReceived.SelfGuide.Any = case_when(
-                                wherehelp_received_gov_website == 1 ~ "Received Self-guided",
-                                wherehelp_received_selfguide_online == 1 ~ "Received Self-guided",
-                                wherehelp_received_nongov_website == 1 ~ "Received Self-guided",
-                                wherehelp_received_struc_therapy == 1 ~ "Received Self-guided",
-                                TRUE ~ "Did not receive self-guided treatment")) %>%
-  
-  mutate(AnyReceived = case_when(TypeReceived.Supported.Any  == "Received Supported" ~ 1,
-                                  TypeReceived.SelfGuide.Any  == "Received Self-guided" ~ 1,
-                                 TRUE ~ 0))
-```
 
 ```{r dummy treatment not received if sought}
 
@@ -1320,16 +1307,37 @@ treat_dat  <- treat_dat %>%
 
 ```{r type received counts}
 
-supportcols <- c("wherehelp_received_emergency_mh","wherehelp_received_online_talk_therapy",
-                 "wherehelp_received_gp","wherehelp_received_existing_mh_team",
-                " wherehelp_received_nonnhs_phone","wherehelp_received_nhs_111")
+supportcols <- c("wherehelp_received_emergency_mh","wherehelp_received_online_talk_therapy","wherehelp_received_gp","wherehelp_received_existing_mh_team","wherehelp_received_nonnhs_phone","wherehelp_received_nhs_111")
 
-selfcols <- c("wherehelp_received_gov_website","wherehelp_received_selfguide_online",
-                 "wherehelp_received_nongov_website","wherehelp_received_struc_therapy")
+selfcols <- c("wherehelp_received_gov_website","wherehelp_received_selfguide_online","wherehelp_received_nongov_website","wherehelp_received_struc_therapy")
 
+othercols <- c("wherehelp_received_other")
+
+
+soughtcols <- c("wherehelp_sought_emergency_mh", "wherehelp_sought_existing_mh_team", "wherehelp_sought_online_talk_therapy", "wherehelp_sought_gp",  "wherehelp_sought_nhs_111", "wherehelp_sought_nonnhs_phone", "wherehelp_sought_gov_website", "wherehelp_sought_nongov_website",  "wherehelp_sought_selfguide_online", "wherehelp_sought_struc_therapy", 
+ "wherehelp_sought_other" )
+
+receivecols <- c("wherehelp_received_emergency_mh","wherehelp_received_online_talk_therapy","wherehelp_received_gp","wherehelp_received_existing_mh_team","wherehelp_received_nonnhs_phone","wherehelp_received_nhs_111","wherehelp_received_gov_website","wherehelp_received_selfguide_online","wherehelp_received_nongov_website","wherehelp_received_struc_therapy","wherehelp_received_other")
+
+reasoncols <- c("preventhelp_emergency_mh", "preventhelp_existing_mh_team", "preventhelp_online_talk_therapy", "preventhelp_gp", "preventhelp_nhs_111", "preventhelp_nonnhs_phone", "preventhelp_gov_website", "preventhelp_nongov_website", "preventhelp_online_self_therapy", "preventhelp_struc_therapy", "preventhelp_other")
+
+helpfulnesscols <- c("treatmenthelpful_emergency_mh", "treatmenthelpful_existing_mh_team", "treatmenthelpful_online_talk_therapy", "treatmenthelpful_gp", "treatmenthelpful_nhs_111", "treatmenthelpful_nonnhs_phone", "treatmenthelpful_gov_website", "treatmenthelpful_nongov_website", "treatmenthelpful_online_self_therapy", "treatmenthelpful_struc_therapy", "treatmenthelpful_other")
 
 treat_dat$TypeReceived.Supported.total <- rowSums(treat_dat[names(treat_dat) %in% supportcols],na.rm = T)
 treat_dat$TypeReceived.SelfGuided.total <- rowSums(treat_dat[names(treat_dat) %in% selfcols],na.rm = T)
+
+#calculate total sources received
+  treat_dat$TypeReceived.All.total <- rowSums(cbind(treat_dat$TypeReceived.SelfGuided.total, treat_dat$TypeReceived.Supported.total), na.rm = T)
+  
+#calculate total reasons not received
+
+total_reasons <- treat_dat %>%
+  mutate(total_reasons_non_na = sum(!is.na(treat_dat[names(treat_dat) %in% reasoncols])))
+
+#calculate total sought but not received
+    treat_dat$SoughtNotReceived.All.total <- (treat_dat$TypeSought.All.total - treat_dat$TypeReceived.All.total)
+    
+    
 
 ```
 
@@ -1384,7 +1392,7 @@ source("./scripts/relabel_barriers_help_factors.R")
 
 
 Identify whether barriers are systemic or client-level
-```{r dummy type of barriers}
+```{r dummy type of barriers, eval = FALSE}
 ## systemic
 treat_dat[grep("prevent",names(treat_dat))] <- apply(treat_dat[grep("prevent",names(treat_dat))], 2, function(x) 
   ifelse(x == "Could not get an appointment","Systemic",x))
@@ -1559,7 +1567,7 @@ dia_cols <- c("mhd.depressive_disorder","mhd.anxiety_disorder","mhd.ptsd","mhd.o
 #### everyone
 
 frequencies for all diagnoses
-```{r freq tables for diagnoses, echo=FALSE}
+```{r freq tables for diagnoses,eval=FALSE, echo=FALSE}
 
 for (i in dia_cols){
   print(freq(MH[i]))
@@ -1570,7 +1578,7 @@ for (i in dia_cols){
 
 #### By sample
 frequencies for all diagnoses
-```{r freq tables for diagnoses by sample}
+```{r freq tables for diagnoses by sample, eval=FALSE}
 
 for (i in dia_cols){
   print(i)
@@ -1579,17 +1587,86 @@ for (i in dia_cols){
 
 ```
 
-## treat dat
+## Add gender and age 
+
+Add gender and age to treatment data 
+
+```{r add gender to treat datgender}
+treat_dat <- left_join(treat_dat,demgen)
+```
+
+
 ### Response rates per wave
 
 ```{r response rates per wave}
 
 treat_dat_count <- treat_dat %>%
-  group_by(wave) %>%
+  group_by(wave, soughthelp_for_self) %>%
   count()
 
 treat_dat_count
+
 ```
+
+##### Response rates by gender
+```{r response rates per wave by gender}
+treat_dat_count_gender <- treat_dat %>%
+  filter(Gender == "Male" | Gender == "Female") %>%
+  filter(!is.na(soughthelp_for_self)) %>%
+  group_by(soughthelp_for_self, Gender) %>%
+  count()
+
+treat_dat_count_gender
+
+treat_dat_count_gender <- treat_dat_count_gender %>%
+  pivot_wider(id_cols = Gender, names_from = soughthelp_for_self, values_from = n)
+
+treat_dat_count_gender$total <- rowSums(treat_dat_count_gender[,2:3])
+
+treat_dat_count_gender <- treat_dat_count_gender %>%
+  mutate(p_sought = `1`/(`0` + `1`)*100,
+         p_not_sought = `0`/(`0` + `1`)*100)
+
+treat_dat_count_gender
+
+```
+
+```{r chisq response gender}
+
+tx_seeking_gender_chisq <- chisq.test(treat_dat_count_gender[c(2:3)])
+tx_seeking_gender_chisq
+tx_seeking_gender_chisq$p.value
+
+```
+
+##### Response rates by age
+```{r response rates per wave by gender}
+treat_dat_count_age <- treat_dat %>%
+  filter(!is.na(soughthelp_for_self)) %>%
+  filter(!is.na(AgeRecoded)) %>%
+  group_by(soughthelp_for_self, AgeRecoded) %>%
+  count()
+treat_dat_count_age
+
+treat_dat_count_age <- treat_dat_count_age %>%
+  pivot_wider(id_cols = AgeRecoded, names_from = soughthelp_for_self, values_from = n)
+
+treat_dat_count_age$total <- rowSums(treat_dat_count_age[,2:3])
+
+treat_dat_count_age <- treat_dat_count_age %>%
+  mutate(p_sought = `1`/(`0` + `1`)*100,
+         p_not_sought = `0`/(`0` + `1`)*100)
+treat_dat_count_age
+```
+
+```{r chisq response agge}
+
+tx_seeking_age_chisq <- chisq.test(treat_dat_count_age[c(2:3)])
+tx_seeking_age_chisq
+tx_seeking_age_chisq$p.value
+
+```
+
 ```{r plot response rates per wave}
 
 treat_dat_count_plot <- treat_dat_count  %>%
@@ -1621,6 +1698,7 @@ treat_dat_count_by_sample <- treat_dat %>%
   group_by(wave,Sample) %>%
   count()
 ```
+
 ###*Plot sample size*
 ```{r plot response rates per wave per sample}
 
@@ -1645,10 +1723,1198 @@ treat_dat_count_by_sample_plot
 
 
 ```
+# *order factors*
 
-### Frequency of treatment seeking per wave
+```{r order factors}
+
+treat_dat$wave <- factor(treat_dat$wave,levels=c("June 2021","May 2021","April 2021","March 2021","February 2021","January 2021","December 2020","November 2020","October 2020","September 2020","August 2020","July 2020"),ordered=TRUE)
+  
+```
+
+# CREATE LONG DATASET
+
+"wherehelp_sought_emergency_mh"                    
+"wherehelp_sought_existing_mh_team"               
+"wherehelp_sought_online_talk_therapy" 
+"wherehelp_sought_gp"      
+"wherehelp_sought_nhs_111" 
+"wherehelp_sought_nonnhs_phone" 
+"wherehelp_sought_gov_website"  
+"wherehelp_sought_nongov_website"
+"wherehelp_sought_selfguide_online"                
+"wherehelp_sought_struc_therapy" 
+"wherehelp_sought_other"   
+
+"wherehelp_received_emergency_mh"                  
+"wherehelp_received_existing_mh_team"                           
+"wherehelp_received_online_talk_therapy"                                
+"wherehelp_received_gp"                                                 
+"wherehelp_received_nhs_111"                                           
+"wherehelp_received_nonnhs_phone"                                      "wherehelp_received_gov_website"                                      
+"wherehelp_received_nongov_website"                 
+"wherehelp_received_selfguide_online"                                 "wherehelp_received_struc_therapy"                                    
+"wherehelp_received_other"                          
+
+"treatmenthelpful_emergency_mh"                     
+"treatmenthelpful_existing_mh_team"                
+"treatmenthelpful_online_talk_therapy"              
+"treatmenthelpful_gp"                              
+"treatmenthelpful_nhs_111"                          
+"treatmenthelpful_nonnhs_phone"                    
+"treatmenthelpful_gov_website"                      
+"treatmenthelpful_nongov_website"                  
+"treatmenthelpful_online_self_therapy"              
+"treatmenthelpful_struc_therapy"                   
+"treatmenthelpful_other"        
+
+### Tx seeking
+
+```{r create long datasets}
+
+seek_long <- treat_dat %>% 
+  filter(soughthelp_for_self == 1) %>%
+pivot_longer(c(wherehelp_sought_emergency_mh,                    
+wherehelp_sought_existing_mh_team,               
+wherehelp_sought_online_talk_therapy, 
+wherehelp_sought_gp,      
+wherehelp_sought_nhs_111, 
+wherehelp_sought_nonnhs_phone, 
+wherehelp_sought_gov_website,  
+wherehelp_sought_nongov_website,
+wherehelp_sought_selfguide_online,                
+wherehelp_sought_struc_therapy, 
+wherehelp_sought_other), names_to = "Type", values_to= "sought")
+
+sum(seek_long$sought, na.rm=T)
+```
+
+### Tx receiving
+
+```{r tx receipt}
+
+receive_long <- treat_dat %>% 
+  filter(soughthelp_for_self ==1) %>%
+pivot_longer(c(wherehelp_received_emergency_mh,                    
+wherehelp_received_existing_mh_team,               
+wherehelp_received_online_talk_therapy, 
+wherehelp_received_gp,      
+wherehelp_received_nhs_111, 
+wherehelp_received_nonnhs_phone, 
+wherehelp_received_gov_website,  
+wherehelp_received_nongov_website,
+wherehelp_received_selfguide_online,                
+wherehelp_received_struc_therapy, 
+wherehelp_received_other), names_to = "Type", values_to= "received")
+
+receive_long %>%
+  count(received, na.rm=T)
+
+treat_long <- cbind(seek_long,receive_long[,80])
+
+treat_long <- treat_long %>%
+  mutate(sought_and_received = 
+           case_when(
+             sought == 1 & received == 1 ~ 1,
+             TRUE ~ 0
+           )) %>%
+         mutate(sought_not_received = 
+                  case_when(
+                    sought == 1 & received == 0 ~1,
+                    TRUE ~0
+                  ))
+
+table(treat_long$sought_and_received)
+table(treat_long$sought_not_received)
+
+treat_long %>%
+  group_by(Type) %>%
+  summarise(n_sought = sum(sought, na.rm = T), n_sought_and_received = sum(sought_and_received, na.rm = T), n_sought_not_received = sum(sought_not_received, na.rm = T), prop_not_received = n_sought_not_received/n_sought*100)
+
+```
+
+### Tx helpfulness
+
+```{r add helpfulness}
+
+helpfulness_long <- treat_dat %>% 
+  filter(soughthelp_for_self ==1) %>%
+pivot_longer(c(treatmenthelpful_emergency_mh,                    
+treatmenthelpful_existing_mh_team,               
+treatmenthelpful_online_talk_therapy, 
+treatmenthelpful_gp,      
+treatmenthelpful_nhs_111, 
+treatmenthelpful_nonnhs_phone, 
+treatmenthelpful_gov_website,  
+treatmenthelpful_nongov_website,
+treatmenthelpful_online_self_therapy,                
+treatmenthelpful_struc_therapy, 
+treatmenthelpful_other), names_to = "Type", values_to= "helpful")
+                
+helpfulness_long %>%
+  count(helpful, na.rm=T)
+
+treat_long <- cbind(treat_long,helpfulness_long[,80])
+
+table(treat_long$helpful)
+
+summary_helpful <- treat_long %>%
+  filter(!is.na(helpful)) %>%
+  group_by(helpful) %>%
+  count(helpful)
+
+total_helpful <- sum(summary_helpful$n)
+
+summary_helpful <- summary_helpful %>%
+  mutate(prop_helpful = n / total_helpful*100)
+summary_helpful
+
+help_long <- treat_long %>%
+  filter(!is.na(helpful)) %>%
+  group_by(Type, helpful) %>%
+  summarise(n = n())
+
+help_wide <- help_long %>%
+  pivot_wider(.,id_cols = Type, names_from = helpful, values_from = n)
+
+help_wide$total <- rowSums(help_wide[2:8])
+
+help_wide_prop <- help_wide %>%
+  mutate(`Extremely unhelpful` =  `Extremely unhelpful`/total*100,
+         `Very unhelpful` = `Very unhelpful`/total*100,
+         `Somewhat unhelpful` = `Somewhat unhelpful`/total*100,
+         `Neither helpful nor unhelpful` = `Neither helpful nor unhelpful`/total*100,
+         `Somewhat helpful` = `Somewhat helpful`/total*100,
+         `Very helpful` = `Very helpful`/total*100,
+         `Extremely helpful` = `Extremely helpful`/total*100)
+help_wide_prop
+
+```
+
+# categorise by treatment type - virtual
+
+```{r virtual or other, eval = FALSE}
+
+treat_long <- treat_long %>%
+  mutate(typeVirtual = case_when(
+    Type ==  "wherehelp_sought_emergency_mh" ~ "other service",
+    Type ==  "wherehelp_sought_existing_mh_team" ~ "other service",
+    Type ==  "wherehelp_sought_online_talk_therapy" ~ "exclusively virtual",
+    Type ==  "wherehelp_sought_gp" ~ "other service",
+    Type ==  "wherehelp_sought_nhs_111" ~ "exclusively virtual",
+    Type ==  "wherehelp_sought_nonnhs_phone" ~ "exclusively virtual",
+    Type ==  "wherehelp_sought_gov_website" ~ "exclusively virtual",
+    Type ==  "wherehelp_sought_nongov_website" ~ "exclusively virtual",
+    Type ==  "wherehelp_sought_selfguide_online" ~ "exclusively virtual",
+    Type ==  "wherehelp_sought_struc_therapy" ~ "other",
+    Type ==  "wherehelp_sought_other" ~ "other"))
+
+
+```
+
+### tx seeking
+
+```{r tx seeking virtual}
+
+#treatment seeking by virtual 
+treat_long %>%
+  group_by(typeVirtual) %>%
+  summarise(n_sought = sum(sought, na.rm = T), propsought = n_sought/total_seeking_attempts*100)
+  
+sum(treat_long$sought, na.rm = T)
+```
+
+```{r tx seeking gender}
+
+total_seeking_attempts <- sum(treat_long$sought, na.rm = T) 
+
+gender_seek <- treat_long %>%
+  filter(Gender == "Male" | Gender == "Female") %>%
+  group_by(Gender) %>%
+  summarise(n_sought = sum(sought, na.rm = T), propsought = n_sought/total_seeking_attempts*100)
+  gender_seek
+  
+sum(treat_long$sought, na.rm = T)
+
+
+```
+
+#### PLOT: tx seeking virtual by wave
+```{r tx seeking virtual plot}
+
+tx_seek_virtual_gender <- treat_long %>%
+  filter(Gender == "Male" | Gender == "Female") %>%
+  group_by(Gender, wave) %>%
+  summarise(n_sought = sum(sought, na.rm = T))
+tx_seek_virtual_gender
+
+tx_seek_gender_all <- treat_long %>%
+    group_by(Gender, wave) %>%
+  summarise(n_sought = sum(sought, na.rm = T))
+tx_seek_gender_all
+
+```
+
+##### - A) count virtual*wave
+```{r}
+tx_seek_virtual_wave %>% 
+  ggplot(mapping = aes(wave, n_sought, fill = typeVirtual)) +
+  geom_bar(aes(),
+           stat = "identity",
+           position = "dodge") +
+  coord_flip() +
+ theme(legend.position = "right", legend.title = element_blank())  +
+  labs(x = "Wave",  y = "Treatment sought (N)") +
+  theme_personal +
+  theme(legend.title = element_blank()) +
+  theme(legend.text = element_text(size = 8)) +
+  theme(legend.key.size = unit(.25, "cm"))
+```
+
+##### - B) proportion gender*type
+```{r}
+
+tx_seek_gender_type <- treat_long %>%
+  filter(Gender == "Male" | Gender == "Female") %>%
+  group_by(Gender, Type) %>%
+  summarise(n_sought = sum(sought, na.rm = T))
+tx_seek_gender_type
+
+tx_seek_gender_type_n <- tx_seek_gender_type %>%
+  pivot_wider(., id_cols = Gender, names_from = Type, values_from = n_sought )
+
+tx_seek_gender_type_n$total <- rowSums(tx_seek_gender_type_n[2:11])
+
+tx_seek_chisq <- chisq.test(tx_seek_gender_type_n[,2:11])
+tx_seek_chisq$expected
+
+chisq.test(tx_seek_gender_type_n[,2:11])
+
+tx_seek_gender_type_prop <- tx_seek_gender_type_n %>%
+  mutate(
+    wherehelp_sought_emergency_mh =  wherehelp_sought_emergency_mh/total*100,
+    wherehelp_sought_existing_mh_team =  wherehelp_sought_existing_mh_team/total*100,
+    wherehelp_sought_gov_website =  wherehelp_sought_gov_website/total*100,
+    wherehelp_sought_gp =  wherehelp_sought_gp/total*100,
+    wherehelp_sought_nhs_111 =  wherehelp_sought_nhs_111/total*100,
+    wherehelp_sought_nongov_website =  wherehelp_sought_nongov_website/total*100,
+    wherehelp_sought_nonnhs_phone =  wherehelp_sought_nonnhs_phone/total*100,
+    wherehelp_sought_online_talk_therapy =  wherehelp_sought_online_talk_therapy/total*100,
+    wherehelp_sought_other =  wherehelp_sought_other/total*100,
+    wherehelp_sought_selfguide_online =  wherehelp_sought_selfguide_online/total*100,
+    wherehelp_sought_struc_therapy =  wherehelp_sought_struc_therapy/total*100
+         )
+tx_seek_gender_type_prop
+
+
+```
+
+##### - B) proportion age*type
+```{r}
+
+tx_seek_age_type <- treat_long %>%
+  filter(!is.na(AgeRecoded)) %>%
+  group_by(AgeRecoded, Type) %>%
+  summarise(n_sought = sum(sought, na.rm = T))
+tx_seek_age_type
+
+tx_seek_age_type_n <- tx_seek_age_type %>%
+  pivot_wider(., id_cols = AgeRecoded, names_from = Type, values_from = n_sought )
+
+tx_seek_age_type_n$total <- rowSums(tx_seek_age_type_n[2:11])
+
+tx_seek_chisq <- chisq.test(tx_seek_age_type_n[,2:11])
+tx_seek_chisq
+tx_seek_chisq$expected
+
+tx_seek_age_type_prop <- tx_seek_age_type_n %>%
+  mutate(
+    wherehelp_sought_emergency_mh =  wherehelp_sought_emergency_mh/total*100,
+    wherehelp_sought_existing_mh_team =  wherehelp_sought_existing_mh_team/total*100,
+    wherehelp_sought_gov_website =  wherehelp_sought_gov_website/total*100,
+    wherehelp_sought_gp =  wherehelp_sought_gp/total*100,
+    wherehelp_sought_nhs_111 =  wherehelp_sought_nhs_111/total*100,
+    wherehelp_sought_nongov_website =  wherehelp_sought_nongov_website/total*100,
+    wherehelp_sought_nonnhs_phone =  wherehelp_sought_nonnhs_phone/total*100,
+    wherehelp_sought_online_talk_therapy =  wherehelp_sought_online_talk_therapy/total*100,
+    wherehelp_sought_other =  wherehelp_sought_other/total*100,
+    wherehelp_sought_selfguide_online =  wherehelp_sought_selfguide_online/total*100,
+    wherehelp_sought_struc_therapy =  wherehelp_sought_struc_therapy/total*100
+         )
+tx_seek_age_type_prop
+
+
+```
+
+##### - C) count all types*wave
+```{r}
+
+tx_seek_wave_all %>% 
+  ggplot(mapping = aes(wave, n_sought, fill = Type)) +
+  geom_bar(aes(),
+           stat = "identity",
+           position = "dodge") +
+  coord_flip() +
+ theme(legend.position = "right", legend.title = element_blank())  +
+  labs(x = "Wave",  y = "Treatment sought (N") +
+  theme_personal +
+  theme(legend.title = element_blank()) +
+  theme(legend.text = element_text(size = 8)) +
+  theme(legend.key.size = unit(.25, "cm"))
+```
+
+##### - D) proportion main types*wave
+```{r}
+tx_seek_wave_prop <- tx_seek_wave %>%
+  pivot_wider(., id_cols = wave, names_from = Type, values_from = n_sought )
+
+tx_seek_wave_prop$total <- rowSums(tx_seek_wave_prop[2:6])
+
+tx_seek_wave_prop <- tx_seek_wave_prop %>%
+  mutate(
+    wherehelp_sought_emergency_mh =  wherehelp_sought_emergency_mh/total*100,
+    wherehelp_sought_existing_mh_team =  wherehelp_sought_existing_mh_team/total*100,
+    wherehelp_sought_gp =  wherehelp_sought_gp/total*100,
+    wherehelp_sought_online_talk_therapy =  wherehelp_sought_online_talk_therapy/total*100,
+    wherehelp_sought_selfguide_online =  wherehelp_sought_selfguide_online/total*100
+         )
+tx_seek_wave_prop
+
+tx_seek_wave_prop_long <- tx_seek_wave_prop %>%
+  pivot_longer(c(wherehelp_sought_emergency_mh:wherehelp_sought_selfguide_online), names_to = "Type", values_to = "percent")
+  
+
+tx_seek_wave_prop_long %>% 
+  ggplot(mapping = aes(wave, percent, fill = Type)) +
+  geom_bar(aes(),
+           stat = "identity",
+           position = "stack") +
+  coord_flip() +
+ theme(legend.position = "right", legend.title = element_blank())  +
+  labs(x = "Wave",  y = "Treatment sought (N") +
+  theme_personal +
+  theme(legend.title = element_blank()) +
+  theme(legend.text = element_text(size = 8)) +
+  theme(legend.key.size = unit(.25, "cm"))
+
+
+```
+
+
+
+
+##### - E) proportion all types - pie
+```{r}
+tx_seek_wave_prop_all <- tx_seek_wave_all %>%
+  pivot_wider(., id_cols = wave, names_from = Type, values_from = n_sought )
+
+tx_seek_wave_prop_all$total <- rowSums(tx_seek_wave_prop_all[2:12])
+
+tx_seek_wave_prop_all <- tx_seek_wave_prop_all %>%
+  mutate(
+    wherehelp_sought_emergency_mh =  wherehelp_sought_emergency_mh/total*100,
+    wherehelp_sought_existing_mh_team =  wherehelp_sought_existing_mh_team/total*100,
+    wherehelp_sought_gp =  wherehelp_sought_gp/total*100,
+    wherehelp_sought_online_talk_therapy =  wherehelp_sought_online_talk_therapy/total*100,
+    wherehelp_sought_selfguide_online =  wherehelp_sought_selfguide_online/total*100,
+    wherehelp_sought_gov_website =  wherehelp_sought_gov_website/total*100,
+    wherehelp_sought_nhs_111 =  wherehelp_sought_nhs_111/total*100,
+    wherehelp_sought_nongov_website =  wherehelp_sought_nongov_website/total*100,
+    wherehelp_sought_nonnhs_phone =  wherehelp_sought_nonnhs_phone/total*100,
+    wherehelp_sought_other =  wherehelp_sought_other/total*100,
+    wherehelp_sought_struc_therapy =  wherehelp_sought_struc_therapy/total*100
+         )
+tx_seek_wave_prop_all
+
+tx_seek_wave_prop_all_long <- tx_seek_wave_prop_all %>%
+  pivot_longer(c(wherehelp_sought_emergency_mh:wherehelp_sought_struc_therapy), names_to = "Type", values_to = "percent") %>%
+  group_by(Type) %>%
+  summarise(percent = mean(percent))
+
+tx_seek_wave_prop_all_long <- tx_seek_wave_prop_all_long[order(tx_seek_wave_prop_all_long$percent),]
+
+tx_seek_wave_prop_all_long <- tx_seek_wave_prop_all_long %>%
+  mutate(Type = case_when(
+    Type == "wherehelp_sought_nhs_111" ~ "NHS 111",
+    Type == "wherehelp_sought_selfguide_online" ~ "Online Self-guided",
+    Type == "wherehelp_sought_emergency_mh" ~ "Emergency MH team",
+    Type == "wherehelp_sought_nonnhs_phone" ~ "Non-NHS phone line",
+    Type == "wherehelp_sought_other" ~ "Other",
+    Type == "wherehelp_sought_gov_website" ~ "Government website",
+    Type == "wherehelp_sought_nongov_website" ~ "Non-government website",
+    Type == "wherehelp_sought_struc_therapy" ~ "Structured therapeutic activity",
+    Type == "wherehelp_sought_online_talk_therapy" ~ "Online talk therapy",
+    Type == "wherehelp_sought_existing_mh_team" ~ "Existing MH team",
+    Type == "wherehelp_sought_gp" ~ "GP"
+  ))
+
+
+tx_seek_wave_prop_all_long$Type <- factor(tx_seek_wave_prop_all_long$Type, levels = c("NHS 111","Online Self-guided", "Emergency MH team", "Non-NHS phone line", "Other", "Government website", "Non-government website", "Structured therapeutic activity", "Online talk therapy", "Existing MH team", "GP"), ordered = TRUE)
+
+#positions for labels
+labels_tx_seek_wave_prop_all_long <- tx_seek_wave_prop_all_long %>%  mutate(csum = rev(cumsum(rev(percent))), 
+         pos = percent/2 + lead(csum, 1),
+         pos = if_else(is.na(pos), percent/2, pos))
+
+tx_type_pie <- tx_seek_wave_prop_all_long %>%
+  ggplot() +
+  geom_bar(width = 1, aes(x="", y=percent, fill = Type), stat = "identity") +
+ #     scale_fill_manual(values = COPINGpalette4) +
+  coord_polar("y",start=0) +
+  theme_void() +
+  labs( fill = "Treatment type") +
+  geom_label_repel(data = labels_tx_seek_wave_prop_all_long,
+                            aes(x = "", y = pos, label = paste0(round(percent,0),"%")),
+                   size = 4.5,
+                   nudge_x = 1,
+    show.legend = FALSE) +
+  scale_linetype_manual(
+                           guide = guide_legend(reverse = TRUE) )
+tx_type_pie
+
+
+```
+
+### tx gap virtual
+
+```{r tx gap virtual}
+
+#treatment gap by virtual
+tx_gap_virtual <- treat_long %>%
+  group_by(typeVirtual) %>%
+  summarise(n_sought = sum(sought, na.rm = T), n_sought_and_received = sum(sought_and_received, na.rm = T), n_sought_not_received = sum(sought_not_received, na.rm = T), prop_not_received = n_sought_not_received/n_sought*100)
+tx_gap_virtual
+
+tx_gap_virtual_chisq <- chisq.test(tx_gap_virtual[c(3:4)])
+tx_gap_virtual_chisq
+tx_gap_virtual_chisq$p.value
+```
+
+
+#### PLOT: tx gap virtual by wave
+
+##### - A) Treatment gap virtual*wave
+```{r plot treatment gap virtual}
+
+tx_gap_virtual_wave <- treat_long %>%
+  filter(typeVirtual != "other") %>%
+  group_by(typeVirtual, wave) %>%
+  summarise(n_sought = sum(sought, na.rm = T), n_sought_and_received = sum(sought_and_received, na.rm = T), n_sought_not_received = sum(sought_not_received, na.rm = T), prop_not_received = n_sought_not_received/n_sought*100)
+tx_gap_virtual_wave
+
+
+
+tx_gap_virtual_wave %>% 
+  ggplot(mapping = aes(wave, prop_not_received, fill = typeVirtual)) +
+  geom_bar(aes(),
+           stat = "identity",
+           position = "dodge") +
+  coord_flip() +
+ theme(legend.position = "right", legend.title = element_blank())  +
+  labs(x = "Wave",  y = "Treatment sought but not received (%)") +
+  theme_personal +
+  theme(legend.title = element_blank()) +
+  theme(legend.text = element_text(size = 8)) +
+  theme(legend.key.size = unit(.25, "cm"))
+```
+
+tx_gap_wave_summary <- treat_long %>%
+  group_by(wave) %>%
+  summarise(n_sought = sum(sought, na.rm = T), n_sought_and_received = sum(sought_and_received, na.rm = T), n_sought_not_received = sum(sought_not_received, na.rm = T), prop_not_received = n_sought_not_received/n_sought*100)
+tx_gap_wave_summary
+
+
+##### - B) Treatment gap all types*gender
+
+
+
+```{r }
+
+tx_gap_gender_main <- treat_long %>%
+ filter(Gender == "Male" | Gender == "Female") %>%
+  group_by(Gender) %>%
+  summarise(n_sought = sum(sought, na.rm = T), n_sought_and_received = sum(sought_and_received, na.rm = T), n_sought_not_received = sum(sought_not_received, na.rm = T), prop_not_received = n_sought_not_received/n_sought*100, prop_received = n_sought_and_received/n_sought*100)
+tx_gap_gender_main
+
+chisq.test(tx_gap_gender_main[,3:4])
+
+tx_gap_gender <- treat_long %>%
+ filter(Gender == "Male" | Gender == "Female") %>%
+  group_by(Gender, Type) %>%
+  summarise(n_sought = sum(sought, na.rm = T), n_sought_and_received = sum(sought_and_received, na.rm = T), n_sought_not_received = sum(sought_not_received, na.rm = T), prop_not_received = n_sought_not_received/n_sought*100)
+tx_gap_gender
+
+tx_gap_gender_wide_n <- tx_gap_gender %>%
+  pivot_wider(id_cols = Gender, names_from = Type, values_from = n_sought_not_received)
+tx_gap_gender_wide_n
+
+chisq.test(tx_gap_gender_wide_n[-1])
+
+tx_gap_gender_wide_prop <- tx_gap_gender %>%
+  pivot_wider(id_cols = Gender, names_from = Type, values_from = prop_not_received)
+tx_gap_gender_wide_prop
+
+chisq.test(tx_gap_gender_wide_prop[-1])
+
+
+
+```
+
+##### - B) Treatment gap all types*age
+
+
+
+```{r }
+
+tx_gap_age_main <- treat_long %>%
+ filter(!is.na(AgeRecoded)) %>%
+  group_by(AgeRecoded) %>%
+  summarise(n_sought = sum(sought, na.rm = T), n_sought_and_received = sum(sought_and_received, na.rm = T), n_sought_not_received = sum(sought_not_received, na.rm = T), prop_not_received = n_sought_not_received/n_sought*100, prop_received = n_sought_and_received/n_sought*100)
+tx_gap_age_main
+
+chisq.test(tx_gap_age_main[,3:4])
+
+tx_gap_age <- treat_long %>%
+ filter(!is.na(AgeRecoded)) %>%
+  group_by(AgeRecoded, Type) %>%
+  summarise(n_sought = sum(sought, na.rm = T), n_sought_and_received = sum(sought_and_received, na.rm = T), n_sought_not_received = sum(sought_not_received, na.rm = T), prop_not_received = n_sought_not_received/n_sought*100)
+tx_gap_age
+
+tx_gap_age_wide_n <- tx_gap_age %>%
+  pivot_wider(id_cols = AgeRecoded, names_from = Type, values_from = n_sought_not_received)
+tx_gap_age_wide_n
+
+chisq.test(tx_gap_age_wide_n[-1])
+
+tx_gap_age_wide_prop <- tx_gap_age %>%
+  pivot_wider(id_cols = AgeRecoded, names_from = Type, values_from = prop_not_received)
+tx_gap_age_wide_prop
+
+chisq.test(tx_gap_gender_wide_prop[-1])
+
+
+
+```
+
+##### - C) Treatment gap main types*wave
+```{r }
+
+tx_gap_wave_main <- treat_long %>%
+  filter(typeVirtual != "other") %>%
+  filter(Type != "wherehelp_sought_gov_website") %>%
+  filter(Type != "wherehelp_sought_nhs_111") %>%
+  filter(Type != "wherehelp_sought_nongov_website") %>%
+  filter(Type != "wherehelp_sought_nonnhs_phone") %>%
+  group_by(Type, wave) %>%
+  summarise(n_sought = sum(sought, na.rm = T), n_sought_and_received = sum(sought_and_received, na.rm = T), n_sought_not_received = sum(sought_not_received, na.rm = T), prop_not_received = n_sought_not_received/n_sought*100)
+tx_gap_wave_main
+
+tx_gap_wave_main %>% 
+  ggplot(mapping = aes(wave, prop_not_received, fill = Type)) +
+  geom_bar(aes(),
+           stat = "identity",
+           position = "dodge") +
+  coord_flip() +
+ theme(legend.position = "right", legend.title = element_blank())  +
+  labs(x = "Wave",  y = "Percent (%)") +
+  theme_personal +
+  theme(legend.title = element_blank()) +
+  theme(legend.text = element_text(size = 8)) +
+  theme(legend.key.size = unit(.25, "cm"))
+
+```
+
+##### - D) Treatment gap all types
+```{r }
+
+tx_gap <- treat_long %>%
+  group_by(Type) %>%
+  summarise(n_sought = sum(sought, na.rm = T), n_sought_and_received = sum(sought_and_received, na.rm = T), n_sought_not_received = sum(sought_not_received, na.rm = T), prop_not_received = n_sought_not_received/n_sought*100)
+tx_gap
+
+tx_gap %>% 
+  ggplot(mapping = aes(Type, prop_not_received, fill = Type)) +
+  geom_bar(aes(),
+           stat = "identity",
+           position = "dodge") +
+  coord_flip() +
+ theme(legend.position = "none", legend.title = element_blank())  +
+  labs(x = "treatment type",  y = "Percent treatment gap (%)") +
+  theme_personal +
+  theme(legend.title = element_blank()) +
+  theme(legend.text = element_text(size = 8)) +
+  theme(legend.key.size = unit(.25, "cm"))
+
+```
+
+##### - E) Treatment gap main types
+```{r }
+
+tx_gap_main <- treat_long %>%
+  filter(typeVirtual != "other") %>%
+  filter(Type != "wherehelp_sought_gov_website") %>%
+  filter(Type != "wherehelp_sought_nhs_111") %>%
+  filter(Type != "wherehelp_sought_nongov_website") %>%
+  filter(Type != "wherehelp_sought_nonnhs_phone") %>%
+  group_by(Type) %>%
+  summarise(n_sought = sum(sought, na.rm = T), n_sought_and_received = sum(sought_and_received, na.rm = T), n_sought_not_received = sum(sought_not_received, na.rm = T), prop_not_received = n_sought_not_received/n_sought*100)
+tx_gap_main
+
+tx_gap_main %>% 
+  ggplot(mapping = aes(Type, prop_not_received, fill = Type)) +
+  geom_bar(aes(),
+           stat = "identity",
+           position = "dodge") +
+  coord_flip() +
+ theme(legend.position = "none", legend.title = element_blank())  +
+  labs(x = "Treatment type",  y = "Percent treatment gap (%)") +
+  theme_personal +
+  theme(legend.title = element_blank()) +
+  theme(legend.text = element_text(size = 8)) +
+  theme(legend.key.size = unit(.25, "cm"))
+
+```
+
+### tx helpfulness virtual
+```{r tx helpfulness virtual}
+#helpfulness
+
+help_long_virtual <- treat_long %>%
+  filter(!is.na(helpful)) %>%
+  group_by(typeVirtual, helpful) %>%
+  summarise(n = n())
+
+help_wide_virtual <- help_long_virtual %>%
+  pivot_wider(.,id_cols = typeVirtual, names_from = helpful, values_from = n)
+
+help_wide_virtual$total <- rowSums(help_wide_virtual[2:8])
+
+help_wide_virtual_prop <- help_wide_virtual %>%
+  mutate(`Extremely unhelpful` =  `Extremely unhelpful`/total*100,
+         `Very unhelpful` = `Very unhelpful`/total*100,
+         `Somewhat unhelpful` = `Somewhat unhelpful`/total*100,
+         `Neither helpful nor unhelpful` = `Neither helpful nor unhelpful`/total*100,
+         `Somewhat helpful` = `Somewhat helpful`/total*100,
+         `Very helpful` = `Very helpful`/total*100,
+         `Extremely helpful` = `Extremely helpful`/total*100)
+help_wide_virtual_prop
+
+helpful_virtual_chisq <- chisq.test(help_wide_virtual[c(2:8)])
+helpful_virtual_chisq
+helpful_virtual_chisq$p.value
+
+```
+
+#### PLOT: helpfulness
+##### - A) Treatment helpfulness*virtual
+```{r}
+
+
+help_long_virtual_prop <- 
+  help_wide_virtual_prop %>%
+  pivot_longer(c(`Extremely unhelpful`:`Extremely helpful`), names_to = "Helpfulness", values_to= "Percent")
+
+help_long_virtual_prop$Helpfulness <- factor(help_long_virtual_prop$Helpfulness,levels=c("Extremely unhelpful", "Very unhelpful", "Somewhat unhelpful", "Neither helpful nor unhelpful", "Somewhat helpful","Very helpful","Extremely helpful"),ordered=TRUE)
+
+help_long_virtual_prop$Helpfulness <- fct_rev(help_long_virtual_prop$Helpfulness)
+
+help_long_virtual_prop %>% 
+  filter(typeVirtual != "other") %>%
+  ggplot(mapping = aes(typeVirtual, Percent, fill = Helpfulness)) +
+  geom_bar(aes(),
+           stat = "identity",
+           position = "stack") +
+ theme(legend.position = "top", legend.title = element_blank())  +
+  labs(x = "Treatment type",  y = "Percent treatment gap (%)") +
+  theme_personal +
+  theme(legend.title = element_blank()) +
+  theme(legend.text = element_text(size = 8)) +
+  scale_fill_manual(values = RAMPlikertpalette) +
+  theme(legend.key.size = unit(.25, "cm"))
+
+```
+
+help_long_all<- treat_long %>%
+  filter(!is.na(helpful)) %>%
+  group_by(Type) %>%
+  group_by(Type, helpful) %>%
+  summarise(n = n())
+  
+  
+  help_wide_all <- help_long_all %>%
+  pivot_wider(.,id_cols = Type, names_from = helpful, values_from = n)
+
+help_wide_all$total <- rowSums(help_wide_all[2:8])
+
+help_wide_all_prop <- help_wide_all %>%
+  mutate(`Extremely unhelpful` =  `Extremely unhelpful`/total*100,
+         `Very unhelpful` = `Very unhelpful`/total*100,
+         `Somewhat unhelpful` = `Somewhat unhelpful`/total*100,
+         `Neither helpful nor unhelpful` = `Neither helpful nor unhelpful`/total*100,
+         `Somewhat helpful` = `Somewhat helpful`/total*100,
+         `Very helpful` = `Very helpful`/total*100,
+         `Extremely helpful` = `Extremely helpful`/total*100)
+help_wide_all_prop
+
+##### - B) Treatment helpfulness*main
+```{r}
+
+help_long_main <- treat_long %>%
+  filter(!is.na(helpful)) %>%
+  filter(typeVirtual != "other") %>%
+  filter(Type != "wherehelp_sought_gov_website") %>%
+  filter(Type != "wherehelp_sought_nhs_111") %>%
+  filter(Type != "wherehelp_sought_nongov_website") %>%
+  filter(Type != "wherehelp_sought_nonnhs_phone") %>%
+  group_by(Type) %>%
+  group_by(Type, helpful) %>%
+  summarise(n = n())
+
+help_wide_main <- help_long_main %>%
+  pivot_wider(.,id_cols = Type, names_from = helpful, values_from = n)
+
+help_wide_main$total <- rowSums(help_wide_main[2:8])
+
+help_wide_main_prop <- help_wide_main %>%
+  mutate(`Extremely unhelpful` =  `Extremely unhelpful`/total*100,
+         `Very unhelpful` = `Very unhelpful`/total*100,
+         `Somewhat unhelpful` = `Somewhat unhelpful`/total*100,
+         `Neither helpful nor unhelpful` = `Neither helpful nor unhelpful`/total*100,
+         `Somewhat helpful` = `Somewhat helpful`/total*100,
+         `Very helpful` = `Very helpful`/total*100,
+         `Extremely helpful` = `Extremely helpful`/total*100)
+help_wide_main_prop
+
+help_long_main_prop <- 
+  help_wide_main_prop %>%
+  pivot_longer(c(`Extremely unhelpful`:`Extremely helpful`), names_to = "Helpfulness", values_to= "Percent")
+
+help_long_main_prop$Helpfulness <- factor(help_long_main_prop$Helpfulness,levels=c("Extremely unhelpful", "Very unhelpful", "Somewhat unhelpful", "Neither helpful nor unhelpful", "Somewhat helpful","Very helpful","Extremely helpful"),ordered=TRUE)
+
+help_long_main_prop$Helpfulness <- fct_rev(help_long_main_prop$Helpfulness)
+
+help_long_main_prop %>% 
+  ggplot(mapping = aes(Type, Percent, fill = Helpfulness)) +
+  geom_bar(aes(),
+           stat = "identity",
+           position = "stack",
+           color = "black") +
+ theme(legend.position = "top", legend.title = element_blank())  +
+  labs(x = "Treatment type",  y = "Percent treatment gap (%)") +
+  theme_personal +
+  theme(legend.title = element_blank()) +
+  theme(legend.text = element_text(size = 8)) +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+  scale_fill_manual(values = RAMPlikertpalette) +
+  theme(legend.key.size = unit(.25, "cm"))
+
+```
+
+# CREATE REASONS DATASET
+
+"reasonhelp_new_mh"                                
+"reasonhelp_cont_mh"                                
+"reasonhelp_worsen_mh"                             
+"reasonhelp_mh_crisis"                              
+"reasonhelp_repeat_prescription"                   
+"reasonhelp_change_med"                             
+"reasonhelp_new_med"                               
+"reasonhelp_alt_support"                            
+"reasonhelp_other"                                 
+
+
+```{r create long datasets}
+
+reasons_long <- treat_long %>% 
+  filter(sought == 1) %>%
+  pivot_longer(c(reasonhelp_new_mh:reasonhelp_other), names_to = "Reason", values_to= "reason_given")
+
+total_reasons <- sum(reasons_long$reason_given, na.rm=T)
+total_reasons
+
+table(reasons_long$reason_given)
+
+```
+
+## summary all reasons sought
+
+```{r total reasons}
+summary_reasons <- reasons_long %>%
+  group_by(Reason) %>%
+  summarise(n = sum(reason_given, na.rm = T), prop = n/total_reasons*100)
+summary_reasons
+```
+
+```{r total reasons by wave}
+summary_reasons_wave <- reasons_long %>%
+  group_by(wave, Reason) %>%
+  summarise(n = sum(reason_given, na.rm = T), prop = n/total_reasons*100)
+summary_reasons_wave
+
+```
+
+## summary recategorise reasons
+
+```{r recategorise reasons}
+reasons_long <- reasons_long %>%
+  mutate(Reason_cat = case_when(
+    Reason == "reasonhelp_new_mh" ~ "Newly emerging symptoms", 
+    Reason == "reasonhelp_cont_mh" ~ "Existing mental health", 
+    Reason == "reasonhelp_worsen_mh" ~ "Existing mental health", 
+    Reason == "reasonhelp_mh_crisis" ~ "Mental health crisis", 
+    Reason == "reasonhelp_repeat_prescription" ~ "Existing mental health", 
+    Reason == "reasonhelp_change_med" ~ "Existing mental health", 
+    Reason == "reasonhelp_new_med" ~ "Seeking new treatment", 
+    Reason == "reasonhelp_alt_support" ~ "Existing mental health", 
+    Reason == "reasonhelp_other" ~ "Other"))
+
+summary_reasons_cat <- reasons_long %>%
+  group_by(Reason_cat) %>%
+  summarise(n = sum(reason_given, na.rm = T), prop = n/total_reasons*100)
+summary_reasons_cat
+
+summary_reasons_cat_wave <- reasons_long %>%
+  group_by(Reason_cat, wave) %>%
+  summarise(n = sum(reason_given, na.rm = T))
+summary_reasons_cat_wave
+
+summary_reasons_cat_wave_wide <- summary_reasons_cat_wave %>%
+  pivot_wider(.,id_cols = wave, names_from = Reason_cat, values_from = n)
+
+summary_reasons_cat_wave_wide$total <- rowSums(summary_reasons_cat_wave_wide[2:6])
+
+summary_reasons_cat_wave_wide_prop <- summary_reasons_cat_wave_wide %>%
+  mutate(`Existing mental health` =  `Existing mental health`/total*100,
+         `Mental health crisis` = `Mental health crisis`/total*100,
+         `Newly emerging symptoms` = `Newly emerging symptoms`/total*100,
+         `Other` = `Other`/total*100,
+         `Seeking new treatment` = `Seeking new treatment`/total*100,)
+summary_reasons_cat_wave_wide_prop
+
+
+```
+
+##### PLOT: reasons sought by month
+
+```{r}
+
+summary_reasons_cat_wave_long_prop <- 
+  summary_reasons_cat_wave_wide_prop %>%
+  pivot_longer(c(`Existing mental health`:`Seeking new treatment`), names_to = "Reason", values_to= "Percent")
+
+summary_reasons_cat_wave_long_prop$Reason <- factor(summary_reasons_cat_wave_long_prop$Reason,levels=c("Existing mental health", "Mental health crisis", "Newly emerging symptoms", "Seeking new treatment", "Other"),ordered=TRUE)
+
+summary_reasons_cat_wave_long_prop$Reason <- fct_rev(summary_reasons_cat_wave_long_prop$Reason)
+
+summary_reasons_cat_wave_long_prop %>%
+  ggplot(mapping = aes(wave, Percent, fill = Reason)) +
+  geom_bar(aes(),
+           stat = "identity",
+           position = "stack") +
+ theme(legend.position = "right", legend.title = element_blank())  +
+  labs(x = "Wave",  y = "Percent reason for seeking (%)") +
+  coord_flip() +
+  theme_personal +
+  theme(legend.title = element_blank()) +
+  theme(legend.text = element_text(size = 8)) +
+  scale_fill_manual(values = rev(COPINGpalette5)) +
+  theme(legend.key.size = unit(.25, "cm"))
+
+```
+
+## summary reasons sought by treatment type (virtual)
+
+```{r reasons by treatment type}
+
+summary_reasons_cat_virtual <- reasons_long %>%
+  group_by(Reason_cat, typeVirtual) %>%
+  summarise(n = sum(reason_given, na.rm = T))
+summary_reasons_cat_virtual
+
+summary_reasons_cat_virtual_wide <- summary_reasons_cat_virtual %>%
+  pivot_wider(.,id_cols = typeVirtual, names_from = Reason_cat, values_from = n)
+summary_reasons_cat_virtual_wide
+
+summary_reasons_cat_virtual_wide$total <- rowSums(summary_reasons_cat_virtual_wide[2:6])
+
+summary_reasons_cat_virtual_wide_prop <- summary_reasons_cat_virtual_wide %>%
+  mutate(`Existing mental health` =  `Existing mental health`/total*100,
+         `Mental health crisis` = `Mental health crisis`/total*100,
+         `Newly emerging symptoms` = `Newly emerging symptoms`/total*100,
+         `Other` = `Other`/total*100,
+         `Seeking new treatment` = `Seeking new treatment`/total*100,)
+summary_reasons_cat_virtual_wide_prop
+
+
+```
+
+# CREATE REASONS NOT RECEIVED DATASET
+
+"preventhelp_emergency_mh"                         
+"preventhelp_existing_mh_team"                      
+"preventhelp_online_talk_therapy"                  
+"preventhelp_gp"                                    
+"preventhelp_nhs_111"                              
+"preventhelp_nonnhs_phone"                          
+"preventhelp_gov_website"                          
+"preventhelp_nongov_website"                        
+"preventhelp_online_self_therapy"                  
+"preventhelp_struc_therapy"                         
+"preventhelp_other"   
+
+```{r create long reasons not received dataset}
+
+reasons_not_received_long <- treat_dat %>% 
+  filter(soughthelp_for_self == 1) %>%
+  pivot_longer(c(preventhelp_emergency_mh:preventhelp_other), names_to = "Type", values_to= "reason_given")
+
+total_reasons_not <- sum(reasons_not_received_long$reason_given, na.rm=T)
+total_reasons_not
+
+table(reasons_not_received_long$reason_given)
+
+```
+
+## summary reasons not received
+
+```{r reasons not received - all}
+summary_not_received <- reasons_not_received_long %>%
+  filter(!is.na(reason_given)) %>%
+  group_by(reason_given) %>%
+  count(reason_given)
+
+total_not_received <- sum(summary_not_received$n)
+
+summary_not_received <- summary_not_received %>%
+  mutate(prop_not_received = n / total_not_received*100)
+summary_not_received
+
+summary_not_received_type <- reasons_not_received_long %>%
+  filter(!is.na(reason_given)) %>%
+  group_by(Type, reason_given) %>%
+  count(reason_given)
+
+not_received_wide <- summary_not_received_type %>%
+  pivot_wider(.,id_cols = Type, names_from = reason_given, values_from = n)
+
+not_received_wide$total <- rowSums(not_received_wide[2:9])
+
+not_received_wide_prop <- not_received_wide %>%
+  mutate(`Could not get an appointment` =  `Could not get an appointment`/total*100,
+         `Waiting list was too long` =  `Waiting list was too long`/total*100,
+         `Was assessed and was unable to be offered support` =  `Was assessed and was unable to be offered support`/total*100,
+         `None of the support options were relevant` =  `None of the support options were relevant`/total*100,
+         `Support option was unavailable when tried to access it` =  `Support option was unavailable when tried to access it`/total*100,
+         `Didn't feel well enough to engage` =  `Didn't feel well enough to engage`/total*100,
+         `Was too busy to engage` =  `Was too busy to engage`/total*100,
+         `Felt better` =  `Felt better`/total*100,
+         `Other` =  `Other`/total*100
+         )
+not_received_wide_prop
+```
+
+#### PLOT: reasons not received
+
+##### - A) resons not received*gender
+```{r}
+
+reasons_not_gender <- reasons_not_received_long %>%
+  filter(Gender == "Male" | Gender == "Female") %>%
+  filter(!is.na(reason_given)) %>%
+  group_by(Gender, reason_given) %>%
+  summarise(n = n())
+reasons_not_gender  
+
+reasons_not_gender_wide <- reasons_not_gender %>%
+  pivot_wider(id_cols = Gender, names_from = reason_given, values_from = n)
+reasons_not_gender_wide
+
+reasons_not_gender_wide$total <- rowSums(reasons_not_gender_wide[-1])
+
+reasons_not_gender_chisq <- chisq.test(reasons_not_gender_wide[2:10])
+reasons_not_gender_chisq
+reasons_not_gender_chisq$residuals
+
+reasons_not_gender_wide_prop <- reasons_not_gender_wide %>%
+  mutate(
+    `Could not get an appointment` = `Could not get an appointment`/total*100,
+    `Waiting list was too long` = `Waiting list was too long`/total*100,
+    `Was assessed and was unable to be offered support` = `Was assessed and was unable to be offered support`/total*100,
+    `None of the support options were relevant` = `None of the support options were relevant`/total*100,
+    `Support option was unavailable when tried to access it` = `Support option was unavailable when tried to access it`/total*100,
+    `Didn't feel well enough to engage` = `Didn't feel well enough to engage`/total*100,
+    `Was too busy to engage` = `Was too busy to engage`/total*100,
+    `Felt better` = `Felt better`/total*100,
+    `Other` = `Other`/total*100
+  )
+
+not_received_long_typeVirtual_prop <- reasons_not_received_long %>% pivot_longer(c(`Client-level`:Systemic), names_to = "Reason", values_to = "Percent")
+
+not_received_long_typeVirtual_prop$Reason <- factor(not_received_long_typeVirtual_prop$Reason,levels=c("Client-level","Systemic","Other"),ordered=TRUE)
+
+#summary_reasons_cat_wave_long_prop$Reason <- fct_rev(summary_reasons_cat_wave_long_prop$Reason)
+
+not_received_long_typeVirtual_prop %>%
+  filter(typeVirtual != "other") %>%
+  ggplot(mapping = aes(typeVirtual, Percent, fill = Reason)) +
+  geom_bar(aes(),
+           stat = "identity",
+           position = "stack") +
+ theme(legend.position = "right", legend.title = element_blank())  +
+  labs(x = "Type",  y = "Percent reason for not receiving (%)") +
+  theme_personal +
+  theme(legend.title = element_blank()) +
+  theme(legend.text = element_text(size = 8)) +
+  scale_fill_manual(values = rev(COPINGpalette3)) +
+  theme(legend.key.size = unit(.25, "cm"))
+
+```
+
+##### - B) resons not received*main
+```{r}
+
+not_received_long_prop <- not_received_wide_prop %>% pivot_longer(c(`Client-level`:Systemic), names_to = "Reason", values_to = "Percent")
+
+not_received_long_prop$Reason <- factor(not_received_long_prop$Reason,levels=c("Client-level","Systemic","Other"),ordered=TRUE)
+
+#summary_reasons_cat_wave_long_prop$Reason <- fct_rev(summary_reasons_cat_wave_long_prop$Reason)
+
+not_received_long_prop %>%
+  filter(Type != "preventhelp_other") %>%
+  filter(Type != "preventhelp_gov_website") %>%
+  filter(Type != "preventhelp_nhs_111") %>%
+  filter(Type != "preventhelp_nongov_website") %>%
+  filter(Type != "preventhelp_nonnhs_phone") %>%
+  filter(Type != "preventhelp_struc_therapy") %>%
+  ggplot(mapping = aes(Type, Percent, fill = Reason)) +
+  geom_bar(aes(),
+           stat = "identity",
+           position = "stack") +
+ theme(legend.position = "right", legend.title = element_blank())  +
+  labs(x = "Type",  y = "Percent reason for not receiving (%)") +
+  theme_personal +
+  theme(legend.title = element_blank()) +
+  theme(legend.text = element_text(size = 8)) +
+  scale_fill_manual(values = rev(COPINGpalette3)) +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+  theme(legend.key.size = unit(.25, "cm"))
+
+```
+
+# CREATE REASONS NOT SOUGHT DATASET
+
+"reasonNohelp_feel_fine"                            
+"reasonNohelp_I_feel_better"                       
+"reasonNohelp_I_dont_think_I_feel_bad_enough"       "reasonNohelp_I_want_help_dont_think_its_available"
+"reasonNohelp_Bad_experiences_in_past"              
+"reasonNohelp_I_want_to_but_havent"                
+"reasonNohelp_Too_busy"                             
+"reasonNohelp_I_didnt_know_where_to_find"          
+"reasonNohelp_other"        
+
+```{r create long reasons not sought datasets}
+
+reasons_not_sought_long <- treat_dat %>% 
+  filter(soughthelp_for_self != 1) %>%
+  pivot_longer(c(reasonNohelp_feel_fine:reasonNohelp_other), names_to = "ReasonNot", values_to= "reason_given")
+
+total_reasons_not <- sum(reasons_not_sought_long$reason_given, na.rm=T)
+total_reasons_not
+
+table(reasons_not_sought_long$reason_given)
+
+```
+
+## summary all reasons NOT sought
+
+```{r total reasons}
+summary_reasons_not <- reasons_not_sought_long %>%
+  group_by(ReasonNot) %>%
+  summarise(n = sum(reason_given, na.rm = T), prop = n/total_reasons_not*100)
+summary_reasons_not
+```
+
+## summary recategorise reasons not sought
+
+```{r recategorise reasons not sought}
+reasons_not_sought_long <- reasons_not_sought_long %>%
+  mutate(Reason_cat = case_when(
+    ReasonNot == "reasonNohelp_Bad_experiences_in_past" ~ "Systemic", 
+    ReasonNot == "reasonNohelp_feel_fine" ~ "Mild or no current symptoms", 
+    ReasonNot == "reasonNohelp_I_didnt_know_where_to_find" ~ "Systemic", 
+    ReasonNot == "reasonNohelp_I_dont_think_I_feel_bad_enough" ~ "Mild or no current symptoms", 
+    ReasonNot == "reasonNohelp_I_feel_better" ~ "Mild or no current symptoms", 
+    ReasonNot == "reasonNohelp_I_want_help_dont_think_its_available" ~ "Systemic", 
+    ReasonNot == "reasonNohelp_I_want_to_but_havent" ~ "Client", 
+    ReasonNot == "reasonNohelp_other" ~ "Other", 
+    ReasonNot == "reasonNohelp_Too_busy" ~ "Client"))
+
+summary_reasons_not_sought_cat <- reasons_not_sought_long %>%
+  group_by(Reason_cat) %>%
+  summarise(n = sum(reason_given, na.rm = T), prop = n/total_reasons_not*100)
+summary_reasons_not_sought_cat
+```
+
+##### PLOT: reasons not sought: overall
+```{r}
+
+summary_reasons_not_sought_cat$Reason_cat <- factor(summary_reasons_not_sought_cat$Reason_cat, levels = c("Mild or no current symptoms", "Client", "Systemic", "Other"),ordered = T)
+
+summary_reasons_not_sought_cat %>%
+  ggplot(aes(x="", y=prop, fill=Reason_cat)) +
+  geom_bar(width = 1, stat = "identity") +
+  scale_fill_manual(values = COPINGpalette4) +
+  coord_polar("y",start=0) +
+  theme_void() +
+  labs( fill = "Category of reason") +
+  geom_text(aes(y = c((round(prop,digits=1))),
+                x = c(1.2,1.2,1.2,1.2),
+                label=paste0(round((prop),0),"%")),
+            size=3,
+            position = position_stack(vjust = 0.5)
+  )
+
+
+
+```
+
+
+#----------------------------------
+# FREQ TREATMENT SEEKING: 3 TYPES
+
+
+
+
+
+
+## Unique individuals seeking help
+
+```{r confirm unique seeking help}
+unique_help_self <- treat_dat %>%
+  filter(soughthelp_for_self == 1)
+
+n_unique_help_self <- n_distinct(unique_help_self$ID)
+n_unique_whole_sample <- n_distinct(treat_dat$ID)
+
+n_unique_help_self
+
+n_unique_whole_sample
+
+prop_help_self  <- (n_unique_help_self/n_unique_whole_sample)*100
+prop_help_self
+
+
+  
+
+```
+
+
+## Unique occasions of treatment seeking (wave)
 
 ```{r treatment seeking freq by wave}
+
+treat_dat %>%
+  filter(soughthelp_for_self == 1) %>%
+  count()
 
 treat_dat_seek_count <- treat_dat %>%
   group_by(wave) %>%
@@ -1662,13 +2928,37 @@ treat_dat_seek_count$prop_responders <- treat_dat_seek_count$`1` / treat_dat_see
 
 treat_dat_seek_count
 
+sum(treat_dat_seek_count$`1`)
+sum(treat_dat_seek_count$total_responders)
+
 #Overall number of reports
-sum(treat_dat_seek_count$`1`)/sum(treat_dat_seek_count$total_responders)
+sum(treat_dat_seek_count$`1`,na.rm = TRUE)/sum(treat_dat_seek_count$total_responders,na.rm=TRUE)
 
 #Overall proportion of treatment seekers
-mean(treat_dat_seek_count$prop_responders)
+mean(treat_dat_seek_count$prop_responders, na.rm = TRUE)
 
 ```
+
+### +Count N waves treatment sought
+
+```{r count n waves treatment sought}
+
+N_waves <- treat_dat %>%
+  pivot_wider(id_cols = ID, names_from = wave, values_from = soughthelp_for_self)
+
+
+N_waves <- N_waves %>%
+    mutate(Total = select(., `July 2020`:`June 2021`) %>% rowSums(na.rm = TRUE))
+
+N_waves_seeking <- N_waves %>%
+  filter(Total > 0)
+
+N_waves_table <- table(N_waves_seeking$Total)
+N_waves_table
+
+prop.table(N_waves_table)*100
+```
+
 
 ```{r plot treatment seeking rates per wave}
 
@@ -1689,21 +2979,158 @@ treat_dat_seek_count_plot <- treat_dat_seek_count  %>%
   ) 
 treat_dat_seek_count_plot
 
+```
+
+
+
+# ***Reduce treat_dat to those seeking treatment***
+
+```{r treat_dat reduced to treatment seekers}
+
+treat_dat <- treat_dat %>%
+  filter(soughthelp_for_self == 1)
 
 ```
+
+## Unique instances of treatment seeking (wave*type)
+
+```{r unique instances of treatment seeking}
+
+#overall count of responses (non-NA) 
+ treat_dat <- treat_dat %>%
+  mutate(responses_total_sought = rowSums(!is.na(treat_dat[names(treat_dat) %in% soughtcols])))
+sum(treat_dat$responses_total_sought)
+
+#overall count of instances sought (==1)
+treat_dat <- treat_dat %>%
+  mutate(total_instances_sought = rowSums((treat_dat[names(treat_dat) %in% soughtcols]), na.rm = T))
+sum(treat_dat$total_instances_sought)
+
+instances_by_individual <- treat_dat %>%
+  group_by(ID) %>%
+  summarise(sum_per_user = sum(total_instances_sought, na.rm = TRUE))
+
+mean(instances_by_individual$sum_per_user, na.rm = T)
+sd(instances_by_individual$sum_per_user)
+
+```
+
+# FREQ TREATMENT GAPS: 3 TYPES
+
+## code treatment gap
+
+```{r code treatment gap}
+
+#calculate treatment gaps
+treat_dat <- treat_dat %>%
+  mutate(
+    tx_gap_emergency_mh = wherehelp_sought_emergency_mh - wherehelp_received_emergency_mh,
+    tx_gap_existing_mh_team = wherehelp_sought_existing_mh_team - wherehelp_received_existing_mh_team,
+    tx_gap_online_talk_therapy = wherehelp_sought_online_talk_therapy - wherehelp_received_online_talk_therapy,
+    tx_gap_gp = wherehelp_sought_gp - wherehelp_received_gp,
+    tx_gap_nhs_111 = wherehelp_sought_nhs_111 - wherehelp_received_nhs_111,
+    tx_gap_nonnhs_phone = wherehelp_sought_nonnhs_phone - wherehelp_received_nonnhs_phone,
+    tx_gap_gov_website = wherehelp_sought_gov_website - wherehelp_received_gov_website,
+    tx_gap_nongov_website = wherehelp_sought_nongov_website - wherehelp_received_nongov_website,
+    tx_gap_selfguide_online = wherehelp_sought_selfguide_online - wherehelp_received_selfguide_online,
+    tx_gap_struc_therapy = wherehelp_sought_struc_therapy - wherehelp_received_struc_therapy,
+    tx_gap_other = wherehelp_sought_other - wherehelp_received_other) 
+
+#remove all negative values (received but not sought)
+treat_dat$tx_gap_emergency_mh[treat_dat$tx_gap_emergency_mh < 1] <- 0
+treat_dat$tx_gap_existing_mh_team[treat_dat$tx_gap_existing_mh_team < 1] <- 0
+treat_dat$tx_gap_online_talk_therapy[treat_dat$tx_gap_online_talk_therapy < 1] <- 0
+treat_dat$tx_gap_gp[treat_dat$tx_gap_gp < 1] <- 0
+treat_dat$tx_gap_nhs_111[treat_dat$tx_gap_nhs_111 < 1] <- 0
+treat_dat$tx_gap_nonnhs_phone[treat_dat$tx_gap_nonnhs_phone < 1] <- 0
+treat_dat$tx_gap_gov_website[treat_dat$tx_gap_gov_website < 1] <- 0
+treat_dat$tx_gap_nongov_website[treat_dat$tx_gap_nongov_website < 1] <- 0
+treat_dat$tx_gap_selfguide_online[treat_dat$tx_gap_selfguide_online < 1] <- 0
+treat_dat$tx_gap_struc_therapy[treat_dat$tx_gap_struc_therapy < 1] <- 0
+treat_dat$tx_gap_other[treat_dat$tx_gap_other < 1] <- 0
+
+gapcols = c(
+  "tx_gap_emergency_mh", 
+  "tx_gap_existing_mh_team", 
+  "tx_gap_online_talk_therapy", 
+  "tx_gap_gp",
+  "tx_gap_nhs_111",
+  "tx_gap_nonnhs_phone",
+  "tx_gap_gov_website",
+  "tx_gap_nongov_website",
+  "tx_gap_selfguide_online",
+  "tx_gap_struc_therapy",
+  "tx_gap_other")
+
+treat_dat <- treat_dat %>%
+  mutate(total_treat_gap = rowSums((treat_dat[names(treat_dat) %in% gapcols]),na.rm = T))
+
+
+```
+
+## Instances sought but didn't receive
+
+```{r instances sought but not received}
+table(treat_dat$total_treat_gap)
+sum(treat_dat$total_treat_gap)
+
+gap_instance_by_wave <- treat_dat %>%
+  group_by(wave) %>%
+  summarise(treat_gap = sum(total_treat_gap), t_sought = sum(total_instances_sought))
+
+gap_instance_by_wave <- gap_instance_by_wave %>%
+  mutate(prop_gap = treat_gap/t_sought*100)
+gap_instance_by_wave
+
+total_gap <- sum(gap_instance_by_wave$treat_gap)/sum(gap_instance_by_wave$t_sought)*100
+total_gap
+
+```
+
+## One or more treatments sought but none received per wave
+
+```{r wave - sought not received}
+
+#overall count of instances received (==1)
+treat_dat <- treat_dat %>%
+  mutate(total_instances_received = rowSums((treat_dat[names(treat_dat) %in% receivecols]), na.rm = T))
+sum(treat_dat$total_instances_received)
+
+#convert to binary
+
+treat_dat <- treat_dat %>%
+  mutate(tx_received = case_when(
+    total_instances_received > 0 ~ 1,
+    total_instances_received <1 ~0
+  ))
+
+table(treat_dat$tx_received)
+
+any_gap_per_wave <- treat_dat %>%
+  group_by(wave) %>%
+  summarise(n_anyreceieved = sum(tx_received), n_sought = sum(soughthelp_for_self))
+
+(1-sum(any_gap_per_wave$n_anyreceieved)/sum(any_gap_per_wave$n_sought))*100
+
+any_gap_per_wave$prop_gap <- (1-any_gap_per_wave$n_anyreceieved / any_gap_per_wave$n_sought)*100
+any_gap_per_wave
+
+```
+
 
 ###*Plot treatment gap*
 ```{r plot treatment not received if sought}
 
-treat_dat_gap_count <- treat_dat %>%
+wave_treatment_gap <- treat_dat %>%
   group_by(wave) %>%
-  count(AnyReceived)
+  count(TypeReceived.Any)
   
-treat_dat_gap_count <- pivot_wider(treat_dat_gap_count, names_from = AnyReceived, values_from = n) 
-treat_dat_gap_count <- treat_dat_gap_count[1:9,]
-treat_dat_gap_count$total_sought <- treat_dat_seek_count$`1`
+treat_dat_gap_count <- pivot_wider(wave_treatment_gap, names_from = TypeReceived.Any, values_from = n) 
 
-treat_dat_gap_count$prop_received <- treat_dat_gap_count$`1` / treat_dat_gap_count$total_sought*100
+treat_dat_gap_count <- treat_dat_gap_count[1:12,]
+treat_dat_gap_count$total_sought <- treat_dat_gap_count$`Not received` + treat_dat_gap_count$Received
+
+treat_dat_gap_count$prop_received <- treat_dat_gap_count$Received / treat_dat_gap_count$total_sought*100
 treat_dat_gap_count$prop_gap <- 100-treat_dat_gap_count$prop_received
 
 count_seek_gap_plot <- treat_dat_gap_count[,c(1,5:6)]
@@ -1722,7 +3149,7 @@ long_n_receipt$received <- as.factor(long_n_receipt$received)
 
 long_n_receipt$received <- factor(long_n_receipt$received, levels=c("Not received","Received"), ordered=TRUE)
 
-long_n_receipt$wave <-factor(long_n_receipt$wave,levels=c("April 2021","March 2021","February 2021","January 2021","December 2020","November 2020","October 2020","September 2020","August 2020","July 2020"),ordered=TRUE)
+long_n_receipt$wave <-factor(long_n_receipt$wave,levels=c("June 2021","May 2021","April 2021","March 2021","February 2021","January 2021","December 2020","November 2020","October 2020","September 2020","August 2020","July 2020"),ordered=TRUE)
   
 treat_dat_received_plot <- long_n_receipt %>%
   ggplot(mapping = aes(wave, percent, fill = received)
@@ -1746,6 +3173,54 @@ treat_dat_received_plot <- long_n_receipt %>%
 treat_dat_received_plot
 
 ```
+
+create a variable that will say if they sought supported or self guided for each support instance
+```{r dummy type of treatment sought}
+
+treat_dat <- treat_dat %>%
+  mutate(TypeSought.Supported.Any  = case_when(wherehelp_sought_emergency_mh == 1 ~ "Sought Supported",
+                               wherehelp_sought_existing_mh_team == 1 ~ "Sought Supported",
+                                wherehelp_sought_online_talk_therapy == 1 ~ "Sought Supported",
+                                wherehelp_sought_gp == 1 ~ "Sought Supported",
+                                wherehelp_sought_nonnhs_phone == 1 ~ "Sought Supported",
+                                wherehelp_sought_nhs_111 == 1 ~ "Sought Supported", 
+                               TRUE ~ "Did not seek supported treatment"),
+         TypeSought.SelfGuide.Any = case_when(
+                                wherehelp_sought_gov_website == 1 ~ "Sought Self-guided",
+                                wherehelp_sought_selfguide_online == 1 ~ "Sought Self-guided",
+                                wherehelp_sought_nongov_website == 1 ~ "Sought Self-guided",
+                                wherehelp_sought_struc_therapy == 1 ~ "Sought Self-guided",
+                                TRUE ~ "Did not seek self-guided treatment")) %>%
+  
+  mutate(AnySought = case_when(TypeSought.Supported.Any  == "Sought Supported" ~ 1,
+                                  TypeSought.SelfGuide.Any  == "Sought Self-guided" ~ 1,
+                                 TRUE ~ 0))
+```
+
+##### received treatment if sought 
+
+identify if treatment was received when sought according to category
+```{r dummy type of treatment received}
+
+treat_dat <- treat_dat %>%
+  mutate(TypeReceived.Any  = 
+           case_when(
+             wherehelp_received_emergency_mh == 1 ~ "Received",
+             wherehelp_received_existing_mh_team == 1 ~ "Received",
+             wherehelp_received_online_talk_therapy == 1 ~ "Received",
+             wherehelp_received_gp == 1 ~ "Received",
+             wherehelp_received_nonnhs_phone == 1 ~ "Received",
+             wherehelp_received_nhs_111 == 1 ~ "Received", 
+             wherehelp_received_gov_website == 1 ~ "Received",
+             wherehelp_received_selfguide_online == 1 ~ "Received",
+             wherehelp_received_nongov_website == 1 ~ "Received",
+             wherehelp_received_struc_therapy == 1 ~ "Received",
+             wherehelp_received_other == 1 ~ "Received",
+             TRUE ~ "Not received")) 
+```
+
+
+
 
 ```{r plot treatment not received if sought - legacy,eval=FALSE}
 combined_seek_gap_plot <- treat_dat_gap_count[,c(1,4:6)]
@@ -1789,13 +3264,7 @@ treat_dat_received_plot
 #average treatment gap across waves
 mean(treat_dat_gap_count$prop_gap)
 
-#rates of treatment gap by source type
 
-#supported
-(1-sum(treat_dat$TypeReceived.Supported.total,na.rm=TRUE)/sum(treat_dat$TypeSought.Supported.total,na.rm=TRUE))*100
-
-#self-guided
-(1-sum(treat_dat$TypeReceived.SelfGuided.total,na.rm=TRUE)/sum(treat_dat$TypeSought.SelfGuided.total,na.rm=TRUE))*100
 
 ```
 
@@ -1809,6 +3278,7 @@ txseek_by_sample <- treat_dat %>%
   freq(soughthelp_for_self)
 
 ```
+
 ### Reason for seeking treatment by wave
 
 ```{r reason seek by wave}
@@ -1816,6 +3286,49 @@ txseek_by_sample <- treat_dat %>%
 txseek_by_wave <- treat_dat %>%
   group_by(wave) %>%
   freq(ReasonSeek)
+
+long_reasons <- pivot_longer(data = treat_dat, cols = c(reasonhelp_new_mh, Reason_Existing_Mh, reasonhelp_mh_crisis, reasonhelp_new_med,reasonhelp_other), names_to = "Reasons_sought", values_to = "sought")
+
+summary_reasons <- long_reasons %>%
+  group_by(wave, Reasons_sought) %>%
+  summarise(n = sum(sought, na.rm = T))
+
+wide_reasons <- pivot_wider(summary_reasons, id_cols = wave, names_from = Reasons_sought, values_from = n)
+
+wide_reasons$total <- rowSums(wide_reasons[2:6],)
+wide_reasons$Reason_Existing_Mh <- wide_reasons$Reason_Existing_Mh/wide_reasons$total *100
+wide_reasons$reasonhelp_mh_crisis <- wide_reasons$reasonhelp_mh_crisis/wide_reasons$total *100
+wide_reasons$reasonhelp_new_med <- wide_reasons$reasonhelp_new_med/wide_reasons$total *100
+wide_reasons$reasonhelp_new_mh <- wide_reasons$reasonhelp_new_mh/wide_reasons$total *100
+wide_reasons$reasonhelp_other <- wide_reasons$reasonhelp_other/wide_reasons$total *100
+
+wide_reasons <- wide_reasons[,1:6]
+
+long_prop_reasons <- wide_reasons %>%
+  pivot_longer(!wave, names_to = "reasonSeek", values_to = "percent")
+
+long_prop_reasons$reasonSeek <- factor(long_prop_reasons$reasonSeek, levels = c("reasonhelp_new_med","reasonhelp_other","reasonhelp_mh_crisis","reasonhelp_new_mh","Reason_Existing_Mh"))
+
+treat_dat_seek_count_plot1 <- long_prop_reasons %>%
+  ggplot(mapping = aes(wave, percent, fill = reasonSeek)
+    ) +
+    geom_bar(aes(),
+      stat="identity",
+     position = "stack"
+    ) +
+  coord_flip() +
+  labs( x = "Time point",  y = "Proportion of sample (%)") +
+  theme_personal +
+  theme(legend.position = "top") +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+  theme(legend.title = element_blank()) +
+    theme(legend.text = element_text(size = 8)) +
+  theme(legend.key.size = unit(.25, "cm")) +
+  scale_fill_manual(
+    values = rev(COPINGpalette5)
+  ) + guides(fill=guide_legend(nrow=4,byrow=TRUE))
+treat_dat_seek_count_plot1
+
 
 ```
 
@@ -1827,9 +3340,17 @@ reasons_seek_count <- treat_dat %>%
   
 reasons_seek_count <- pivot_wider(reasons_seek_count, names_from = ReasonSeek, values_from = n) 
 
-reasons_seek_count$total_responders <- reasons_seek_count$`Existing mental health` + reasons_seek_count$`Mental health crisis` + reasons_seek_count$`Newly emerging symptoms` + reasons_seek_count$`Seeking new treatment`
+reasons_seek_count$`Existing mental health` <- as.numeric(reasons_seek_count$`Existing mental health`)
+reasons_seek_count$`Mental health crisis` <- as.numeric(reasons_seek_count$`Mental health crisis`)
+reasons_seek_count$`Newly emerging symptoms` <- as.numeric(reasons_seek_count$`Newly emerging symptoms`)
+reasons_seek_count$`Seeking new treatment` <- as.numeric(reasons_seek_count$`Seeking new treatment`)
+reasons_seek_count$Other <- as.numeric(reasons_seek_count$Other)
 
-prop_seek_count <- reasons_seek_count[,-(6:7)]
+reasons_seek_count <- reasons_seek_count %>%
+  ungroup %>%
+  mutate(total_responders = select(., `Existing mental health`:`Seeking new treatment`) %>% rowSums(na.rm = TRUE))
+
+prop_seek_count <- reasons_seek_count[,-(7:8)]
 
 prop_seek_count$`Existing mental health concern` <- reasons_seek_count$`Existing mental health` / reasons_seek_count$total_responders*100
 prop_seek_count$`Existing mental health` <- NULL
@@ -1840,21 +3361,25 @@ prop_seek_count$`Newly emerging symptoms` <- reasons_seek_count$`Newly emerging 
 
 prop_seek_count$`Seeking new treatment` <- reasons_seek_count$`Seeking new treatment` / reasons_seek_count$total_responders*100
 
+prop_seek_count$Other <- reasons_seek_count$Other / reasons_seek_count$total_responders*100
+
 prop_seek_count
+
+
 ```
 ###*Plot reason seek*
 ```{r reason seek by wave plot}
 
-prop_reasons <- prop_seek_count 
+prop_reasons <- prop_seek_count[c(1:6)] 
 
 long_prop_reasons <-  prop_reasons %>%
 pivot_longer(!wave, names_to = "ReasonSeek", values_to = "n")
 
 long_prop_reasons$ReasonSeek <- as.factor(long_prop_reasons$ReasonSeek)
 
-long_prop_reasons$ReasonSeek <- factor(long_prop_reasons$ReasonSeek, levels=c("Newly emerging symptoms","Mental health crisis","Seeking new treatment","Existing mental health concern"), ordered=TRUE)
+long_prop_reasons$ReasonSeek <- factor(long_prop_reasons$ReasonSeek, levels=c("Mental health crisis","Seeking new treatment","Other", "Newly emerging symptoms","Existing mental health concern"), ordered=TRUE)
 
-long_prop_reasons$wave <-factor(long_prop_reasons$wave,levels=c("April 2021","March 2021","February 2021","January 2021","December 2020","November 2020","October 2020","September 2020","August 2020","July 2020"),ordered=TRUE)
+long_prop_reasons$wave <-factor(long_prop_reasons$wave,levels=c("June 2021","May 2021","April 2021","March 2021","February 2021","January 2021","December 2020","November 2020","October 2020","September 2020","August 2020","July 2020"),ordered=TRUE)
   
 treat_dat_seek_count_plot <- long_prop_reasons %>%
   ggplot(mapping = aes(wave, n, fill = ReasonSeek)
@@ -1872,7 +3397,7 @@ treat_dat_seek_count_plot <- long_prop_reasons %>%
     theme(legend.text = element_text(size = 8)) +
   theme(legend.key.size = unit(.25, "cm")) +
   scale_fill_manual(
-    values = rev(RAMPworseGRADpalette)
+    values = rev(COPINGpalette5)
   ) + guides(fill=guide_legend(nrow=4,byrow=TRUE))
 prop_reasons
 treat_dat_seek_count_plot
@@ -2175,6 +3700,10 @@ treat_dat %>%
 ###*Plot overall reasons not received*
 ```{r check barriers overall supported systemic}
 
+treat_dat <- treat_dat %>%
+  mutate(total_non_na = rowSums(!is.na(treat_dat[names(treat_dat) %in% reasoncols])))
+sum(treat_dat$total_non_na)
+
 reason_not_received <- tibble(reason = c("Systemic","Client","Other"),`Self guided` = 1:3, `Supported` = 1:3)
 
 reason_not_received[1,2] <- sum(treat_dat$PreventHelp_SelfGuided.Systemic==1,na.rm=TRUE)
@@ -2319,6 +3848,79 @@ treat_dat_not_received_by_source_plot <- long_reason_not_received_by_source_perc
 treat_dat_not_received_by_source_plot
 
 ```
+
+### ***Type of treatment sought by wave***
+
+```{r type seek by wave}
+
+table(treat_dat$soughthelp_for_self)
+
+
+type_seek_wave <- treat_dat %>%
+  filter(soughthelp_for_self == 1) #filter for those who sought help only
+  
+type_seek_wave <- pivot_longer(data = type_seek_wave, cols = c(wherehelp_sought_emergency_mh, wherehelp_sought_existing_mh_team, wherehelp_sought_online_talk_therapy, wherehelp_sought_gp, wherehelp_sought_nhs_111, wherehelp_sought_nonnhs_phone, wherehelp_sought_gov_website, wherehelp_sought_nongov_website, wherehelp_sought_selfguide_online, wherehelp_sought_struc_therapy, wherehelp_sought_other), names_to = "Treatment source", values_to = "sought" )
+
+type_seek_wave <- type_seek_wave %>%
+  mutate(typeVirtual = case_when(
+    `Treatment source` ==  "wherehelp_sought_emergency_mh" ~ "other",
+    `Treatment source` ==  "wherehelp_sought_existing_mh_team" ~ "other",
+    `Treatment source` ==  "wherehelp_sought_online_talk_therapy" ~ "exclusively virtual",
+    `Treatment source` ==  "wherehelp_sought_gp" ~ "other",
+    `Treatment source` ==  "wherehelp_sought_nhs_111" ~ "exclusively virtual",
+    `Treatment source` ==  "wherehelp_sought_nonnhs_phone" ~ "exclusively virtual",
+    `Treatment source` ==  "wherehelp_sought_gov_website" ~ "exclusively virtual",
+    `Treatment source` ==  "wherehelp_sought_nongov_website" ~ "exclusively virtual",
+    `Treatment source` ==  "wherehelp_sought_selfguide_online" ~ "exclusively virtual",
+    `Treatment source` ==  "wherehelp_sought_struc_therapy" ~ "other",
+    `Treatment source` ==  "wherehelp_sought_other" ~ "other"))
+
+type_seek_wave$`Treatment source` <- as.factor(type_seek_wave$`Treatment source`)
+type_seek_wave$wave <- as.factor(type_seek_wave$wave)
+
+
+percent_type_seek_wave <- type_seek_wave %>%
+  filter(sought != "NA") %>%
+  dplyr::group_by(wave, `Treatment source`) %>%
+  summarise(n = sum(sought==1)) %>%
+  mutate(percent = n/sum(n)*100)
+
+percent_type_seek_wave_cat <- type_seek_wave %>%
+  filter(sought != "NA") %>%
+  dplyr::group_by(wave, typeVirtual) %>%
+  summarise(n = sum(sought==1)) %>%
+  mutate(percent = n/sum(n)*100)
+
+percent_type_seek_wave %>% 
+  ggplot(mapping = aes(wave, percent, fill = `Treatment source`)) +
+  geom_bar(aes(),
+           stat = "identity",
+           position = "stack") +
+  coord_flip() +
+ theme(legend.position = "right", legend.title = element_blank())  +
+  labs(x = "Wave",  y = "Percent (%)") +
+  theme_personal +
+  theme(legend.title = element_blank()) +
+  theme(legend.text = element_text(size = 8)) +
+  theme(legend.key.size = unit(.25, "cm"))
+
+percent_type_seek_wave_cat %>% 
+  ggplot(mapping = aes(wave, percent, fill = typeVirtual)) +
+  geom_bar(aes(),
+           stat = "identity",
+           position = "stack") +
+  coord_flip() +
+ theme(legend.position = "right", legend.title = element_blank())  +
+  labs(x = "Wave",  y = "Percent (%)") +
+  theme_personal +
+  theme(legend.title = element_blank()) +
+  theme(legend.text = element_text(size = 8)) +
+  theme(legend.key.size = unit(.25, "cm"))
+
+
+```
+
+
 **Client-level**
 ```{r check barriers by wave supported client level, eval=FALSE}
 treat_dat %>%
@@ -2591,6 +4193,26 @@ treat_dat %>%
 ###*Plot helpfulness*
 ```{r plot helpfulness}
 
+treat_dat <- treat_dat %>%
+  mutate(total_helpfulness_non_na = rowSums(!is.na(treat_dat[names(treat_dat) %in% helpfulnesscols])))
+
+helpfulnessTotal <- sum(treat_dat$total_helpfulness_non_na)
+helpfulnessTotal
+
+helpful_treat_dat_long <- pivot_longer(data = treat_dat, cols = c(treatmenthelpful_emergency_mh, treatmenthelpful_existing_mh_team, treatmenthelpful_online_talk_therapy, treatmenthelpful_gp, treatmenthelpful_nhs_111, treatmenthelpful_nonnhs_phone, treatmenthelpful_gov_website, treatmenthelpful_nongov_website, treatmenthelpful_online_self_therapy, treatmenthelpful_struc_therapy, treatmenthelpful_other), names_to = "Tx_type", values_to = "helpfulness")
+
+helpful_summary <- helpful_treat_dat_long %>%
+  filter( !is.na(helpfulness)) %>%
+  group_by(helpfulness) %>%
+  summarise(n = n())
+
+helpful_summary$percent <- helpful_summary$n/helpfulnessTotal*100
+
+prop.table(table(helpful_summary))
+
+
+test <- treat_dat[,c(1,3,6:27,39:49,73,92,95)]
+
 helpfulness_freq_supported <- treat_dat %>%
   freq(Helpfulness_Supported)
 
@@ -2693,6 +4315,74 @@ wide_tx_sought_mf
 sum(wide_tx_sought_mf$`0`) + sum(wide_tx_sought_mf$`1`)
 ```
 
+### ***Type of treatment sought by gender***
+
+```{r type seek by gender}
+
+type_seek_gender <- treat_dat %>%
+  filter(soughthelp_for_self == 1) %>% #filter for those who sought help only
+  filter(Gender == "Male" | Gender == "Female")
+  
+type_seek_gender <- pivot_longer(data = type_seek_gender, cols = c(wherehelp_sought_emergency_mh, wherehelp_sought_existing_mh_team, wherehelp_sought_online_talk_therapy, wherehelp_sought_gp, wherehelp_sought_nhs_111, wherehelp_sought_nonnhs_phone, wherehelp_sought_gov_website, wherehelp_sought_nongov_website, wherehelp_sought_selfguide_online, wherehelp_sought_struc_therapy, wherehelp_sought_other), names_to = "Treatment source", values_to = "sought" )
+# 
+# type_seek_wave$`Treatment source` <- as.factor(type_seek_wave$`Treatment source`)
+# type_seek_wave$wave <- as.factor(type_seek_wave$wave)
+
+type_seek_gender <- type_seek_gender %>%
+  mutate(typeVirtual = case_when(
+    `Treatment source` ==  "wherehelp_sought_emergency_mh" ~ "other",
+    `Treatment source` ==  "wherehelp_sought_existing_mh_team" ~ "other",
+    `Treatment source` ==  "wherehelp_sought_online_talk_therapy" ~ "exclusively virtual",
+    `Treatment source` ==  "wherehelp_sought_gp" ~ "other",
+    `Treatment source` ==  "wherehelp_sought_nhs_111" ~ "exclusively virtual",
+    `Treatment source` ==  "wherehelp_sought_nonnhs_phone" ~ "exclusively virtual",
+    `Treatment source` ==  "wherehelp_sought_gov_website" ~ "exclusively virtual",
+    `Treatment source` ==  "wherehelp_sought_nongov_website" ~ "exclusively virtual",
+    `Treatment source` ==  "wherehelp_sought_selfguide_online" ~ "exclusively virtual",
+    `Treatment source` ==  "wherehelp_sought_struc_therapy" ~ "other",
+    `Treatment source` ==  "wherehelp_sought_other" ~ "other"))
+
+
+percent_type_seek_gender <- type_seek_gender %>%
+  filter(sought != "NA") %>%
+  dplyr::group_by(Gender, `Treatment source`) %>%
+  summarise(n = sum(sought==1)) %>%
+  mutate(percent = n/sum(n)*100)
+
+percent_type_seek_gender_cat <- type_seek_gender %>%
+  filter(sought != "NA") %>%
+  dplyr::group_by(Gender, typeVirtual) %>%
+  summarise(n = sum(sought==1)) %>%
+  mutate(percent = n/sum(n)*100)
+
+percent_type_seek_gender %>% 
+  ggplot(mapping = aes(Gender, percent, fill = `Treatment source`)) +
+  geom_bar(aes(),
+           stat = "identity",
+           position = "stack") +
+  coord_flip() +
+ theme(legend.position = "right", legend.title = element_blank())  +
+  labs(x = "Gender",  y = "Percent (%)") +
+  theme_personal +
+  theme(legend.title = element_blank()) +
+  theme(legend.text = element_text(size = 8)) +
+  theme(legend.key.size = unit(.25, "cm"))
+
+percent_type_seek_gender_cat %>% 
+  ggplot(mapping = aes(Gender, percent, fill = typeVirtual)) +
+  geom_bar(aes(),
+           stat = "identity",
+           position = "stack") +
+  coord_flip() +
+ theme(legend.position = "right", legend.title = element_blank())  +
+  labs(x = "Gender",  y = "Percent (%)") +
+  theme_personal +
+  theme(legend.title = element_blank()) +
+  theme(legend.text = element_text(size = 8)) +
+  theme(legend.key.size = unit(.25, "cm"))
+
+```
+
 ### Treatment seeking rates by Age
 ```{r treatment seeking freq by age}
 
@@ -2717,6 +4407,73 @@ wide_tx_sought_age
 
 #N for chisq test
 sum(wide_tx_sought_age$`0`) + sum(wide_tx_sought_age$`1`)
+```
+
+### ***Type of treatment sought by age***
+
+```{r type seek by age}
+
+type_seek_age <- treat_dat %>%
+  filter(soughthelp_for_self == 1) 
+  
+type_seek_age <- pivot_longer(data = type_seek_age, cols = c(wherehelp_sought_emergency_mh, wherehelp_sought_existing_mh_team, wherehelp_sought_online_talk_therapy, wherehelp_sought_gp, wherehelp_sought_nhs_111, wherehelp_sought_nonnhs_phone, wherehelp_sought_gov_website, wherehelp_sought_nongov_website, wherehelp_sought_selfguide_online, wherehelp_sought_struc_therapy, wherehelp_sought_other), names_to = "Treatment source", values_to = "sought" )
+# 
+# type_seek_wave$`Treatment source` <- as.factor(type_seek_wave$`Treatment source`)
+# type_seek_wave$wave <- as.factor(type_seek_wave$wave)
+
+type_seek_age <- type_seek_age %>%
+  mutate(typeVirtual = case_when(
+    `Treatment source` ==  "wherehelp_sought_emergency_mh" ~ "other",
+    `Treatment source` ==  "wherehelp_sought_existing_mh_team" ~ "other",
+    `Treatment source` ==  "wherehelp_sought_online_talk_therapy" ~ "exclusively virtual",
+    `Treatment source` ==  "wherehelp_sought_gp" ~ "other",
+    `Treatment source` ==  "wherehelp_sought_nhs_111" ~ "exclusively virtual",
+    `Treatment source` ==  "wherehelp_sought_nonnhs_phone" ~ "exclusively virtual",
+    `Treatment source` ==  "wherehelp_sought_gov_website" ~ "exclusively virtual",
+    `Treatment source` ==  "wherehelp_sought_nongov_website" ~ "exclusively virtual",
+    `Treatment source` ==  "wherehelp_sought_selfguide_online" ~ "exclusively virtual",
+    `Treatment source` ==  "wherehelp_sought_struc_therapy" ~ "other",
+    `Treatment source` ==  "wherehelp_sought_other" ~ "other"))
+
+
+percent_type_seek_age <- type_seek_age %>%
+  filter(sought != "NA") %>%
+  dplyr::group_by(AgeRecoded, `Treatment source`) %>%
+  summarise(n = sum(sought==1)) %>%
+  mutate(percent = n/sum(n)*100)
+
+percent_type_seek_age_cat <- type_seek_age %>%
+  filter(sought != "NA") %>%
+  dplyr::group_by(AgeRecoded, typeVirtual) %>%
+  summarise(n = sum(sought==1)) %>%
+  mutate(percent = n/sum(n)*100)
+
+percent_type_seek_age %>% 
+  ggplot(mapping = aes(AgeRecoded, percent, fill = `Treatment source`)) +
+  geom_bar(aes(),
+           stat = "identity",
+           position = "stack") +
+  coord_flip() +
+ theme(legend.position = "right", legend.title = element_blank())  +
+  labs(x = "Gender",  y = "Percent (%)") +
+  theme_personal +
+  theme(legend.title = element_blank()) +
+  theme(legend.text = element_text(size = 8)) +
+  theme(legend.key.size = unit(.25, "cm"))
+
+percent_type_seek_age_cat %>% 
+  ggplot(mapping = aes(AgeRecoded, percent, fill = typeVirtual)) +
+  geom_bar(aes(),
+           stat = "identity",
+           position = "stack") +
+  coord_flip() +
+ theme(legend.position = "right", legend.title = element_blank())  +
+  labs(x = "Gender",  y = "Percent (%)") +
+  theme_personal +
+  theme(legend.title = element_blank()) +
+  theme(legend.text = element_text(size = 8)) +
+  theme(legend.key.size = unit(.25, "cm"))
+
 ```
 
 ###*Summary reasons not received - BY GENDER*

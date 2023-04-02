@@ -40,10 +40,10 @@ if(!require(ggpubr)){
   library(ggpubr)
 }
 
-if(!require(summarytools)){
-  install.packages("summarytools")
-  library(summarytools)
-}
+#if(!require(summarytools)){
+#  install.packages("summarytools")
+#}
+#  library(summarytools)
 
 if(!require(skimr)){
   install.packages("skimr")
@@ -87,10 +87,10 @@ if(!require(viridis)){
   library(viridis)
 }
 
-if(!require(ggformula)){
-  install.packages("ggformula")
-  library(ggformula)
-}
+# if(!require(ggformula)){
+#   install.packages("ggformula")
+#   library(ggformula)
+# }
 
 
 if(!require(ggpubr)){
@@ -98,10 +98,10 @@ if(!require(ggpubr)){
   library(ggpubr)
 }
 
-if(!require(ggrepel)){
-  install.packages("ggrepel")
-  library(ggrepel)
-}
+# if(!require(ggrepel)){
+#   install.packages("ggrepel")
+#   library(ggrepel)
+# }
 
 
 
@@ -110,9 +110,17 @@ if(!require(stringi)){
   library(stringi)
 }
 
-if(!require(Cairo)){
-  install.packages("Cairo")
-  library(Cairo)
+if(!require(eeptools)){
+  install.packages("eeptools")
+  library(eeptools)
 }
 
+# if(!require(Cairo)){
+#   install.packages("Cairo")
+#   library(Cairo)
+# }
 
+#if(!require(ggrepel)){
+#  install.packages("ggrepel")
+#  library(ggrepel)
+#}
