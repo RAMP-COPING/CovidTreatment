@@ -4,8 +4,8 @@
 
 ## read in downloaded publically available UK outcode data and city names
 
-postcode_df <- read_csv("/Users/kirstin/Dropbox/SGDP/RAMP/data/Postcode/postcode_outcodes.csv")
-city_labels <- fread("/Users/kirstin/Dropbox/SGDP/RAMP/data/Postcode/postcodes.csv",
+postcode_df <- read_csv(paste0(postpath,"/postcode_outcodes.csv"))
+city_labels <- fread(paste0(postpath,"/postcodes.csv"),
                      select  = c("Postcode area", "District", "County","Postcode district"))
 
 ## Rename city label columns

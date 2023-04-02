@@ -1,0 +1,37 @@
+TITLE:
+Class Prediction;
+DATA:
+FILE = "yx1_x2_e2dad6e8dd363b87cfeb360896276649.dat";
+ 
+VARIABLE:
+NAMES = x1 x2 x3 y; 
+ MISSING=.;
+ 
+    USEVARIABLES = y
+      x1
+x2
+      ;
+    NOMINAL = y;
+    
+    
+ANALYSIS:
+
+      ESTIMATOR = MLR;
+      ALGORITHM = INTEGRATION;
+      INTEGRATION = MONTECARLO (1000);
+      PROCESSORS = 2;
+    
+MODEL:
+
+    y ON
+      x1
+x2
+      ;
+
+    [x1
+x2]; ! deal with missing
+    
+OUTPUT:
+
+      STANDARDIZED;
+      CINTERVAL;
